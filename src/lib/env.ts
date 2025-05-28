@@ -5,7 +5,7 @@ const EnvSchema = z.object({
   LOG_LEVEL: z
     .enum(["fatal", "error", "warn", "info", "debug", "trace"])
     .default("info"),
-  DATABASE_URL: z.string(),
+  DATABASE_URL: z.string().optional(),
   BETTER_AUTH_SECRET: z.string().optional(),
   BETTER_AUTH_URL: z.string().optional(),
   NEXT_PUBLIC_API_URL: z.string().optional()

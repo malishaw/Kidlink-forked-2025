@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 import { SignoutButton } from "@/modules/authentication/components/signout-button";
