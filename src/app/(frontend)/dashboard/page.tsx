@@ -1,6 +1,6 @@
 import React from "react";
 
-import { SignoutButton } from "@/features/auth/components/signout-button";
+import { SignoutButton } from "@/modules/authentication/components/signout-button";
 
 export default function DashboardPage() {
   return (

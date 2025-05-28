@@ -7,10 +7,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { redirect } from "next/navigation";
 
-import {
-  signupSchema,
-  type SignupSchemaT
-} from "@/features/auth/schemas/signup-schema";
+import { signupSchema, type SignupSchemaT } from "../schemas/signup-schema";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -27,7 +24,7 @@ import { GoogleAuthButton } from "./google-auth-button";
 import { GithubAuthButton } from "./github-auth-button";
 import { Separator } from "@/components/ui/separator";
 import { PasswordInput } from "@/components/ui/password-input";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/modules/authentication/client";
 
 type Props = {
   className?: string;

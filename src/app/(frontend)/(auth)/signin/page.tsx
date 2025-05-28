@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Logo } from "@/components/logo";
-import { SigninForm } from "@/features/auth/components/signin-form";
+import { SigninForm } from "@/modules/authentication/components/signin-form";
 
 export default function LoginPage() {
   return (

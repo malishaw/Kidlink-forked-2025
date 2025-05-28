@@ -17,11 +17,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-import { authClient } from "@/lib/auth-client";
-import {
-  signinSchema,
-  type SigninSchemaT
-} from "@/features/auth/schemas/signin-schema";
+import { authClient } from "@/modules/authentication/client";
+import { signinSchema, type SigninSchemaT } from "../schemas/signin-schema";
 import { cn } from "@/lib/utils";
 
 import { GoogleAuthButton } from "./google-auth-button";

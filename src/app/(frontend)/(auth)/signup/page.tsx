@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Logo } from "@/components/logo";
-import { SignupForm } from "@/features/auth/components/signup-form";
+import { SignupForm } from "@/modules/authentication/components/signup-form";
 
 export default function SignupPage() {
   return (

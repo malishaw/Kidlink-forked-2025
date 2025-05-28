@@ -4,7 +4,7 @@ import React from "react";
 import { ArrowLeftIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ResetPasswordForm } from "@/features/auth/components/reset-password-form";
+import { ResetPasswordForm } from "@/modules/authentication/components/reset-password-form";
 
 type SearchParams = Promise<{
   error?: string;

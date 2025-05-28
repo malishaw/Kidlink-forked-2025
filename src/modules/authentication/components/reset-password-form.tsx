@@ -19,11 +19,11 @@ import {
 import {
   resetPasswordSchema,
   type ResetPasswordSchemaT
-} from "@/features/auth/schemas/reset-password-schema";
+} from "../schemas/reset-password-schema";
 import { cn } from "@/lib/utils";
 
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/modules/authentication/client";
 import { PasswordInput } from "@/components/ui/password-input";
 
 type Props = {

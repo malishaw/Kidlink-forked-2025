@@ -2,12 +2,12 @@
 
 import React, { useId, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { LogOut } from "lucide-react";
 
 import { Button, type VariantType } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
-import { toast } from "sonner";
+import { authClient } from "@/modules/authentication/client";
 import { cn } from "@/lib/utils";
-import { LogOut } from "lucide-react";
 
 type Props = {
   className?: string;

@@ -6,7 +6,7 @@ import { FaGithub } from "react-icons/fa";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/modules/authentication/client";
 
 type Props = {
   mode: "login" | "signup";
