@@ -1,5 +1,5 @@
 {
-  "extends": "../typescript-config/base.json",
+  "extends": "@repo/typescript-config/hono",
   "compilerOptions": {
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "rootDir": "src",

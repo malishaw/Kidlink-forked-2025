@@ -2,12 +2,10 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "./base.json",
   "compilerOptions": {
-    "plugins": [{ "name": "next" }],
+    "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "allowJs": true,
-    "jsx": "preserve",
-    "noEmit": true,
-    "lib": ["es2022", "DOM", "DOM.Iterable"]
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx"
   }
 }
