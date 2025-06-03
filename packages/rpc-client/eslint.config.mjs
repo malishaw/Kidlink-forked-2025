@@ -1,3 +1,3 @@
-import { config } from "@repo/eslint-config/base";
+import { nodeConfig } from "@repo/eslint-config/hono";
 
-export default config;
+export default nodeConfig;
