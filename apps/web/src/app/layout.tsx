@@ -1,6 +1,6 @@
+import "@repo/ui/globals.css";
 import type { Metadata } from "next";
-import { fontSans, fontHeading } from "../lib/fonts";
-import "./globals.css";
+import { fontHeading, fontSans } from "../lib/fonts";
 
 export const metadata: Metadata = {
   title: "Create Next App",
