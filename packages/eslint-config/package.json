@@ -6,7 +6,8 @@
   "exports": {
     "./base": "./base.js",
     "./hono": "./hono.js",
-    "./next-js": "./next.js"
+    "./next-js": "./next.js",
+    "./react-internal": "./react-internal.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
@@ -19,6 +20,8 @@
     "eslint-plugin-turbo": "^2.5.0",
     "globals": "^16.2.0",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.33.0"
+    "typescript-eslint": "^8.33.0",
+    "@typescript-eslint/eslint-plugin": "^8.24.1",
+    "@typescript-eslint/parser": "^8.24.1"
   }
 }
