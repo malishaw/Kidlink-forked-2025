@@ -10,6 +10,6 @@
     "./base": "./base.json",
     "./hono": "./hono.json",
     "./nextjs": "./nextjs.json",
-    "./react-internal": "./react-internal.json"
+    "./react-library": "./react-library.json"
   }
 }
