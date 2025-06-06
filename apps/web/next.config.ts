@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@repo/ui"],
+  transpilePackages: [
+    "@repo/ui",
+    "@nextplate/api",
+    "@nextplate/rpc",
+    "@repo/eslint-config",
+    "@repo/typescript-config"
+  ],
   async rewrites() {
     return [
       {

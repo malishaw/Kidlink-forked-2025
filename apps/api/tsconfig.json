@@ -11,7 +11,7 @@
       "@/*": ["./src/*"]
     },
     "typeRoots": ["./node_modules/@types"],
-    "types": ["node", "bun"],
+    "types": ["bun"],
     "strict": true,
     "outDir": "./dist",
     "skipLibCheck": true

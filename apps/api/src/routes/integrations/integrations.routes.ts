@@ -4,24 +4,25 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
 import {
-  insertTaskSchema,
-  selectTaskSchema,
-  updateTaskSchema
-} from "@/db/schema";
+  selectIntegrationSchema,
+  createIntegrationSchema,
+  updateIntegrationSchema
+} from "./integrations.schema";
 import { notFoundSchema } from "@/lib/constants";
+import { errorMessageSchema } from "@/lib/helpers";
 
-const tags: string[] = ["Tasks"];
+const tags: string[] = ["Integrations"];
 
 // List route definition
 export const list = createRoute({
   tags,
-  summary: "List all tasks",
+  summary: "List all integrations",
   path: "/",
   method: "get",
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      z.array(selectTaskSchema),
-      "The list of tasks"
+      z.array(selectIntegrationSchema),
+      "The list of integrations"
     )
   }
 });
@@ -29,36 +30,53 @@ export const list = createRoute({
 // Create route definition
 export const create = createRoute({
   tags,
-  summary: "Create a new task",
+  summary: "Create a new integration",
   path: "/",
   method: "post",
   request: {
-    body: jsonContentRequired(insertTaskSchema, "The task to create")
+    body: jsonContentRequired(
+      createIntegrationSchema,
+      "The integration to create"
+    )
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(
-      selectTaskSchema,
-      "The created task"
+      selectIntegrationSchema,
+      "The created integration"
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthorized request, user not authenticated"
+    ),
+    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
+      errorMessageSchema,
+      "Internal server error"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(insertTaskSchema),
+      createErrorSchema(createIntegrationSchema),
       "The validation error(s)"
     )
   }
 });
 
-// Get single task route definition
+// Get single integration route definition
 export const getOne = createRoute({
   tags,
-  summary: "Get a single task",
+  summary: "Get a single integration",
   method: "get",
   path: "/{id}",
   request: {
     params: IdParamsSchema
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(selectTaskSchema, "Requested task"),
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Task not found"),
+    [HttpStatusCodes.OK]: jsonContent(
+      selectIntegrationSchema,
+      "Requested integration"
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      notFoundSchema,
+      "Integration not found"
+    ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
       "Invalid ID format"
@@ -69,27 +87,38 @@ export const getOne = createRoute({
 // Patch route definition
 export const patch = createRoute({
   tags,
-  summary: "Update a task",
+  summary: "Update an integration",
   path: "/{id}",
   method: "patch",
   request: {
     params: IdParamsSchema,
-    body: jsonContentRequired(updateTaskSchema, "The task updates")
+    body: jsonContentRequired(
+      updateIntegrationSchema,
+      "The integration updates"
+    )
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(selectTaskSchema, "The updated task"),
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Task not found"),
+    [HttpStatusCodes.OK]: jsonContent(
+      selectIntegrationSchema,
+      "The updated integration"
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      notFoundSchema,
+      "Integration not found"
+    ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(updateTaskSchema).or(createErrorSchema(IdParamsSchema)),
+      createErrorSchema(updateIntegrationSchema).or(
+        createErrorSchema(IdParamsSchema)
+      ),
       "The validation error(s)"
     )
   }
 });
 
-// Remove task route definition
+// Remove integration route definition
 export const remove = createRoute({
   tags,
-  summary: "Remove a task",
+  summary: "Remove an integration",
   path: "/{id}",
   method: "delete",
   request: {
@@ -97,9 +126,12 @@ export const remove = createRoute({
   },
   responses: {
     [HttpStatusCodes.NO_CONTENT]: {
-      description: "Task deleted"
+      description: "Integration deleted"
     },
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Task not found"),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      notFoundSchema,
+      "Integration not found"
+    ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
       "Invalid ID format"

@@ -5,5 +5,11 @@
   "license": "MIT",
   "publishConfig": {
     "access": "public"
+  },
+  "exports": {
+    "./base": "./base.json",
+    "./hono": "./hono.json",
+    "./nextjs": "./nextjs.json",
+    "./react-internal": "./react-internal.json"
   }
 }
