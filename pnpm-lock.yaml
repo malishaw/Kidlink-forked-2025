@@ -11,6 +11,9 @@ importers:
       better-auth:
         specifier: ^1.2.8
         version: 1.2.8
+      zod:
+        specifier: ^3.25.55
+        version: 3.25.55
     devDependencies:
       prettier:
         specifier: ^3.5.3
@@ -106,9 +109,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@hookform/resolvers':
-        specifier: ^5.0.1
-        version: 5.0.1(react-hook-form@7.57.0(react@19.1.0))
       '@nextplate/api':
         specifier: workspace:_
         version: link:../api
@@ -202,6 +202,9 @@ importers:
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@tanstack/react-form':
+        specifier: ^1.12.2
+        version: 1.12.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -236,7 +239,7 @@ importers:
         specifier: ^19.0.0
         version: 19.1.0(react@19.1.0)
       react-hook-form:
-        specifier: ^7.57.0
+        specifier: ^7.47.0
         version: 7.57.0(react@19.1.0)
       react-icons:
         specifier: ^5.5.0
@@ -254,8 +257,8 @@ importers:
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@19.1.1(@types/react@19.1.0))(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       zod:
-        specifier: ^3.25.51
-        version: 3.25.51
+        specifier: ^3.22.4
+        version: 3.25.55
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3
@@ -359,6 +362,9 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.1.2
         version: 1.2.3(@types/react@19.1.0)(react@19.1.0)
+      '@tanstack/react-form':
+        specifier: ^1.12.2
+        version: 1.12.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -941,11 +947,6 @@ packages:
     peerDependencies:
       hono: '>=3.9.0'
       zod: ^3.25.0
-
-  '@hookform/resolvers@5.0.1':
-    resolution: {integrity: sha512-u/+Jp83luQNx9AdyW2fIPGY6Y7NG68eN2ZW8FOJYL+M0i4s49+refdJdOp/A9n9HFQtQs3HIDHQvX3ZET2o7YA==}
-    peerDependencies:
-      react-hook-form: ^7.55.0
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -1954,9 +1955,6 @@ packages:
     resolution: {integrity: sha512-1hsLpRHfSuMB9ee2aAdh0Htza/X3f4djhYISrggqGe3xopNjOcePiSDkDDoPzDYaaMCrbqGP1H2TYU7bgL9PmA==}
     engines: {node: '>=20.0.0'}
 
-  '@standard-schema/utils@0.3.0':
-    resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
-
   '@stylistic/eslint-plugin@4.4.0':
     resolution: {integrity: sha512-bIh/d9X+OQLCAMdhHtps+frvyjvAM4B1YlSJzcEEhl7wXLIqPar3ngn9DrHhkBOrTA/z9J0bUMtctAspe0dxdQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -2056,6 +2054,30 @@ packages:
 
   '@tailwindcss/postcss@4.1.8':
     resolution: {integrity: sha512-vB/vlf7rIky+w94aWMw34bWW1ka6g6C3xIOdICKX2GC0VcLtL6fhlLiafF0DVIwa9V6EHz8kbWMkS2s2QvvNlw==}
+
+  '@tanstack/form-core@1.12.2':
+    resolution: {integrity: sha512-5nigvx9FAtWWKpDRnhdGrsMC4LjKGdk4+SnJ8xP/phOvW0ffan5atX1u+RvBifWBOIOD6W2tmGDgelUHyJLCpA==}
+
+  '@tanstack/react-form@1.12.2':
+    resolution: {integrity: sha512-pXp+R6EbK0ObK/MpSkczO6A0/W9yw7dl+y8BVLC4hSYrWz/jMXmbsB7fD278AfR5Uvo2iq0D4Wpj+X8qC+TFIg==}
+    peerDependencies:
+      '@tanstack/react-start': ^1.112.0
+      react: ^17.0.0 || ^18.0.0 || ^19.0.0
+      vinxi: ^0.5.0
+    peerDependenciesMeta:
+      '@tanstack/react-start':
+        optional: true
+      vinxi:
+        optional: true
+
+  '@tanstack/react-store@0.7.1':
+    resolution: {integrity: sha512-qUTEKdId6QPWGiWyKAPf/gkN29scEsz6EUSJ0C3HgLMgaqTAyBsQ2sMCfGVcqb+kkhEXAdjleCgH6LAPD6f2sA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
+  '@tanstack/store@0.7.1':
+    resolution: {integrity: sha512-PjUQKXEXhLYj2X5/6c1Xn/0/qKY0IVFxTJweopRfF26xfjVyb14yALydJrHupDh3/d+1WKmfEgZPBVCmDkzzwg==}
 
   '@tootallnate/quickjs-emscripten@0.23.0':
     resolution: {integrity: sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==}
@@ -2823,6 +2845,9 @@ packages:
   decimal.js-light@2.5.1:
     resolution: {integrity: sha512-qIMFpTMZmny+MMIitAB6D7iVPEorVw6YQRWkvarTkT4tBeSLLiHzcwj6q0MmYSFCiVpiqPJTJEYIrpcPzVEIvg==}
 
+  decode-formdata@0.9.0:
+    resolution: {integrity: sha512-q5uwOjR3Um5YD+ZWPOF/1sGHVW9A5rCrRwITQChRXlmPkxDFBqCm4jNTIVdGHNH9OnR+V9MoZVgRhsFb+ARbUw==}
+
   decode-named-character-reference@1.1.0:
     resolution: {integrity: sha512-Wy+JTSbFThEOXQIR2L6mxJvEs+veIzpmqD7ynWxMXGpnk3smkHQOp6forLdHsKpAMW9iJpaBBIxz285t1n1C3w==}
 
@@ -2869,6 +2894,9 @@ packages:
 
   detect-node-es@1.1.0:
     resolution: {integrity: sha512-ypdmJU/TbBby2Dxibuv7ZLW3Bs1QEmM7nHjEANfohJLvE0XVujisn1qPJcZxg+qDucsr+bP6fLD1rPS3AhJ7EQ==}
+
+  devalue@5.1.1:
+    resolution: {integrity: sha512-maua5KUiapvEwiEAe+XnlZ3Rh0GD+qI1J/nb9vrJc3muPXvcF/8gXYTWF76+5DAqHyDUtOIImEuo0YKE9mshVw==}
 
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
@@ -5625,8 +5653,8 @@ packages:
   zod@3.25.48:
     resolution: {integrity: sha512-0X1mz8FtgEIvaxGjdIImYpZEaZMrund9pGXm3M6vM7Reba0e2eI71KPjSCGXBfwKDPwPoywf6waUKc3/tFvX2Q==}
 
-  zod@3.25.51:
-    resolution: {integrity: sha512-TQSnBldh+XSGL+opiSIq0575wvDPqu09AqWe1F7JhUMKY+M91/aGlK4MhpVNO7MgYfHcVCB1ffwAUTJzllKJqg==}
+  zod@3.25.55:
+    resolution: {integrity: sha512-219huNnkSLQnLsQ3uaRjXsxMrVm5C9W3OOpEVt2k5tvMKuA8nBSu38e0B//a+he9Iq2dvmk2VyYVlHqiHa4YBA==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -6041,11 +6069,6 @@ snapshots:
     dependencies:
       hono: 4.7.11
       zod: 3.25.48
-
-  '@hookform/resolvers@5.0.1(react-hook-form@7.57.0(react@19.1.0))':
-    dependencies:
-      '@standard-schema/utils': 0.3.0
-      react-hook-form: 7.57.0(react@19.1.0)
 
   '@humanfs/core@0.19.1': {}
 
@@ -6990,7 +7013,7 @@ snapshots:
 
   '@scalar/openapi-types@0.2.0':
     dependencies:
-      zod: 3.25.51
+      zod: 3.25.55
 
   '@scalar/types@0.1.5':
     dependencies:
@@ -6998,7 +7021,7 @@ snapshots:
       '@unhead/schema': 1.11.20
       nanoid: 5.1.5
       type-fest: 4.41.0
-      zod: 3.25.51
+      zod: 3.25.55
 
   '@simplewebauthn/browser@13.1.0': {}
 
@@ -7011,8 +7034,6 @@ snapshots:
       '@peculiar/asn1-rsa': 2.3.15
       '@peculiar/asn1-schema': 2.3.15
       '@peculiar/asn1-x509': 2.3.15
-
-  '@standard-schema/utils@0.3.0': {}
 
   '@stylistic/eslint-plugin@4.4.0(eslint@9.28.0(jiti@2.4.2))(typescript@5.8.2)':
     dependencies:
@@ -7103,6 +7124,29 @@ snapshots:
       '@tailwindcss/oxide': 4.1.8
       postcss: 8.5.4
       tailwindcss: 4.1.8
+
+  '@tanstack/form-core@1.12.2':
+    dependencies:
+      '@tanstack/store': 0.7.1
+
+  '@tanstack/react-form@1.12.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@tanstack/form-core': 1.12.2
+      '@tanstack/react-store': 0.7.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      decode-formdata: 0.9.0
+      devalue: 5.1.1
+      react: 19.1.0
+    transitivePeerDependencies:
+      - react-dom
+
+  '@tanstack/react-store@0.7.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@tanstack/store': 0.7.1
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+      use-sync-external-store: 1.5.0(react@19.1.0)
+
+  '@tanstack/store@0.7.1': {}
 
   '@tootallnate/quickjs-emscripten@0.23.0': {}
 
@@ -7644,7 +7688,7 @@ snapshots:
       jose: 5.10.0
       kysely: 0.28.2
       nanostores: 0.11.4
-      zod: 3.25.51
+      zod: 3.25.55
 
   better-call@1.0.9:
     dependencies:
@@ -7952,6 +7996,8 @@ snapshots:
 
   decimal.js-light@2.5.1: {}
 
+  decode-formdata@0.9.0: {}
+
   decode-named-character-reference@1.1.0:
     dependencies:
       character-entities: 2.0.2
@@ -8002,6 +8048,8 @@ snapshots:
   detect-libc@2.0.4: {}
 
   detect-node-es@1.1.0: {}
+
+  devalue@5.1.1: {}
 
   devlop@1.1.0:
     dependencies:
@@ -11294,6 +11342,6 @@ snapshots:
 
   zod@3.25.48: {}
 
-  zod@3.25.51: {}
+  zod@3.25.55: {}
 
   zwitch@2.0.4: {}
