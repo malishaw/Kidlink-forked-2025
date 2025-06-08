@@ -12,24 +12,12 @@ import {
   CardTitle
 } from "@repo/ui/components/card";
 import { Input } from "@repo/ui/components/input";
-import { useAppForm } from "@repo/ui/components/tanstack-form";
 import { cn } from "@repo/ui/lib/utils";
-import { signupSchema } from "../schemas";
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const form = useAppForm({
-    validators: { onChange: signupSchema },
-    defaultValues: {
-      email: "",
-      password: "",
-      confirmPassword: ""
-    },
-    onSubmit: ({ value }) => console.log(value)
-  });
-
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();

@@ -19,6 +19,9 @@
   "tsc-alias": {
     "resolveFullPaths": true
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+    "../../packages/database/src/schemas/integrations.schema.ts"
+  ],
   "exclude": ["node_modules", "dist", "build"]
 }
