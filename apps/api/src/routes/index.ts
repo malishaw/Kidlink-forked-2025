@@ -4,13 +4,9 @@ import { AppOpenAPI } from "@/types";
 import { BASE_PATH } from "../lib/constants";
 import index from "./index.route";
 import tasks from "./tasks/tasks.index";
-import integrations from "./integrations/integrations.index";
 
 export function registerRoutes(app: AppOpenAPI) {
-  return app
-    .route("/", index)
-    .route("/tasks", tasks)
-    .route("/integrations", integrations);
+  return app.route("/", index).route("/tasks", tasks);
 }
 
 // stand alone router type used for api client
