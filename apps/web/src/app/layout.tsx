@@ -1,5 +1,6 @@
 import "@repo/ui/globals.css";
 import type { Metadata } from "next";
+import { Toaster } from "sonner";
 import { fontHeading, fontSans } from "../lib/fonts";
 
 export const metadata: Metadata = {
@@ -18,6 +19,7 @@ export default function RootLayout({
         className={`${fontSans.variable} ${fontHeading.variable} font-sans antialiased`}
       >
         {children}
+        <Toaster position="bottom-left" />
       </body>
     </html>
   );

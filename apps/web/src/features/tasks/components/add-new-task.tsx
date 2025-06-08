@@ -1,8 +1,8 @@
 "use client";
-import { useCallback } from "react";
+import { PlusCircleIcon } from "lucide-react";
+import { useCallback, useId, useState } from "react";
 
 import { Button } from "@repo/ui/components/button";
-import { Checkbox } from "@repo/ui/components/checkbox";
 import {
   Dialog,
   DialogClose,
@@ -16,16 +16,35 @@ import {
 import { Input } from "@repo/ui/components/input";
 import { useAppForm } from "@repo/ui/components/tanstack-form";
 
-import { insertTaskSchema } from "@nextplate/api/schema";
+import { toast } from "sonner";
+import { addTask } from "../actions/add-task.action";
+import { addTaskSchema } from "../schemas";
 
 export function AddNewTask() {
+  const [open, setOpen] = useState<boolean>(false);
+  const toastId = useId();
+
   const form = useAppForm({
-    validators: { onChange: insertTaskSchema },
+    validators: { onChange: addTaskSchema },
     defaultValues: {
-      name: "",
-      done: false
+      name: ""
     },
-    onSubmit: async ({ value }) => console.log(value)
+    onSubmit: async ({ value }) => {
+      try {
+        toast.loading("Creating new task...", { id: toastId });
+
+        await addTask(value);
+
+        toast.success("Task created successfully!", { id: toastId });
+      } catch (error) {
+        console.error("Failed to add task:", error);
+        toast.error("Failed to create task. Please try again.", {
+          id: toastId
+        });
+      } finally {
+        setOpen(false);
+      }
+    }
   });
 
   const handleSubmit = useCallback(
@@ -38,14 +57,14 @@ export function AddNewTask() {
   );
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Add new Task</Button>
+        <Button icon={<PlusCircleIcon />}>Add new Task</Button>
       </DialogTrigger>
 
-      <form.AppForm>
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px]">
+        <form.AppForm>
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <DialogHeader>
               <DialogTitle>Create new Task</DialogTitle>
               <DialogDescription>
@@ -61,7 +80,7 @@ export function AddNewTask() {
                     <field.FormLabel>Task Name</field.FormLabel>
                     <field.FormControl>
                       <Input
-                        placeholder="FatahChan"
+                        placeholder="Go to the store"
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                         onBlur={field.handleBlur}
@@ -71,37 +90,19 @@ export function AddNewTask() {
                   </field.FormItem>
                 )}
               />
-
-              <form.AppField
-                name="done"
-                children={(field) => (
-                  <field.FormItem>
-                    <field.FormLabel>Status</field.FormLabel>
-                    <field.FormControl>
-                      <Checkbox
-                        checked={field.state.value}
-                        onCheckedChange={(checked: boolean) => {
-                          field.handleChange(checked);
-                        }}
-                      />
-                    </field.FormControl>
-                    <field.FormDescription>
-                      Mark this task as completed or not.
-                    </field.FormDescription>
-                    <field.FormMessage />
-                  </field.FormItem>
-                )}
-              />
             </div>
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button type="submit">Create</Button>
+
+              <Button type="submit" loading={form.state.isSubmitting}>
+                Create
+              </Button>
             </DialogFooter>
-          </DialogContent>
-        </form>
-      </form.AppForm>
+          </form>
+        </form.AppForm>
+      </DialogContent>
     </Dialog>
   );
 }

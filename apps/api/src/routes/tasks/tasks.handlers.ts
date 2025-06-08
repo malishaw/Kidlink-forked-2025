@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
@@ -19,9 +19,9 @@ import type {
 // List tasks route handler
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const tasks = await db.query.tasks.findMany({
-    // orderBy(fields) {
-    //   return desc(fields.createdAt);
-    // }
+    orderBy(fields) {
+      return desc(fields.createdAt);
+    }
   });
 
   return c.json(tasks);
@@ -80,7 +80,10 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
 
   const [task] = await db
     .update(tasks)
-    .set(updates)
+    .set({
+      ...updates,
+      updatedAt: new Date()
+    })
     .where(eq(tasks.id, id))
     .returning();
 

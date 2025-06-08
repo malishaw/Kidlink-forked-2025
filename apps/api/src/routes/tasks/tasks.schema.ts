@@ -16,7 +16,12 @@ export const insertTaskSchema = createInsertSchema(tasks, {
     updatedAt: true
   });
 
-export const updateTaskSchema = insertTaskSchema.partial();
+export const updateTaskSchema = createInsertSchema(tasks)
+  .omit({
+    createdAt: true,
+    updatedAt: true
+  })
+  .partial();
 
 // Type Definitions
 export type Task = z.infer<typeof selectTaskSchema>;
