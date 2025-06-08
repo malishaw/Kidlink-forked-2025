@@ -9,7 +9,7 @@ export default async function Home() {
   const tasks = await res.json();
 
   return (
-    <div className="container mx-auto py-8 max-w-4xl">
+    <div className="container mx-auto py-8 max-w-2xl">
       <div className="mb-8 flex justify-between items-center">
         <h1 className="text-3xl font-bold">Task Manager</h1>
 
