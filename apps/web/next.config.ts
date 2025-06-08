@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
     "@nextplate/api",
     "@nextplate/rpc",
     "@repo/eslint-config",
-    "@repo/typescript-config"
+    "@repo/typescript-config",
+    "@repo/database"
   ],
   async rewrites() {
     return [

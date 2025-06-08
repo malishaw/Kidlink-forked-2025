@@ -6,14 +6,14 @@ import { cn } from "@repo/ui/lib/utils";
 import {
   createFormHook,
   createFormHookContexts,
-  useStore,
+  useStore
 } from "@tanstack/react-form";
 
 const {
   fieldContext,
   formContext,
   useFieldContext: _useFieldContext,
-  useFormContext,
+  useFormContext
 } = createFormHookContexts();
 
 const { useAppForm, withForm } = createFormHook({
@@ -24,9 +24,9 @@ const { useAppForm, withForm } = createFormHook({
     FormControl,
     FormDescription,
     FormMessage,
-    FormItem,
+    FormItem
   },
-  formComponents: {},
+  formComponents: {}
 });
 
 type FormItemContextValue = {
@@ -34,7 +34,7 @@ type FormItemContextValue = {
 };
 
 const FormItemContext = React.createContext<FormItemContextValue>(
-  {} as FormItemContextValue,
+  {} as FormItemContextValue
 );
 
 function FormItem({ className, ...props }: React.ComponentProps<"div">) {
@@ -68,7 +68,7 @@ const useFieldContext = () => {
     formMessageId: `${id}-form-item-message`,
     errors,
     store,
-    ...fieldContext,
+    ...fieldContext
   };
 };
 
@@ -140,4 +140,4 @@ function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
   );
 }
 
-export { useAppForm, useFormContext, useFieldContext, withForm };
+export { useAppForm, useFieldContext, useFormContext, withForm };

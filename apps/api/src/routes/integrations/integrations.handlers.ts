@@ -5,8 +5,8 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/types";
 
-import { db } from "@/db";
-import { integration } from "@/db/schema";
+import { db } from "@repo/database/client";
+import { integration } from "@repo/database/schemas";
 
 import type { GetOneRoute, UpdateRoute } from "./integrations.routes";
 

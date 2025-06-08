@@ -4,9 +4,9 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/types";
 
-import { db } from "@/db";
-import { tasks } from "@/db/schema";
 import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
+import { db } from "@repo/database";
+import { tasks } from "@repo/database/schemas";
 
 import type {
   CreateRoute,
