@@ -7,7 +7,7 @@ import {
   organization
 } from "better-auth/plugins";
 
-import { db } from "@repo/database/client";
+import { db } from "@/db";
 import * as schema from "@repo/database/schemas";
 
 export const auth = betterAuth({
