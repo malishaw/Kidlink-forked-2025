@@ -1,6 +1,6 @@
-import { Bricolage_Grotesque, Inter } from "next/font/google";
+import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
 
-export const fontSans = Inter({
+export const fontSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-sans"
 });

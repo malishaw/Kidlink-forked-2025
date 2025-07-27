@@ -1,6 +1,7 @@
 import { betterFetch } from "@better-fetch/fetch";
 import type { Session } from "@nextplate/api/lib/auth.js";
 import { NextResponse, type NextRequest } from "next/server";
+import { getUserType } from "./lib/helpers/get-user-type";
 
 const authRoutes = [
   "/signin",
@@ -10,13 +11,16 @@ const authRoutes = [
   "/email-verified"
 ];
 
-const protectedRoutes = ["/dashboard"];
+const protectedRoutes = ["/admin", "/account"];
 
 export default async function authMiddleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isProtectedPath = protectedRoutes.some((route) =>
     pathname.startsWith(route)
   );
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-url", request.url);
 
   if (authRoutes.includes(pathname) || isProtectedPath) {
     // Fetch session
@@ -32,15 +36,49 @@ export default async function authMiddleware(request: NextRequest) {
     );
 
     // If Auth route and Already authenticated,
-    // Redirect back to dashboard
+    // Redirect back to appropiate path
     if (authRoutes.includes(pathname) && session) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      const userType = await getUserType();
+
+      if (userType === "systemAdmin") {
+        return NextResponse.redirect(new URL("/admin", request.url));
+      }
+
+      if (userType === "hotelOwner" || userType === "user") {
+        return NextResponse.redirect(new URL("/account", request.url));
+      }
     }
 
-    // If Dashboard route and Not authenticated,
+    // If protected route and Not authenticated,
     // Redirect back to signin
     if (isProtectedPath && !session) {
       return NextResponse.redirect(new URL("/signin", request.url));
+    }
+
+    // If authenticated, and trying to access '/admin'
+    if (session && pathname.startsWith("/admin")) {
+      const userType = await getUserType();
+
+      if (userType === "systemAdmin") {
+        return NextResponse.next();
+      }
+
+      if (userType === "hotelOwner" || userType === "user") {
+        return NextResponse.redirect(new URL("/account", request.url));
+      }
+    }
+
+    // If authenticated and trying to access '/account'
+    if (session && pathname.startsWith("/account")) {
+      const userType = await getUserType();
+
+      if (userType === "systemAdmin") {
+        return NextResponse.redirect(new URL("/admin", request.url));
+      }
+
+      if (userType === "hotelOwner" || userType === "user") {
+        return NextResponse.next();
+      }
     }
   }
 
