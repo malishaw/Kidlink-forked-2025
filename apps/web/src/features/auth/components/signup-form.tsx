@@ -17,8 +17,11 @@ import {
 import { Input } from "@repo/ui/components/input";
 import { useAppForm } from "@repo/ui/components/tanstack-form";
 import { cn } from "@repo/ui/lib/utils";
+import { useQueryState } from "nuqs";
 
 import { authClient } from "@/lib/auth-client";
+import { Checkbox } from "@repo/ui/components/checkbox";
+import { Label } from "@repo/ui/components/label";
 import { signupSchema, type SignupSchema } from "../schemas";
 
 export function SignupForm({
@@ -27,6 +30,7 @@ export function SignupForm({
 }: React.ComponentProps<"div">) {
   const toastId = useId();
   const router = useRouter();
+  const [mode, setMode] = useQueryState("mode");
 
   const form = useAppForm({
     validators: { onChange: signupSchema },
@@ -58,7 +62,11 @@ export function SignupForm({
         },
         onSuccess(ctx) {
           toast.success("User registered successfully !", { id: toastId });
-          router.push("/signin");
+          if (mode === "hotelOwner") {
+            router.push("/setup-organization");
+          } else {
+            router.push("/signin");
+          }
         },
         onError(ctx) {
           toast.error(`Failed: ${ctx.error.message}`, { id: toastId });
@@ -149,6 +157,23 @@ export function SignupForm({
                     </field.FormItem>
                   )}
                 />
+
+                <div className="my-2 flex items-center gap-2">
+                  <Checkbox
+                    id="hotelOwnerCheck"
+                    checked={mode === "hotelOwner"}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setMode("hotelOwner");
+                      } else {
+                        setMode("");
+                      }
+                    }}
+                  />
+                  <Label htmlFor="hotelOwnerCheck" className="text-xs">
+                    Continue as Hotel Owner
+                  </Label>
+                </div>
 
                 {/* -------- */}
 
