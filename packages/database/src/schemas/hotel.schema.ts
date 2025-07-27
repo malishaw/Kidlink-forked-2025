@@ -1,5 +1,7 @@
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
+  boolean,
+  date,
   decimal,
   index,
   integer,
@@ -7,10 +9,12 @@ import {
   pgEnum,
   pgTable,
   text,
+  timestamp,
   varchar
 } from "drizzle-orm/pg-core";
 import { timestamps } from "../utils/helpers";
 import { organization, user } from "./auth.schema";
+import { rooms, roomTypes } from "./room.schema";
 
 export const hotelStatusEnum = pgEnum("hotel_status", [
   "active",
@@ -132,42 +136,78 @@ export const hotelImages = pgTable(
     hotelId: text("hotel_id")
       .references(() => hotels.id, { onDelete: "cascade" })
       .notNull(),
-    roomTypeId: uuid("room_type_id").references(() => roomTypes.id, {
+    roomTypeId: text("room_type_id").references(() => roomTypes.id, {
       onDelete: "cascade"
     }),
-    imageUrl: varchar("image_url", { length: 500 }).notNull(),
-    imageType: imageTypeEnum("image_type").default("other").notNull(),
+
+    imageUrl: text("image_url").notNull(),
     altText: varchar("alt_text", { length: 255 }),
     displayOrder: integer("display_order").default(0),
-    isPrimary: boolean("is_primary").default(false),
-    createdAt: timestamp("created_at").defaultNow().notNull()
+    isThumbnail: boolean("is_thumbnail").default(false),
+
+    ...timestamps
   },
-  (table) => ({
-    hotelImageIndex: index("hotel_images_hotel_idx").on(table.hotelId),
-    roomTypeImageIndex: index("hotel_images_room_type_idx").on(
-      table.roomTypeId
-    ),
-    displayOrderIndex: index("hotel_images_display_order_idx").on(
-      table.displayOrder
-    )
-  })
+  (table) => [
+    index("hotel_images_hotel_idx").on(table.hotelId),
+    index("hotel_images_room_type_idx").on(table.roomTypeId),
+    index("hotel_images_display_order_idx").on(table.displayOrder)
+  ]
 );
 
 export const hotelPolicies = pgTable(
   "hotel_policies",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
-    hotelId: uuid("hotel_id")
+    id: text("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    hotelId: text("hotel_id")
       .references(() => hotels.id, { onDelete: "cascade" })
       .notNull(),
     policyType: varchar("policy_type", { length: 100 }).notNull(), // cancellation, pet, smoking, etc.
     policyText: text("policy_text").notNull(),
+
     effectiveDate: date("effective_date").defaultNow().notNull(),
     isActive: boolean("is_active").default(true).notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull()
+
+    ...timestamp
   },
-  (table) => ({
-    hotelPolicyIndex: index("hotel_policies_hotel_idx").on(table.hotelId),
-    policyTypeIndex: index("hotel_policies_type_idx").on(table.policyType)
-  })
+  (table) => [
+    index("hotel_policies_hotel_idx").on(table.hotelId),
+    index("hotel_policies_type_idx").on(table.policyType)
+  ]
 );
+
+// Relation Definitions
+
+export const hotelRelations = relations(hotels, ({ many }) => ({
+  amenities: many(hotelAmenities),
+  roomTypes: many(roomTypes),
+  rooms: many(rooms),
+  images: many(hotelImages),
+  policies: many(hotelPolicies)
+}));
+
+export const hotelAmenitiesRelations = relations(hotelAmenities, ({ one }) => ({
+  hotel: one(hotels, {
+    fields: [hotelAmenities.hotelId],
+    references: [hotels.id]
+  })
+}));
+
+export const hotelImagesRelations = relations(hotelImages, ({ one }) => ({
+  hotel: one(hotels, {
+    fields: [hotelImages.hotelId],
+    references: [hotels.id]
+  }),
+  roomType: one(roomTypes, {
+    fields: [hotelImages.roomTypeId],
+    references: [roomTypes.id]
+  })
+}));
+
+export const hotelPoliciesRelations = relations(hotelPolicies, ({ one }) => ({
+  hotel: one(hotels, {
+    fields: [hotelPolicies.hotelId],
+    references: [hotels.id]
+  })
+}));

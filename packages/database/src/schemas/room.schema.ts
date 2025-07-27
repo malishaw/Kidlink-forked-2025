@@ -10,9 +10,10 @@ import {
   varchar
 } from "drizzle-orm/pg-core";
 
+import { relations } from "drizzle-orm";
 import { boolean, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 import { timestamps } from "../utils/helpers";
-import { hotels } from "./hotel.schema";
+import { hotelImages, hotels } from "./hotel.schema";
 
 export const viewTypeEnum = pgEnum("view_type", [
   "ocean",
@@ -110,3 +111,28 @@ export const rooms = pgTable(
     index("rooms_status_idx").on(table.status)
   ]
 );
+
+export const roomTypesRelations = relations(roomTypes, ({ one, many }) => ({
+  hotel: one(hotels, { fields: [roomTypes.hotelId], references: [hotels.id] }),
+  amenities: many(roomTypeAmenities),
+  rooms: many(rooms),
+  images: many(hotelImages)
+}));
+
+export const roomTypeAmenitiesRelations = relations(
+  roomTypeAmenities,
+  ({ one }) => ({
+    roomType: one(roomTypes, {
+      fields: [roomTypeAmenities.roomTypeId],
+      references: [roomTypes.id]
+    })
+  })
+);
+
+export const roomsRelations = relations(rooms, ({ one, many }) => ({
+  hotel: one(hotels, { fields: [rooms.hotelId], references: [hotels.id] }),
+  roomType: one(roomTypes, {
+    fields: [rooms.roomTypeId],
+    references: [roomTypes.id]
+  })
+}));
