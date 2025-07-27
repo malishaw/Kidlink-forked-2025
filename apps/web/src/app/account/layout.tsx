@@ -1,23 +1,13 @@
-import { authClient } from "@/lib/auth-client";
-import { AccountLayout } from "@/modules/layouts/account-layout";
-import { headers } from "next/headers";
+import { getUserType } from "@/lib/helpers/get-user-type";
 
 export default async function AccountPageLayout({
-  dashboard,
-  auth
+  hotel,
+  user
 }: {
-  dashboard?: React.ReactNode;
-  auth?: React.ReactNode;
+  hotel?: React.ReactNode;
+  user?: React.ReactNode;
 }) {
-  const session = await authClient.getSession({
-    fetchOptions: {
-      headers: await headers()
-    }
-  });
+  const userType = await getUserType();
 
-  return (
-    <AccountLayout>
-      {session.data && !session.error ? dashboard : auth}
-    </AccountLayout>
-  );
+  return <div>{userType === "hotelOwner" ? hotel : user}</div>;
 }

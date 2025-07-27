@@ -67,19 +67,6 @@ export default async function authMiddleware(request: NextRequest) {
         return NextResponse.redirect(new URL("/account", request.url));
       }
     }
-
-    // If authenticated and trying to access '/account'
-    if (session && pathname.startsWith("/account")) {
-      const userType = await getUserType();
-
-      if (userType === "systemAdmin") {
-        return NextResponse.redirect(new URL("/admin", request.url));
-      }
-
-      if (userType === "hotelOwner" || userType === "user") {
-        return NextResponse.next();
-      }
-    }
   }
 
   return NextResponse.next();
