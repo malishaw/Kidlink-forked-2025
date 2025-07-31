@@ -5,11 +5,9 @@ import {
   decimal,
   index,
   integer,
-  jsonb,
   pgEnum,
   pgTable,
   text,
-  timestamp,
   varchar
 } from "drizzle-orm/pg-core";
 import { timestamps } from "../utils/helpers";
@@ -93,9 +91,6 @@ export const hotels = pgTable(
     checkInTime: varchar("check_in_time", { length: 5 }).default("15:00"), // HH:MM format
     checkOutTime: varchar("check_out_time", { length: 5 }).default("11:00"), // HH:MM format
 
-    // Policies (stored as JSON for flexibility)
-    hotelPolicies: jsonb("hotel_policies"), // cancellation, pet, smoking, etc.
-
     status: hotelStatusEnum("status").default("pending_approval").notNull(),
 
     ...timestamps
@@ -169,7 +164,7 @@ export const hotelPolicies = pgTable(
     effectiveDate: date("effective_date").defaultNow().notNull(),
     isActive: boolean("is_active").default(true).notNull(),
 
-    ...timestamp
+    ...timestamps
   },
   (table) => [
     index("hotel_policies_hotel_idx").on(table.hotelId),

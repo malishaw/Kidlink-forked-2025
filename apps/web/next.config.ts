@@ -16,6 +16,16 @@ const nextConfig: NextConfig = {
         destination: "http://localhost:8000/api/:path*"
       }
     ];
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "donext.s3.ap-south-1.amazonaws.com",
+        port: "",
+        pathname: "/**"
+      }
+    ]
   }
 };
 
