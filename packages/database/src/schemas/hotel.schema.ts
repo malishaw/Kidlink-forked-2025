@@ -174,12 +174,20 @@ export const hotelPolicies = pgTable(
 
 // Relation Definitions
 
-export const hotelRelations = relations(hotels, ({ many }) => ({
+export const hotelRelations = relations(hotels, ({ many, one }) => ({
   amenities: many(hotelAmenities),
   roomTypes: many(roomTypes),
   rooms: many(rooms),
   images: many(hotelImages),
-  policies: many(hotelPolicies)
+  policies: many(hotelPolicies),
+  hotelType: one(hotelTypes, {
+    fields: [hotels.hotelType],
+    references: [hotelTypes.id]
+  }),
+  propertyClass: one(propertyClasses, {
+    fields: [hotels.propertyClass],
+    references: [propertyClasses.id]
+  })
 }));
 
 export const hotelAmenitiesRelations = relations(hotelAmenities, ({ one }) => ({

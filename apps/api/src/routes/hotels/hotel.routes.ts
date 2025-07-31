@@ -5,13 +5,18 @@ import { z } from "zod";
 
 import {
   errorMessageSchema,
+  getPaginatedSchema,
   queryParamsSchema,
   stringIdParamSchema
 } from "@api/lib/helpers";
 import {
+  hotelInsertSchema,
+  hotelQueryParamsSchema,
+  hotelSelectSchema,
   hotelTypeInsertSchema,
   hotelTypeSchema,
-  hotelTypeUpdateSchema
+  hotelTypeUpdateSchema,
+  plainHotelSchema
 } from "./hotel.schema";
 
 const tags: string[] = ["Hotels"];
@@ -125,3 +130,63 @@ export type ListHotelTypesRoute = typeof listAllHotelTypesRoute;
 export type CreateHotelTypeRoute = typeof createNewHotelTypeRoute;
 export type UpdateHotelTypeRoute = typeof updateHotelTypeRoute;
 export type RemoveHotelTypeRoute = typeof removeHotelTypeRoute;
+
+/**
+ * ================================================================
+ * Hotels Routes
+ * ================================================================
+ */
+
+// List all hotels route definition
+export const listAllHotelsRoute = createRoute({
+  tags,
+  summary: "List all hotels",
+  method: "get",
+  path: "/",
+  request: {
+    query: hotelQueryParamsSchema
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      getPaginatedSchema(z.array(hotelSelectSchema)),
+      "The list of Hotels"
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthorized access"
+    )
+  }
+});
+
+// Create new hotel route definition
+export const createNewHotelRoute = createRoute({
+  tags,
+  summary: "Create new Hotel",
+  method: "post",
+  path: "/",
+  request: {
+    body: jsonContentRequired(hotelInsertSchema, "Create new hotel")
+  },
+  responses: {
+    [HttpStatusCodes.CREATED]: jsonContent(
+      plainHotelSchema,
+      "The hotel created"
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthorized access"
+    ),
+    [HttpStatusCodes.FORBIDDEN]: jsonContent(
+      errorMessageSchema,
+      "Forbidden access"
+    ),
+    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
+      errorMessageSchema,
+      "Failed to create"
+    )
+  }
+});
+
+// Export hotel routes type definitions
+export type ListAllHotelsRoute = typeof listAllHotelsRoute;
+export type CreateNewHotelRoute = typeof createNewHotelRoute;

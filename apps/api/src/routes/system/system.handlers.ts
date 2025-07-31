@@ -53,6 +53,6 @@ export const checkUserTypeHandler: AppRouteHandler<CheckUserTypeRoute> = async (
     return c.json({ userType: "user" as const }, HttpStatusCodes.OK);
   } catch (error) {
     console.log(error);
-    return c.json({ userType: "user" }, HttpStatusCodes.OK);
+    return c.json({ userType: "user" as const }, HttpStatusCodes.OK);
   }
 };

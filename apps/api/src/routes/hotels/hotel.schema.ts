@@ -105,9 +105,13 @@ export const hotelPolicyUpdateSchema = createInsertSchema(hotelPolicies)
  * - roomTypes (need to populate, 1:M)
  * - rooms (route based population, 1:M)
  */
+export const plainHotelSchema = createSelectSchema(hotels);
+
+export type PlainHotelType = z.infer<typeof plainHotelSchema>;
+
 export const basicHotelSchema = createSelectSchema(hotels, {
-  hotelType: hotelTypeSchema,
-  propertyClass: propertyClassSchema
+  hotelType: hotelTypeSchema.nullable(),
+  propertyClass: propertyClassSchema.nullable()
 });
 
 export type BasicHotelType = z.infer<typeof basicHotelSchema>;
@@ -148,3 +152,13 @@ export const hotelUpdateSchema = createInsertSchema(hotels)
     updatedAt: true
   })
   .partial();
+
+// Helper Schemas
+export const hotelQueryParamsSchema = z.object({
+  page: z.string().optional(),
+  limit: z.string().optional(),
+  sort: z.enum(["asc", "desc"]).optional().default("desc"),
+  search: z.string().optional(),
+  hotelType: z.string().optional(),
+  propertyClass: z.string().optional()
+});
