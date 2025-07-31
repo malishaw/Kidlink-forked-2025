@@ -55,6 +55,13 @@ export default async function authMiddleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/signin", request.url));
     }
 
+    // If authenticated, and trying to access '/account'
+    if (session && pathname.startsWith("/account")) {
+      if (session.user.role === "admin") {
+        return NextResponse.redirect(new URL("/admin", request.url));
+      }
+    }
+
     // If authenticated, and trying to access '/admin'
     if (session && pathname.startsWith("/admin")) {
       const userType = await getUserType();

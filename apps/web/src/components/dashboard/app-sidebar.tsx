@@ -1,10 +1,10 @@
 "use client";
 
 import {
+  IconBox,
   IconBuildings,
   IconDashboard,
   IconHelp,
-  IconInnerShadowTop,
   IconSearch,
   IconSettings
 } from "@tabler/icons-react";
@@ -25,7 +25,7 @@ import {
   SidebarMenuItem
 } from "@repo/ui/components/sidebar";
 import { Skeleton } from "@repo/ui/components/skeleton";
-import { NavUserManagement } from "./nav-user-management";
+import { PiBuilding } from "react-icons/pi";
 
 const data = {
   user: {
@@ -59,51 +59,14 @@ const data = {
   ],
   documents: [
     {
-      name: "Housing",
-      url: "/dashboard/housing",
+      name: "Manage Hotel",
+      url: "/account/manage",
       icon: IconBuildings
     },
     {
-      name: "Sell/Swap",
-      url: "/dashboard/sellswap",
-      icon: IconBuildings
-    },
-    {
-      name: "Jobs",
-      url: "/dashboard/jobs",
-      icon: IconBuildings
-    },
-
-    {
-      name: "University",
-      url: "/dashboard/university",
-      icon: IconBuildings
-    },
-    {
-      name: "Ads Payment Plan",
-      url: "/dashboard/adzPaymentPlan",
-      icon: IconBuildings
-    },
-    {
-      name: "Site Settings",
-      url: "/dashboard/siteSettings",
-      icon: IconBuildings
-    },
-    {
-      name: "Products",
-      url: "/dashboard/products",
-      icon: IconBuildings
-    },
-    {
-      name: "Ads",
-      url: "/dashboard/ads",
-      icon: IconBuildings
-    },
-    {
-      name: "b2bplans",
-      url: "/dashboard/b2bplans",
-
-      icon: IconBuildings
+      name: "Hotel Rooms",
+      url: "/account/manage/rooms",
+      icon: IconBox
     }
   ],
   userManagement: [
@@ -136,8 +99,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 className="data-[slot=sidebar-menu-button]:!p-1.5"
               >
                 <div>
-                  <IconInnerShadowTop className="!size-5" />
-                  <span className="text-base font-semibold">
+                  <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded">
+                    <PiBuilding className="size-4" />
+                  </div>
+                  <span className="text-base font-semibold font-heading">
                     {activeOrg.data.name}
                   </span>
                 </div>
@@ -151,7 +116,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavDocuments items={data.documents} />
-        <NavUserManagement items={data.userManagement} />
+        {/* <NavUserManagement items={data.userManagement} /> */}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

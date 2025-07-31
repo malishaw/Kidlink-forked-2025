@@ -19,7 +19,7 @@ export default function DashboardLayout({ children }: Props) {
       }
     >
       <AppSidebar variant="inset" />
-      <SidebarInset className="bg-primary-foreground">
+      <SidebarInset className="bg-background">
         <SiteHeader />
 
         <div className="flex flex-1 flex-col">{children}</div>
