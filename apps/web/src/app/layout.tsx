@@ -1,4 +1,4 @@
-import { Providers } from "@/components/providers";
+import { Providers } from "@/modules/layouts/providers";
 import "@repo/ui/globals.css";
 import type { Metadata } from "next";
 import { Toaster } from "sonner";

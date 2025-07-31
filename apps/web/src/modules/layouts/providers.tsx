@@ -9,7 +9,7 @@ const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider defaultTheme="dark" enableSystem={false}>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
       <main>
         <QueryClientProvider client={queryClient}>
           <NuqsAdapter>{children}</NuqsAdapter>

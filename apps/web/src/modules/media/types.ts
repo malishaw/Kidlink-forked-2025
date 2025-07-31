@@ -53,7 +53,7 @@ export const mediaUpdateSchema = createInsertSchema(media)
 
 export type MediaUpdateType = z.infer<typeof mediaUpdateSchema>;
 
-const PROJECT_FOLDER = "techshop";
+const PROJECT_FOLDER = "bloonsoo";
 
 export enum MediaUploadPaths {
   GALLERY = `${PROJECT_FOLDER}/gallery`
