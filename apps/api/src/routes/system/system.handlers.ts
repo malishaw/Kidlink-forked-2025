@@ -3,7 +3,6 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import type { AppRouteHandler } from "@api/types";
 
 import { db } from "@api/db";
-import { auth } from "@api/lib/auth";
 import type { CheckUserTypeRoute } from "./system.routes";
 
 // check User type handler
@@ -36,16 +35,16 @@ export const checkUserTypeHandler: AppRouteHandler<CheckUserTypeRoute> = async (
 
     if (userOrg) {
       // Set active organization as created organization
-      const switchRes = await auth.api.setActiveOrganization({
-        body: {
-          organizationId: userOrg.organizationId
-        },
-        headers: {
-          cookie: c.req.header("cookie")
-        }
-      });
+      // const switchRes = await auth.api.setActiveOrganization({
+      //   body: {
+      //     organizationId: userOrg.organizationId
+      //   },
+      //   headers: {
+      //     cookie: c.req.header("cookie")
+      //   }
+      // });
 
-      console.log({ switchRes });
+      // console.log({ switchRes });
 
       return c.json({ userType: "hotelOwner" as const }, HttpStatusCodes.OK);
     }

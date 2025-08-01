@@ -3,7 +3,7 @@ import Link from "next/link";
 
 type Props = {};
 
-export function Navbar({}: Props) {
+export async function Navbar({}: Props) {
   return (
     <div className="h-16 w-full flex items-center justify-between content-container mx-auto">
       <div className="text-white font-black text-2xl font-heading">

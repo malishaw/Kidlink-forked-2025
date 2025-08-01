@@ -192,7 +192,7 @@ export const getMyHotelRoute = createRoute({
   tags,
   summary: "Get my hotel",
   method: "get",
-  path: "/",
+  path: "/my-hotel",
   responses: {
     [HttpStatusCodes.OK]: jsonContent(hotelSelectSchema, "The hotel item"),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
