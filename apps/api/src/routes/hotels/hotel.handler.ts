@@ -12,6 +12,7 @@ import { PropertyClass } from "../property-classes/property-classes.schema";
 import type {
   CreateHotelTypeRoute,
   CreateNewHotelRoute,
+  GetMyHotelRoute,
   ListAllHotelsRoute,
   ListHotelTypesRoute,
   RemoveHotelTypeRoute,
@@ -380,4 +381,69 @@ export const createNewHotelHandler: AppRouteHandler<
   }
 
   return c.json(inserted, HttpStatusCodes.CREATED);
+};
+
+// Get my hotel route handler
+export const getMyHotelHandler: AppRouteHandler<GetMyHotelRoute> = async (
+  c
+) => {
+  const session = c.get("session");
+  const user = c.get("user");
+  let activeOrganizationId = session?.activeOrganizationId;
+
+  if (!session || !user)
+    return c.json(
+      {
+        message: HttpStatusPhrases.UNAUTHORIZED
+      },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+
+  if (user.role === "user" && !activeOrganizationId) {
+    // Check is this user a member of any organization
+    const organizationMember = await db.query.member.findFirst({
+      where: (fields, { eq }) => eq(fields.userId, user.id)
+    });
+
+    if (!organizationMember) {
+      return c.json(
+        {
+          message: HttpStatusPhrases.FORBIDDEN
+        },
+        HttpStatusCodes.FORBIDDEN
+      );
+    }
+
+    if (organizationMember.role === "member") {
+      return c.json(
+        {
+          message: HttpStatusPhrases.FORBIDDEN
+        },
+        HttpStatusCodes.FORBIDDEN
+      );
+    }
+
+    activeOrganizationId = organizationMember.organizationId;
+  }
+
+  const myHotel = await db.query.hotels.findFirst({
+    where: (fields, { eq }) => eq(fields.organizationId, activeOrganizationId!),
+    with: {
+      hotelType: true,
+      propertyClass: true
+    }
+  });
+
+  if (!myHotel) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.NOT_FOUND
+      },
+      HttpStatusCodes.NOT_FOUND
+    );
+  }
+
+  const formattedHotel: HotelSelectType = myHotel as HotelSelectType;
+
+  return c.json(formattedHotel, HttpStatusCodes.OK);
 };

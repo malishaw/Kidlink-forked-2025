@@ -187,6 +187,32 @@ export const createNewHotelRoute = createRoute({
   }
 });
 
+// Get my-hotel route definition
+export const getMyHotelRoute = createRoute({
+  tags,
+  summary: "Get my hotel",
+  method: "get",
+  path: "/",
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(hotelSelectSchema, "The hotel item"),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthorized access"
+    ),
+    [HttpStatusCodes.FORBIDDEN]: jsonContent(
+      errorMessageSchema,
+      "Forbidden access"
+    ),
+
+    // Not found used to identify if hotel doesn't setup yet
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      errorMessageSchema,
+      "No hotel found"
+    )
+  }
+});
+
 // Export hotel routes type definitions
 export type ListAllHotelsRoute = typeof listAllHotelsRoute;
 export type CreateNewHotelRoute = typeof createNewHotelRoute;
+export type GetMyHotelRoute = typeof getMyHotelRoute;

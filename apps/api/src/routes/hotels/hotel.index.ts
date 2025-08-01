@@ -9,6 +9,7 @@ const router = createRouter()
   .openapi(routes.updateHotelTypeRoute, handlers.updateHotelTypeHandler)
   .openapi(routes.removeHotelTypeRoute, handlers.removeHotelTypeHandler)
   .openapi(routes.listAllHotelsRoute, handlers.listAllHotelsHandler)
-  .openapi(routes.createNewHotelRoute, handlers.createNewHotelHandler);
+  .openapi(routes.createNewHotelRoute, handlers.createNewHotelHandler)
+  .openapi(routes.getMyHotelRoute, handlers.getMyHotelHandler);
 
 export default router;

@@ -1,6 +1,4 @@
-import { relations } from "drizzle-orm";
 import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
-import { hotels } from "./hotel.schema";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -104,6 +102,6 @@ export const invitation = pgTable("invitation", {
 });
 
 // Define relations
-export const organizationRelations = relations(organization, ({ many }) => ({
-  hotels: many(hotels)
-}));
+// export const organizationRelations = relations(organization, ({ many }) => ({
+//   hotels: many(hotels)
+// }));
