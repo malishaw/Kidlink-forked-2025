@@ -5,6 +5,8 @@ import { BASE_PATH } from "../lib/constants";
 import hotels from "./hotels/hotel.index";
 import index from "./index.route";
 import media from "./media/media.index";
+import nurseryClass from "./nursery-class/nursery-class.index";
+import nursery from "./nursery/nursery.index";
 import propertyClasses from "./property-classes/property-classes.index";
 import system from "./system/system.index";
 import tasks from "./tasks/tasks.index";
@@ -16,7 +18,9 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/system", system)
     .route("/media", media)
     .route("/property-classes", propertyClasses)
-    .route("/hotels", hotels);
+    .route("/hotels", hotels)
+    .route("/nursery", nursery)
+    .route("/classes", nurseryClass);
 }
 
 // stand alone router type used for api client
