@@ -21,3 +21,5 @@ export * from "./notifications.schema";
 export * from "./payments.schema";
 
 export * from "./badges.schema";
+
+export * from "./parent.schema";
