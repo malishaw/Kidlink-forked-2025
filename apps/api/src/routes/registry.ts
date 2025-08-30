@@ -15,6 +15,7 @@ import payments from "./payments/payments.index";
 import propertyClasses from "./property-classes/property-classes.index";
 import system from "./system/system.index";
 import tasks from "./tasks/tasks.index";
+import teachers from "./teacher/teacher.index";
 
 export function registerRoutes(app: AppOpenAPI) {
   return app
@@ -30,7 +31,8 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/classes", classes)
     .route("/notifications", notifications)
     .route("/payments", payments)
-    .route("/badges", badges);
+    .route("/badges", badges)
+    .route("/teachers", teachers);
 }
 
 // stand alone router type used for api client
