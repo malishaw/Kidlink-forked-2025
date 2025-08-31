@@ -6,9 +6,7 @@ type Props = {};
 export async function Navbar({}: Props) {
   return (
     <div className="h-16 w-full flex items-center justify-between content-container mx-auto">
-      <div className="text-white font-black text-2xl font-heading">
-        Bloonsoo
-      </div>
+      <div className="text-white font-black text-2xl font-heading">KidLink</div>
 
       <div className="flex items-center gap-2">
         <Button
