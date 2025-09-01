@@ -23,25 +23,32 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-import { createTeacher } from "@/features/teachers/actions/create-teacher";
-import { TeachersList as useTeachersList } from "@/features/teachers/actions/get-teacher";
+import { createChildren } from "@/features/children/actions/create-children";
+import { ChildrensList as useChildrensList } from "@/features/children/actions/get-children";
 
-export function TeachersList() {
+export function ChildrensList() {
   const [selectedChild, setSelectedChild] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<"name" | "children" | "recent">("name");
 
-  const { data, isLoading, error } = useTeachersList({});
+  const { data, isLoading, error } = useChildrensList({});
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
-    phoneNumber: "",
-    address: "",
-    avatar: "",
+    organizationId: "",
+    nurseryId: "",
+    parentId: "",
+    classId: "",
+    dateOfBirth: "",
+    gender: "",
+    emergencyContact: "",
+    medicalNotes: "",
+    profileImageUrl: "",
+    imagesUrl: "",
+    activities: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -56,7 +63,7 @@ export function TeachersList() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await createTeacher(formData);
+      await createChildren(formData);
       setIsModalOpen(false);
       setFormData({
         name: "",
@@ -68,7 +75,7 @@ export function TeachersList() {
       window.location.reload();
     } catch (err) {
       console.error(err);
-      alert("Failed to create teacher");
+      alert("Failed to create children");
     } finally {
       setIsSubmitting(false);
     }
@@ -83,10 +90,10 @@ export function TeachersList() {
         </div>
         <div className="text-center space-y-2">
           <p className="text-lg font-medium text-gray-700">
-            Loading teachers...
+            Loading childrens...
           </p>
           <p className="text-sm text-gray-500">
-            Please wait while we fetch teacher information
+            Please wait while we fetch children information
           </p>
         </div>
       </div>
@@ -100,7 +107,7 @@ export function TeachersList() {
           <Award className="w-8 h-8 text-red-600" />
         </div>
         <h3 className="text-xl font-bold text-red-800 mb-3">
-          Failed to load teachers
+          Failed to load childrens
         </h3>
         <p className="text-red-600 mb-6 max-w-md mx-auto">
           Error: {error.message}
@@ -109,21 +116,21 @@ export function TeachersList() {
     );
   }
 
-  const teachersData = data?.data || [];
+  const childrensData = data?.data || [];
 
-  const filteredTeachers = teachersData.filter(
-    (teacher: any) =>
-      teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      teacher.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      teacher.phoneNumber?.includes(searchTerm) ||
-      teacher.children?.some(
+  const filteredChildrens = childrensData.filter(
+    (children: any) =>
+      children.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      children.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      children.phoneNumber?.includes(searchTerm) ||
+      children.children?.some(
         (child: any) =>
           child.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           child.class.toLowerCase().includes(searchTerm.toLowerCase())
       )
   );
 
-  const sortedTeachers = [...filteredTeachers].sort((a, b) => {
+  const sortedChildrens = [...filteredChildrens].sort((a, b) => {
     switch (sortBy) {
       case "name":
         return a.name.localeCompare(b.name);
@@ -154,7 +161,7 @@ export function TeachersList() {
               </div>
               <div>
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  Teachers Directory
+                  Childrens Directory
                 </h1>
                 <p className="text-gray-600 text-lg">
                   Manage educator profiles and student assignments
@@ -165,14 +172,14 @@ export function TeachersList() {
               <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full">
                 <Users className="h-4 w-4 text-blue-600" />
                 <span className="text-sm font-semibold text-blue-700">
-                  {sortedTeachers.length} Teacher
-                  {sortedTeachers.length !== 1 ? "s" : ""}
+                  {sortedChildrens.length} Children
+                  {sortedChildrens.length !== 1 ? "s" : ""}
                 </span>
               </div>
               <div className="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full">
                 <Award className="h-4 w-4 text-purple-600" />
                 <span className="text-sm font-semibold text-purple-700">
-                  {sortedTeachers.reduce(
+                  {sortedChildrens.reduce(
                     (acc, t) => acc + (t.children?.length || 0),
                     0
                   )}{" "}
@@ -187,7 +194,7 @@ export function TeachersList() {
               onClick={() => setIsModalOpen(true)}
               className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white"
             >
-              + Create Teacher
+              + Create Children
             </Button>
             <div className="flex bg-gray-100 p-1 rounded-xl">
               <button
@@ -227,11 +234,11 @@ export function TeachersList() {
           </div>
         </div>
 
-        {/* Create Teacher Modal */}
+        {/* Create Children Modal */}
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
             <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-lg relative">
-              <h2 className="text-2xl font-bold mb-4">Create New Teacher</h2>
+              <h2 className="text-2xl font-bold mb-4">Create New Children</h2>
               <form onSubmit={handleFormSubmit} className="space-y-4">
                 <input
                   type="text"
@@ -242,36 +249,60 @@ export function TeachersList() {
                   className="w-full border border-gray-200 rounded-xl px-4 py-2"
                   required
                 />
+
                 <input
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                  value={formData.email}
-                  onChange={handleFormChange}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2"
-                  required
-                />
-                <input
-                  type="text"
-                  name="phoneNumber"
-                  placeholder="Phone Number"
-                  value={formData.phoneNumber}
+                  type="date"
+                  name="dateOfBirth"
+                  placeholder="Date of Birth"
+                  value={formData.dateOfBirth}
                   onChange={handleFormChange}
                   className="w-full border border-gray-200 rounded-xl px-4 py-2"
                 />
                 <input
                   type="text"
-                  name="address"
-                  placeholder="Address"
-                  value={formData.address}
+                  name="gender"
+                  placeholder="Gender"
+                  value={formData.gender}
                   onChange={handleFormChange}
                   className="w-full border border-gray-200 rounded-xl px-4 py-2"
                 />
                 <input
                   type="text"
-                  name="avatar"
-                  placeholder="Avatar URL"
-                  value={formData.avatar}
+                  name="emergencyContact"
+                  placeholder="Emergency Contact"
+                  value={formData.emergencyContact}
+                  onChange={handleFormChange}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2"
+                />
+                <input
+                  type="text"
+                  name="medicalNotes"
+                  placeholder="Medical Notes"
+                  value={formData.medicalNotes}
+                  onChange={handleFormChange}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2"
+                />
+                <input
+                  type="text"
+                  name="profileImageUrl"
+                  placeholder="Profile Image URL"
+                  value={formData.profileImageUrl}
+                  onChange={handleFormChange}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2"
+                />
+                <input
+                  type="text"
+                  name="imagesUrl"
+                  placeholder="Images URL"
+                  value={formData.imagesUrl}
+                  onChange={handleFormChange}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2"
+                />
+                <input
+                  type="text"
+                  name="activities"
+                  placeholder="Activities"
+                  value={formData.activities}
                   onChange={handleFormChange}
                   className="w-full border border-gray-200 rounded-xl px-4 py-2"
                 />
@@ -288,7 +319,7 @@ export function TeachersList() {
                     className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? "Saving..." : "Save Teacher"}
+                    {isSubmitting ? "Saving..." : "Save Children"}
                   </Button>
                 </div>
               </form>
@@ -296,7 +327,7 @@ export function TeachersList() {
           </div>
         )}
 
-        {/* Teachers Cards */}
+        {/* Childrens Cards */}
         <div
           className={
             viewMode === "grid"
@@ -304,16 +335,16 @@ export function TeachersList() {
               : "space-y-6"
           }
         >
-          {sortedTeachers.map((teacher: any) => (
+          {sortedChildrens.map((children: any) => (
             <Card
-              key={teacher.id}
+              key={children.id}
               className={`group relative overflow-hidden border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 rounded-3xl ${viewMode === "list" ? "flex flex-row gap-4 p-4" : ""}`}
             >
               <CardHeader className="flex items-center gap-4">
                 <Avatar className="h-16 w-16 shadow-lg ring-4 ring-white group-hover:ring-blue-100 transition-all duration-300">
-                  <AvatarImage src={teacher.avatar || "/placeholder.svg"} />
+                  <AvatarImage src={children.avatar || "/placeholder.svg"} />
                   <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white font-bold text-lg">
-                    {teacher.name
+                    {children.name
                       .split(" ")
                       .map((n: string) => n[0])
                       .join("")}
@@ -321,30 +352,32 @@ export function TeachersList() {
                 </Avatar>
                 <div>
                   <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-blue-700 transition-colors duration-200">
-                    {teacher.name}
+                    {children.name}
                   </CardTitle>
-                  <p className="text-sm text-gray-600">{teacher.email}</p>
-                  <p className="text-sm text-gray-600">{teacher.phoneNumber}</p>
-                  <p className="text-sm text-gray-600">{teacher.address}</p>
+                  <p className="text-sm text-gray-600">{children.email}</p>
+                  <p className="text-sm text-gray-600">
+                    {children.phoneNumber}
+                  </p>
+                  <p className="text-sm text-gray-600">{children.address}</p>
                   <p className="text-xs text-gray-400">
-                    Organization: {teacher.organizationId}
+                    Organization: {children.organizationId}
                   </p>
                   <p className="text-xs text-gray-400">
-                    Created: {new Date(teacher.createdAt).toLocaleString()}
+                    Created: {new Date(children.createdAt).toLocaleString()}
                   </p>
                   <p className="text-xs text-gray-400">
-                    Updated: {new Date(teacher.updatedAt).toLocaleString()}
+                    Updated: {new Date(children.updatedAt).toLocaleString()}
                   </p>
                 </div>
               </CardHeader>
 
-              {teacher.children && teacher.children.length > 0 && (
+              {children.children && children.children.length > 0 && (
                 <CardContent className="mt-4">
                   <h4 className="font-semibold mb-2">
-                    Students ({teacher.children.length})
+                    Students ({children.children.length})
                   </h4>
                   <div className="space-y-2">
-                    {teacher.children.map((child: any) => (
+                    {children.children.map((child: any) => (
                       <div
                         key={child.id}
                         className="flex items-center justify-between p-2 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200"

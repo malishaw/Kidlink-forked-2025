@@ -3,24 +3,26 @@ import { z } from "zod";
 
 import { classes } from "@repo/database";
 
-// Select schema (for reading)
-export const classSchema = createSelectSchema(classes);
+// Base select schema (from Drizzle)
+export const classSchema = createSelectSchema(classes, {
+  teacherIds: z.array(z.string()), // force teacherIds to be string[]
+  nurseryId: z.string().nullable(),
+  mainTeacherId: z.string().nullable(),
+});
 
-// Insert schema (for creating new rows)
-export const classInsertSchema = createInsertSchema(classes).omit({
+// Insert schema
+export const classInsertSchema = createInsertSchema(classes, {
+  teacherIds: z.array(z.string()).default([]),
+  nurseryId: z.string().nullable(),
+  mainTeacherId: z.string().nullable(),
+}).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
 
-// Update schema (for partial updates)
-export const classUpdateSchema = createInsertSchema(classes)
-  .omit({
-    id: true,
-    createdAt: true,
-    updatedAt: true,
-  })
-  .partial();
+// Update schema (partial for PATCH)
+export const classUpdateSchema = classInsertSchema.partial();
 
 // Types
 export type Class = z.infer<typeof classSchema>;

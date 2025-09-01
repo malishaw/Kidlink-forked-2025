@@ -20,10 +20,9 @@ type Session = {
   activeOrganizationId?: string | null;
 };
 
-// 🔍 List ONLY classes whose parent nursery belongs to the logged-in user (and org if present)
+// 🔍 List ONLY classes whose parent nursery belongs to the logged-in user
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const session = c.get("session") as Session | undefined;
-
   if (!session?.userId) {
     return c.json(
       { message: HttpStatusPhrases.UNAUTHORIZED },
@@ -31,7 +30,6 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     );
   }
 
-  // Join classes -> nurseries to enforce ownership/org constraints
   const where = session.activeOrganizationId
     ? and(
         eq(nurseries.createdBy, session.userId),
@@ -44,6 +42,8 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
       id: classes.id,
       nurseryId: classes.nurseryId,
       name: classes.name,
+      mainTeacherId: classes.mainTeacherId,
+      teacherIds: classes.teacherIds,
       createdAt: classes.createdAt,
       updatedAt: classes.updatedAt,
     })
@@ -51,7 +51,6 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     .innerJoin(nurseries, eq(nurseries.id, classes.nurseryId))
     .where(where);
 
-  // TODO: wire real pagination using query params
   const page = 1;
   const limit = rows.length;
   const totalCount = rows.length;
@@ -60,18 +59,13 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   return c.json(
     {
       data: rows,
-      meta: {
-        totalCount,
-        limit,
-        currentPage: page,
-        totalPages,
-      },
+      meta: { totalCount, limit, currentPage: page, totalPages },
     },
     HttpStatusCodes.OK
   );
 };
 
-// ➕ Create new class (auto-pick nursery if omitted; otherwise verify ownership)
+// ➕ Create new class
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const body = c.req.valid("json");
   const session = c.get("session") as Session | undefined;
@@ -83,11 +77,9 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     );
   }
 
-  // Resolve/validate nurseryId according to logged-in user + org
   let resolvedNurseryId: string | undefined = body.nurseryId ?? undefined;
 
   if (!resolvedNurseryId) {
-    // Try to auto-pick the only nursery owned by this user (and org, if set)
     const ownershipWhere = session.activeOrganizationId
       ? and(
           eq(nurseries.createdBy, session.userId),
@@ -116,9 +108,8 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
       );
     }
 
-    resolvedNurseryId = ownedNurseries[0]?.id as unknown as string;
+    resolvedNurseryId = ownedNurseries[0]?.id as string;
   } else {
-    // Validate provided nurseryId is owned by the user (and org, if set)
     const nurseryWhere = session.activeOrganizationId
       ? and(
           eq(nurseries.id, resolvedNurseryId),
@@ -146,6 +137,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     .values({
       ...body,
       nurseryId: resolvedNurseryId!,
+      teacherIds: body.teacherIds ?? [],
       createdAt: now,
       updatedAt: now,
     })
@@ -154,7 +146,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   return c.json(inserted, HttpStatusCodes.CREATED);
 };
 
-// 🔎 Get one class (must belong to a nursery owned by the logged-in user)
+// 🔎 Get one class
 export const getOne: AppRouteHandler<GetByIdRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const session = c.get("session") as Session | undefined;
@@ -184,6 +176,8 @@ export const getOne: AppRouteHandler<GetByIdRoute> = async (c) => {
       id: classes.id,
       nurseryId: classes.nurseryId,
       name: classes.name,
+      mainTeacherId: classes.mainTeacherId,
+      teacherIds: classes.teacherIds,
       createdAt: classes.createdAt,
       updatedAt: classes.updatedAt,
     })
@@ -193,7 +187,6 @@ export const getOne: AppRouteHandler<GetByIdRoute> = async (c) => {
     .limit(1);
 
   const item = row[0];
-
   if (!item) {
     return c.json(
       { message: HttpStatusPhrases.NOT_FOUND },
@@ -204,8 +197,7 @@ export const getOne: AppRouteHandler<GetByIdRoute> = async (c) => {
   return c.json(item, HttpStatusCodes.OK);
 };
 
-// ✏️ Update (only if the class's parent nursery is owned by the user)
-// If nurseryId is being changed, the new nursery must also be owned by the user.
+// ✏️ Update class
 export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const updates = c.req.valid("json");
@@ -218,7 +210,6 @@ export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
     );
   }
 
-  // First ensure the class is currently owned (via its parent nursery)
   const ownershipWhere = session.activeOrganizationId
     ? and(
         eq(classes.id, String(id)),
@@ -246,7 +237,6 @@ export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
     );
   }
 
-  // If changing nurseryId, validate the new parent is also owned
   if (updates.nurseryId) {
     const nurseryWhere = session.activeOrganizationId
       ? and(
@@ -274,6 +264,7 @@ export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
     .update(classes)
     .set({
       ...updates,
+      teacherIds: updates.teacherIds ?? [],
       updatedAt: new Date(),
     })
     .where(eq(classes.id, String(id)))
@@ -289,7 +280,7 @@ export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
   return c.json(updated, HttpStatusCodes.OK);
 };
 
-// 🗑️ Delete (only if the class's parent nursery is owned by the user)
+// 🗑️ Delete class
 export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const session = c.get("session") as Session | undefined;
@@ -301,7 +292,6 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
     );
   }
 
-  // Confirm ownership via join
   const ownershipWhere = session.activeOrganizationId
     ? and(
         eq(classes.id, String(id)),

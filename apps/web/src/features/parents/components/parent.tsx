@@ -24,12 +24,53 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+import { createParent } from "@/features/parents/actions/create-parent"; // your async create function
 import { ParentsList as useParentsList } from "@/features/parents/actions/get-parent";
 
 export function ParentsList() {
   const [selectedChild, setSelectedChild] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const { data, isLoading, error } = useParentsList({});
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phoneNumber: "",
+    address: "",
+    avatar: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      await createParent(formData); // call your backend
+      setIsModalOpen(false);
+      setFormData({
+        name: "",
+        email: "",
+        phoneNumber: "",
+        address: "",
+        avatar: "",
+      });
+      window.location.reload(); // reload list after creation
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create parent");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -68,7 +109,6 @@ export function ParentsList() {
 
   const parentsData = data?.data || [];
 
-  // Filter parents based on search term
   const filteredParents = parentsData.filter(
     (parent: any) =>
       parent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -79,7 +119,7 @@ export function ParentsList() {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-6 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
       {/* Header Section */}
       <div className="bg-gradient-to-r from-blue-50 via-white to-purple-50 rounded-2xl p-8 shadow-sm border border-gray-200">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -101,6 +141,12 @@ export function ParentsList() {
               {filteredParents.length}{" "}
               {filteredParents.length === 1 ? "Family" : "Parents"}
             </Badge>
+            <Button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white"
+            >
+              + Create Parent
+            </Button>
           </div>
         </div>
 
@@ -118,6 +164,75 @@ export function ParentsList() {
           </div>
         </div>
       </div>
+
+      {/* Create Parent Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-lg relative">
+            <h2 className="text-2xl font-bold mb-4">Create New Parent</h2>
+            <form onSubmit={handleFormSubmit} className="space-y-4">
+              <input
+                type="text"
+                name="name"
+                placeholder="Full Name"
+                value={formData.name}
+                onChange={handleFormChange}
+                className="w-full border border-gray-200 rounded-xl px-4 py-2"
+                required
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleFormChange}
+                className="w-full border border-gray-200 rounded-xl px-4 py-2"
+                required
+              />
+              <input
+                type="text"
+                name="phoneNumber"
+                placeholder="Phone Number"
+                value={formData.phoneNumber}
+                onChange={handleFormChange}
+                className="w-full border border-gray-200 rounded-xl px-4 py-2"
+              />
+              <input
+                type="text"
+                name="address"
+                placeholder="Address"
+                value={formData.address}
+                onChange={handleFormChange}
+                className="w-full border border-gray-200 rounded-xl px-4 py-2"
+              />
+              <input
+                type="text"
+                name="avatar"
+                placeholder="Avatar URL"
+                value={formData.avatar}
+                onChange={handleFormChange}
+                className="w-full border border-gray-200 rounded-xl px-4 py-2"
+              />
+              <div className="flex justify-end gap-4 mt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Saving..." : "Save Parent"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Parents Grid */}
       {filteredParents.length === 0 ? (

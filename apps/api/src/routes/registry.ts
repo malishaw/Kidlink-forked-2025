@@ -2,6 +2,7 @@ import { createRouter } from "@api/lib/create-app";
 import { AppOpenAPI } from "@api/types";
 
 import { BASE_PATH } from "../lib/constants";
+import children from "./children/children.index";
 import hotels from "./hotels/hotel.index";
 import index from "./index.route";
 import media from "./media/media.index";
@@ -31,6 +32,7 @@ export function registerRoutes(app: AppOpenAPI) {
 
     .route("/hotels", hotels)
     .route("/nursery", nursery)
+    .route("/children", children)
     .route("/classes", nurseryClass);
 }
 

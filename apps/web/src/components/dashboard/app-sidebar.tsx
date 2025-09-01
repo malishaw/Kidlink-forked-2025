@@ -68,6 +68,26 @@ const data = {
       url: "/account/manage/classes",
       icon: IconBox,
     },
+    {
+      name: "Teacher Management",
+      url: "/account/manage/teachers",
+      icon: IconBox,
+    },
+    {
+      name: "Parent Managemet",
+      url: "/account/manage/parents",
+      icon: IconBox,
+    },
+    {
+      name: "Notifications",
+      url: "/account/manage/notification",
+      icon: IconBox,
+    },
+    {
+      name: "Children",
+      url: "/account/manage/children",
+      icon: IconBox,
+    },
   ],
   userManagement: [
     {
