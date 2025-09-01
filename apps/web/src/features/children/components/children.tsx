@@ -6,12 +6,7 @@ import {
   AvatarImage,
 } from "@repo/ui/components/avatar";
 import { Button } from "@repo/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/components/card";
+import { CardContent, CardHeader, CardTitle } from "@repo/ui/components/card";
 import {
   Award,
   ChevronDown,
@@ -21,6 +16,7 @@ import {
   List,
   Users,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { createChildren } from "@/features/children/actions/create-children";
@@ -28,6 +24,7 @@ import { ChildrensList as useChildrensList } from "@/features/children/actions/g
 
 export function ChildrensList() {
   const [selectedChild, setSelectedChild] = useState<any>(null);
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<"name" | "children" | "recent">("name");
@@ -336,9 +333,12 @@ export function ChildrensList() {
           }
         >
           {sortedChildrens.map((children: any) => (
-            <Card
+            <div
               key={children.id}
-              className={`group relative overflow-hidden border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 rounded-3xl ${viewMode === "list" ? "flex flex-row gap-4 p-4" : ""}`}
+              className={`group relative overflow-hidden border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 rounded-3xl cursor-pointer ${viewMode === "list" ? "flex flex-row gap-4 p-4" : ""}`}
+              onClick={() =>
+                router.push(`/account/manage/children/${children.id}`)
+              }
             >
               <CardHeader className="flex items-center gap-4">
                 <Avatar className="h-16 w-16 shadow-lg ring-4 ring-white group-hover:ring-blue-100 transition-all duration-300">
@@ -380,14 +380,17 @@ export function ChildrensList() {
                     {children.children.map((child: any) => (
                       <div
                         key={child.id}
-                        className="flex items-center justify-between p-2 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200"
+                        className="flex items-center justify-between p-2 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/account/manage/children/${child.id}`);
+                        }}
                       >
                         <div className="text-sm font-medium">
                           {child.name} ({child.class})
                         </div>
                         <Button
                           size="sm"
-                          onClick={() => setSelectedChild(child)}
                           className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 shadow-sm hover:shadow-md text-xs px-3"
                         >
                           <Eye className="h-3 w-3 mr-2" /> View
@@ -397,7 +400,7 @@ export function ChildrensList() {
                   </div>
                 </CardContent>
               )}
-            </Card>
+            </div>
           ))}
         </div>
       </div>

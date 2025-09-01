@@ -1,36 +1,29 @@
 "use client";
 
-import {
-  IconCreditCard,
-  IconDotsVertical,
-  IconNotification,
-  IconUserCircle
-} from "@tabler/icons-react";
+import { IconDotsVertical } from "@tabler/icons-react";
 
 import { SignoutButton } from "@/features/auth/components/signout-button";
 import {
   Avatar,
   AvatarFallback,
-  AvatarImage
+  AvatarImage,
 } from "@repo/ui/components/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar
+  useSidebar,
 } from "@repo/ui/components/sidebar";
 
 export function NavUser({
-  user
+  user,
 }: {
   user: {
     name: string;
@@ -82,7 +75,7 @@ export function NavUser({
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
+            {/* <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <IconUserCircle />
@@ -97,7 +90,7 @@ export function NavUser({
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator /> */}
 
             <DropdownMenuItem asChild>
               <SignoutButton className="w-full" />

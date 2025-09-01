@@ -1,5 +1,5 @@
 {
-  "id": "b0fde281-8766-4dff-b9ca-366942d25ad1",
+  "id": "a71ca77a-5664-4e0d-b4b7-9401506f5b6f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -160,13 +160,13 @@
           "name": "gender",
           "type": "varchar(10)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "emergency_contact": {
           "name": "emergency_contact",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "medical_notes": {
           "name": "medical_notes",

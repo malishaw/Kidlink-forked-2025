@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  IconBox,
-  IconBuildings,
-  IconDashboard,
-  IconHelp,
-  IconSearch,
-  IconSettings,
-} from "@tabler/icons-react";
+import { IconBox, IconBuildings, IconDashboard } from "@tabler/icons-react";
 import * as React from "react";
 
 import { NavDocuments } from "@/components/dashboard/nav-documents";
@@ -41,21 +34,21 @@ const data = {
     },
   ],
   navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: IconHelp,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
-    },
+    // {
+    //   title: "Settings",
+    //   url: "#",
+    //   icon: IconSettings,
+    // },
+    // {
+    //   title: "Get Help",
+    //   url: "#",
+    //   icon: IconHelp,
+    // },
+    // {
+    //   title: "Search",
+    //   url: "#",
+    //   icon: IconSearch,
+    // },
   ],
   documents: [
     {
