@@ -6,6 +6,8 @@ import hotels from "./hotels/hotel.index";
 import index from "./index.route";
 import media from "./media/media.index";
 import notification from "./notification/notification.index";
+import nurseryClass from "./nursery-class/nursery-class.index";
+import nursery from "./nursery/nursery.index";
 import parent from "./parents/parent.index";
 import payment from "./payments/payment.index";
 import propertyClasses from "./property-classes/property-classes.index";
@@ -27,7 +29,9 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/teacher", teacher)
     .route("/payment", payment)
 
-    .route("/hotels", hotels);
+    .route("/hotels", hotels)
+    .route("/nursery", nursery)
+    .route("/classes", nurseryClass);
 }
 
 // stand alone router type used for api client

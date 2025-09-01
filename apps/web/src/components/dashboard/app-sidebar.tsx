@@ -6,7 +6,7 @@ import {
   IconDashboard,
   IconHelp,
   IconSearch,
-  IconSettings
+  IconSettings,
 } from "@tabler/icons-react";
 import * as React from "react";
 
@@ -22,7 +22,7 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
 } from "@repo/ui/components/sidebar";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { PiBuilding } from "react-icons/pi";
@@ -31,56 +31,56 @@ const data = {
   user: {
     name: "shadcn",
     email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg"
+    avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
     {
       title: "Dashboard",
       url: "#",
-      icon: IconDashboard
-    }
+      icon: IconDashboard,
+    },
   ],
   navSecondary: [
     {
       title: "Settings",
       url: "#",
-      icon: IconSettings
+      icon: IconSettings,
     },
     {
       title: "Get Help",
       url: "#",
-      icon: IconHelp
+      icon: IconHelp,
     },
     {
       title: "Search",
       url: "#",
-      icon: IconSearch
-    }
+      icon: IconSearch,
+    },
   ],
   documents: [
     {
-      name: "Manage Hotel",
+      name: "Manage Nursery",
       url: "/account/manage",
-      icon: IconBuildings
+      icon: IconBuildings,
     },
     {
-      name: "Hotel Rooms",
-      url: "/account/manage/rooms",
-      icon: IconBox
-    }
+      name: "Manage Classes",
+      url: "/account/manage/classes",
+      icon: IconBox,
+    },
   ],
   userManagement: [
     {
       name: "All Users",
       url: "/dashboard/users",
-      icon: IconBuildings
+      icon: IconBuildings,
     },
     {
       name: "Organizations",
       url: "/dashboard/organizations",
-      icon: IconBuildings
-    }
-  ]
+      icon: IconBuildings,
+    },
+  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
