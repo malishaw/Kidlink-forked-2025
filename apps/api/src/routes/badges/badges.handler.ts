@@ -56,7 +56,7 @@ export const getOne = async (c: any) => {
   const { id } = c.req.valid("param");
 
   const badge = await db.query.badges.findFirst({
-    where: eq(badges.id, Number(id)),
+    where: eq(badges.id, id),
   });
 
   if (!badge) {
@@ -88,7 +88,7 @@ export const patch = async (c: any) => {
       ...updates,
       updatedAt: new Date(),
     })
-    .where(eq(badges.id, Number(id)))
+    .where(eq(badges.id, id))
     .returning();
 
   if (!updated) {
@@ -115,7 +115,7 @@ export const remove = async (c: any) => {
 
   const [deleted] = await db
     .delete(badges)
-    .where(eq(badges.id, Number(id)))
+    .where(eq(badges.id, id))
     .returning();
 
   if (!deleted) {

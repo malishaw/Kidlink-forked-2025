@@ -4,6 +4,7 @@ import * as handlers from "./badges.handler";
 import * as routes from "./badges.routes";
 
 const router = createRouter()
+//.openapi(routes.list, handlers.list)
   .openapi(routes.list, handlers.list)
   .openapi(routes.create, handlers.create)
   .openapi(routes.getById, handlers.getOne)

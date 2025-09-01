@@ -19,12 +19,17 @@ CREATE TABLE "account" (
 );
 --> statement-breakpoint
 CREATE TABLE "badges" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"organization_id" text,
 	"child_id" text,
 	"teacher_id" text,
 	"title" varchar(255) NOT NULL,
 	"description" text,
+	"status" varchar(50) DEFAULT 'active',
+	"badge_type" varchar(100),
+	"icon_url" text,
+	"points" integer DEFAULT 0,
+	"level" varchar(50),
 	"awarded_at" timestamp DEFAULT now(),
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
