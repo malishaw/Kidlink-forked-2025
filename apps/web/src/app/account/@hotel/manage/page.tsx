@@ -1,6 +1,18 @@
 "use client";
 
+import type React from "react";
+
 import { useCreateNursery } from "@/app/account/actions/create-nursery.action";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@repo/ui/components//card";
+import { Input } from "@repo/ui/components//input";
+import { Button } from "@repo/ui/components/button";
+import { Label } from "@repo/ui/components/label";
+import { Textarea } from "@repo/ui/components/textarea";
 import { useState } from "react";
 
 export default function CreateNurseryForm() {
@@ -73,143 +85,185 @@ export default function CreateNurseryForm() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 p-4 max-w-lg mx-auto bg-white shadow rounded"
-    >
-      <h2 className="text-xl font-bold">Create Nursery</h2>
+    <Card className="w-[1200px] mx-auto">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">Create Nursery</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Basic Information - 2x2 Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">Title *</Label>
+              <Input
+                id="title"
+                name="title"
+                value={form.title}
+                onChange={handleChange}
+                placeholder="Nursery title"
+                required
+              />
+            </div>
 
-      <input
-        type="text"
-        name="title"
-        value={form.title}
-        onChange={handleChange}
-        placeholder="Title"
-        className="w-full border px-3 py-2 rounded"
-        required
-      />
+            <div className="space-y-2">
+              <Label htmlFor="address">Address</Label>
+              <Input
+                id="address"
+                name="address"
+                value={form.address}
+                onChange={handleChange}
+                placeholder="Full address"
+              />
+            </div>
 
-      <textarea
-        name="description"
-        value={form.description}
-        onChange={handleChange}
-        placeholder="Description"
-        className="w-full border px-3 py-2 rounded"
-      />
+            <div className="space-y-2">
+              <Label htmlFor="longitude">Longitude</Label>
+              <Input
+                id="longitude"
+                type="number"
+                step="any"
+                name="longitude"
+                value={form.longitude}
+                onChange={handleChange}
+                placeholder="e.g., -122.4194"
+              />
+            </div>
 
-      <input
-        type="text"
-        name="address"
-        value={form.address}
-        onChange={handleChange}
-        placeholder="Address"
-        className="w-full border px-3 py-2 rounded"
-      />
+            <div className="space-y-2">
+              <Label htmlFor="latitude">Latitude</Label>
+              <Input
+                id="latitude"
+                type="number"
+                step="any"
+                name="latitude"
+                value={form.latitude}
+                onChange={handleChange}
+                placeholder="e.g., 37.7749"
+              />
+            </div>
+          </div>
 
-      <div className="flex gap-2">
-        <input
-          type="number"
-          step="any"
-          name="longitude"
-          value={form.longitude}
-          onChange={handleChange}
-          placeholder="Longitude"
-          className="w-1/2 border px-3 py-2 rounded"
-        />
-        <input
-          type="number"
-          step="any"
-          name="latitude"
-          value={form.latitude}
-          onChange={handleChange}
-          placeholder="Latitude"
-          className="w-1/2 border px-3 py-2 rounded"
-        />
-      </div>
+          {/* Description - Full Width */}
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              placeholder="Describe your nursery..."
+              rows={3}
+            />
+          </div>
 
-      <div>
-        <label className="block font-medium">Phone Numbers</label>
-        {form.phoneNumbers.map((phone, idx) => (
-          <input
-            key={idx}
-            type="text"
-            value={phone}
-            onChange={(e) =>
-              handleArrayChange("phoneNumbers", idx, e.target.value)
-            }
-            placeholder="Phone number"
-            className="w-full border px-3 py-2 rounded mb-2"
-          />
-        ))}
-        <button
-          type="button"
-          onClick={() => addArrayField("phoneNumbers")}
-          className="text-sm text-blue-600"
-        >
-          + Add Phone
-        </button>
-      </div>
+          {/* Logo - Full Width */}
+          <div className="space-y-2">
+            <Label htmlFor="logo">Logo URL</Label>
+            <Input
+              id="logo"
+              name="logo"
+              value={form.logo}
+              onChange={handleChange}
+              placeholder="https://example.com/logo.png"
+            />
+          </div>
 
-      <input
-        type="text"
-        name="logo"
-        value={form.logo}
-        onChange={handleChange}
-        placeholder="Logo URL"
-        className="w-full border px-3 py-2 rounded"
-      />
+          {/* Dynamic Arrays in 2x1 Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Phone Numbers */}
+            <div className="space-y-3">
+              <Label className="text-base font-medium">Phone Numbers</Label>
+              <div className="space-y-2">
+                {form.phoneNumbers.map((phone, idx) => (
+                  <Input
+                    key={idx}
+                    type="tel"
+                    value={phone}
+                    onChange={(e) =>
+                      handleArrayChange("phoneNumbers", idx, e.target.value)
+                    }
+                    placeholder="Phone number"
+                  />
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => addArrayField("phoneNumbers")}
+                  className="w-full"
+                >
+                  + Add Phone Number
+                </Button>
+              </div>
+            </div>
 
-      <div>
-        <label className="block font-medium">Photos</label>
-        {form.photos.map((photo, idx) => (
-          <input
-            key={idx}
-            type="text"
-            value={photo}
-            onChange={(e) => handleArrayChange("photos", idx, e.target.value)}
-            placeholder="Photo URL"
-            className="w-full border px-3 py-2 rounded mb-2"
-          />
-        ))}
-        <button
-          type="button"
-          onClick={() => addArrayField("photos")}
-          className="text-sm text-blue-600"
-        >
-          + Add Photo
-        </button>
-      </div>
+            {/* Photos */}
+            <div className="space-y-3">
+              <Label className="text-base font-medium">Photos</Label>
+              <div className="space-y-2">
+                {form.photos.map((photo, idx) => (
+                  <Input
+                    key={idx}
+                    type="url"
+                    value={photo}
+                    onChange={(e) =>
+                      handleArrayChange("photos", idx, e.target.value)
+                    }
+                    placeholder="Photo URL"
+                  />
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => addArrayField("photos")}
+                  className="w-full"
+                >
+                  + Add Photo
+                </Button>
+              </div>
+            </div>
+          </div>
 
-      <div>
-        <label className="block font-medium">Attachments</label>
-        {form.attachments.map((file, idx) => (
-          <input
-            key={idx}
-            type="text"
-            value={file}
-            onChange={(e) =>
-              handleArrayChange("attachments", idx, e.target.value)
-            }
-            placeholder="Attachment URL"
-            className="w-full border px-3 py-2 rounded mb-2"
-          />
-        ))}
-        <button
-          type="button"
-          onClick={() => addArrayField("attachments")}
-          className="text-sm text-blue-600"
-        >
-          + Add Attachment
-        </button>
-      </div>
+          {/* Attachments - Full Width */}
+          <div className="space-y-3">
+            <Label className="text-base font-medium">Attachments</Label>
+            <div className="space-y-2">
+              {form.attachments.map((file, idx) => (
+                <Input
+                  key={idx}
+                  type="url"
+                  value={file}
+                  onChange={(e) =>
+                    handleArrayChange("attachments", idx, e.target.value)
+                  }
+                  placeholder="Attachment URL"
+                />
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => addArrayField("attachments")}
+                className="w-full max-w-xs"
+              >
+                + Add Attachment
+              </Button>
+            </div>
+          </div>
 
-      <button
-        type="submit"
-        className="bg-green-600 text-white px-4 py-2 rounded"
-        disabled={isPending}
-      >
-        {isPending ? "Saving..." : "Save Nursery"}
-      </button>
-    </form>
+          {/* Submit Button */}
+          <div className="pt-4">
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="w-full md:w-auto px-8"
+            >
+              {isPending ? "Creating Nursery..." : "Create Nursery"}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
