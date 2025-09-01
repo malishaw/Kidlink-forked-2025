@@ -1,4 +1,5 @@
 import HotelSearchComponent from "@/features/hotels/components/advanced-search";
+<<<<<<< HEAD
 import { Button } from "@repo/ui/components/button";
 import {
   Card,
@@ -9,10 +10,13 @@ import {
 } from "@repo/ui/components/card";
 import { BookOpen, Heart, Users } from "lucide-react";
 import Image from "next/image";
+=======
+>>>>>>> origin/feature/nursery
 import { Navbar } from "./navbar";
 
 export function Hero() {
   return (
+<<<<<<< HEAD
     <>
       {/* Hero Section */}
       <div className="relative w-full h-[90vh] bg-gradient-to-b from-black/90 to-transparent">
@@ -38,6 +42,18 @@ export function Hero() {
           alt="KidLink.com"
           className="absolute top-0 left-0 object-cover w-full h-full -z-10"
         />
+=======
+    <div className="relative w-full h-[90vh] bg-gradient-to-b from-black/20 to-transparent">
+      <Navbar />
+      <div className="pt-24 flex flex-col items-center justify-center text-white text-center ">
+        {/* <h1 className="text-4xl text-shadow-2xs md:text-6xl font-bold mt-6 mb-4">
+          Welcome to Ejobs.com
+        </h1>
+        <p className="text-lg md:text-xl max-w-2xl">
+          Your one-stop destination for all your travel needs. Explore, book,
+          and enjoy your perfect getaway.
+        </p> */}
+>>>>>>> origin/feature/nursery
       </div>
 
       {/* About Section */}
@@ -53,6 +69,7 @@ export function Hero() {
             </p>
           </div>
 
+<<<<<<< HEAD
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="border-border hover:shadow-lg transition-shadow">
               <CardHeader>
@@ -188,5 +205,19 @@ export function Hero() {
         </div>
       </section>
     </>
+=======
+      {/* Background video */}
+      <video
+        className="absolute top-0 left-0 object-cover w-full h-full -z-10"
+        autoPlay
+        loop
+        muted
+        playsInline
+      >
+        <source src="/assets/vid3.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+    </div>
+>>>>>>> origin/feature/nursery
   );
 }

@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1756556963717,
-      "tag": "0000_slow_the_fury",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1756566358337,
-      "tag": "0001_romantic_starbolt",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1756617843433,
-      "tag": "0002_tired_roulette",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1756618805773,
-      "tag": "0003_colossal_may_parker",
+      "when": 1756702077287,
+      "tag": "0000_parallel_gamora",
       "breakpoints": true
     }
   ]
