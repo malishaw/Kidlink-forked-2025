@@ -2,11 +2,19 @@
 
 import { useCreateClass } from "@/app/account/actions/create-class-action";
 import { Plus, Trash2 } from "lucide-react"; // icon library
+import { Button } from "@repo/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@repo/ui/components/card";
+import { Input } from "@repo/ui/components/input";
+import { Label } from "@repo/ui/components/label";
 import { useState } from "react";
 
 export default function CreateClassForm() {
   const { mutate: createClass, isPending } = useCreateClass();
-
   const [name, setName] = useState("");
   const [mainTeacherId, setMainTeacherId] = useState<string | null>(null);
   const [teacherIds, setTeacherIds] = useState<string[]>([""]); // start with one empty field
@@ -48,74 +56,37 @@ export default function CreateClassForm() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 p-4 max-w-lg mx-auto bg-white shadow rounded"
-    >
-      <h2 className="text-xl font-bold">Create Class</h2>
-
-      {/* Class Name */}
-      <input
-        type="text"
-        name="name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Class name"
-        className="w-full border px-3 py-2 rounded"
-        required
-      />
-
-      {/* Main Teacher ID */}
-      <input
-        type="text"
-        name="mainTeacherId"
-        value={mainTeacherId ?? ""}
-        onChange={(e) => setMainTeacherId(e.target.value || null)}
-        placeholder="Main Teacher ID (optional)"
-        className="w-full border px-3 py-2 rounded"
-      />
-
-      {/* All Teachers (dynamic fields) */}
-      <div>
-        <label className="block font-medium mb-1">All Teacher IDs</label>
-        {teacherIds.map((teacherId, index) => (
-          <div key={index} className="flex gap-2 mb-2">
-            <input
-              type="text"
-              value={teacherId}
-              onChange={(e) => handleTeacherChange(index, e.target.value)}
-              placeholder={`Teacher ID #${index + 1}`}
-              className="flex-1 border px-3 py-2 rounded"
+    <Card className="w-[600px] ml-0">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">Create Class</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Class Name */}
+          <div className="space-y-2">
+            <Label htmlFor="name">Class Name *</Label>
+            <Input
+              id="name"
+              name="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter class name"
+              required
             />
-            {index === teacherIds.length - 1 ? (
-              <button
-                type="button"
-                onClick={handleAddTeacherField}
-                className="bg-blue-500 text-white px-3 py-2 rounded flex items-center"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => handleRemoveTeacherField(index)}
-                className="bg-red-500 text-white px-3 py-2 rounded flex items-center"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            )}
           </div>
-        ))}
-      </div>
 
-      {/* Submit */}
-      <button
-        type="submit"
-        className="bg-green-600 text-white px-4 py-2 rounded"
-        disabled={isPending}
-      >
-        {isPending ? "Saving..." : "Save Class"}
-      </button>
-    </form>
+          {/* Submit Button */}
+          <div className="pt-4">
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="w-full md:w-auto px-8"
+            >
+              {isPending ? "Saving..." : "Save Class"}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

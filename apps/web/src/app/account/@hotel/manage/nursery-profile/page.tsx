@@ -9,7 +9,7 @@ export default function NurseriesPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-5xl mx-auto p-6">
+      <div className="w-full max-w-5xl p-6">
         <h1 className="text-2xl font-bold mb-4">Nurseries</h1>
         <div className="animate-pulse space-y-3">
           <div className="h-20 bg-gray-100 rounded" />
@@ -22,7 +22,7 @@ export default function NurseriesPage() {
 
   if (isError) {
     return (
-      <div className="max-w-5xl mx-auto p-6">
+      <div className="w-full max-w-5xl p-6">
         <h1 className="text-2xl font-bold mb-4">Nurseries</h1>
         <div className="bg-red-50 text-red-700 p-4 rounded">
           {(error as Error)?.message || "Failed to load nurseries"}
@@ -40,7 +40,7 @@ export default function NurseriesPage() {
   const nurseries = data ?? [];
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className="w-full max-w-5xl p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Nurseries</h1>
         <Link
