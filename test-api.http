@@ -1,0 +1,46 @@
+### Variables
+@baseUrl = http://localhost:3000
+@apiUrl = {{baseUrl}}/api
+
+### Test lesson plans endpoints
+
+# 1. List all lesson plans
+GET {{apiUrl}}/lesson-plans
+Content-Type: application/json
+
+###
+
+# 2. Create a new lesson plan
+POST {{apiUrl}}/lesson-plans
+Content-Type: application/json
+
+{
+  "title": "Math Lesson 1",
+  "content": "Introduction to basic algebra",
+  "childId": 1
+}
+
+###
+
+# 3. Get a specific lesson plan
+GET {{apiUrl}}/lesson-plans/1
+Content-Type: application/json
+
+###
+
+# 4. Update a lesson plan
+PATCH {{apiUrl}}/lesson-plans/1
+Content-Type: application/json
+
+{
+  "title": "Updated Math Lesson 1",
+  "content": "Advanced algebra concepts"
+}
+
+###
+
+# 5. Delete a lesson plan
+DELETE {{apiUrl}}/lesson-plans/1
+Content-Type: application/json
+
+###

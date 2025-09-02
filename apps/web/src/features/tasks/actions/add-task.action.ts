@@ -20,7 +20,7 @@ export async function addTask(data: AddTaskSchema) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(`${errorData.message}`);
+    throw new Error(`${errorData.message}`); 
   }
 
   const taskData = await response.json();

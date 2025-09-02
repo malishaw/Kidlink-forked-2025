@@ -5,6 +5,7 @@ import { BASE_PATH } from "../lib/constants";
 import children from "./children/children.index";
 import hotels from "./hotels/hotel.index";
 import index from "./index.route";
+import lessonPlans from "./lessonPlans/lessonPlans.index";
 import media from "./media/media.index";
 import notification from "./notification/notification.index";
 import nurseryClass from "./nursery-class/nursery-class.index";
