@@ -12,7 +12,7 @@ export const childrenInsertSchema = createInsertSchema(children, {
 }).omit({
   id: true,
   organizationId: true,
-  // parentId: true,
+  // parentId: true,6
   createdAt: true,
   updatedAt: true,
   // Remove these omits so they can be included in requests or set by server

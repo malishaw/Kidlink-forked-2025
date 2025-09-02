@@ -36,6 +36,12 @@ CREATE TABLE "children" (
 	"class_id" text,
 	"name" varchar(255) NOT NULL,
 	"dob" timestamp,
+	"gender" varchar(10) NOT NULL,
+	"emergency_contact" varchar(255) NOT NULL,
+	"medical_notes" varchar(500),
+	"profile_image_url" text,
+	"images_url" text,
+	"activities" text,
 	"updated_at" timestamp DEFAULT now(),
 	"created_at" timestamp DEFAULT now()
 );
@@ -272,6 +278,17 @@ CREATE TABLE "tasks" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
+CREATE TABLE "teacher" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"organization_id" text,
+	"children_id" text,
+	"lesson_plans_id" text,
+	"class_id" text,
+	"name" varchar(255) NOT NULL,
+	"updated_at" timestamp DEFAULT now(),
+	"created_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
 CREATE TABLE "user" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
@@ -331,6 +348,10 @@ ALTER TABLE "room_types" ADD CONSTRAINT "room_types_hotel_id_hotels_id_fk" FOREI
 ALTER TABLE "rooms" ADD CONSTRAINT "rooms_hotel_id_hotels_id_fk" FOREIGN KEY ("hotel_id") REFERENCES "public"."hotels"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "rooms" ADD CONSTRAINT "rooms_room_type_id_room_types_id_fk" FOREIGN KEY ("room_type_id") REFERENCES "public"."room_types"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "teacher" ADD CONSTRAINT "teacher_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "teacher" ADD CONSTRAINT "teacher_children_id_children_id_fk" FOREIGN KEY ("children_id") REFERENCES "public"."children"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "teacher" ADD CONSTRAINT "teacher_lesson_plans_id_lesson_plans_id_fk" FOREIGN KEY ("lesson_plans_id") REFERENCES "public"."lesson_plans"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "teacher" ADD CONSTRAINT "teacher_class_id_classes_id_fk" FOREIGN KEY ("class_id") REFERENCES "public"."classes"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "hotel_amenities_hotel_idx" ON "hotel_amenities" USING btree ("hotel_id");--> statement-breakpoint
 CREATE INDEX "hotel_amenities_type_idx" ON "hotel_amenities" USING btree ("amenity_type");--> statement-breakpoint
 CREATE INDEX "hotel_images_hotel_idx" ON "hotel_images" USING btree ("hotel_id");--> statement-breakpoint

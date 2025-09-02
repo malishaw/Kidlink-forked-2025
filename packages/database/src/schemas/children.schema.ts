@@ -21,6 +21,12 @@ export const children = pgTable("children", {
   name: varchar("name", { length: 255 }).notNull(),
 
   dateOfBirth: timestamp("dob"),
+  gender: varchar("gender", { length: 10 }).notNull(),
+  emergencyContact: varchar("emergency_contact", { length: 255 }).notNull(),
+  medicalNotes:varchar("medical_notes", { length: 500 }),
+  profileImageUrl: text("profile_image_url"),
+  imagesUrl: text("images_url"),
+  activities: text("activities"),
 
   updatedAt: timestamp("updated_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),

@@ -20,8 +20,7 @@ export const lessonPlans = pgTable("lesson_plans", {
   teacherId: text("teacher_id").references(() => user.id),
 
   childId: text("child_id")
-    .references(() => children.id)
-    .notNull(),
+    .references(() => children.id),
 
   classId: text("class_id").references(() => classes.id),
 

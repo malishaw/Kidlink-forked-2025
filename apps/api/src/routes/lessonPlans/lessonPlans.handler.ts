@@ -134,7 +134,7 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
     );
   }
 
-  return c.body(null, HttpStatusCodes.NO_CONTENT);
+  return c.json({ message: "Deleted successfully" }, HttpStatusCodes.OK);
 };
 
 // import { eq } from "drizzle-orm";
