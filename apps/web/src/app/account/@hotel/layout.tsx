@@ -1,8 +1,8 @@
 import React from "react";
 
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
+import { ManageTabBar } from "@/components/dashboard/manage-tab-bar";
 import { SiteHeader } from "@/components/dashboard/site-header";
-import { NurseryTabBar } from "@/features/nursery/components/nursery-tab-bar";
 import { Separator } from "@repo/ui/components/separator";
 import { SidebarInset, SidebarProvider } from "@repo/ui/components/sidebar";
 
@@ -25,7 +25,7 @@ export default function DashboardLayout({ children }: Props) {
         <SiteHeader />
         <div>
           <Separator />
-          <NurseryTabBar />
+          <ManageTabBar />
           <Separator />
         </div>
 

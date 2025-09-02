@@ -19,8 +19,14 @@ export * from "./payment.schema";
 
 export * from "./class.schema";
 
+<<<<<<< HEAD
 export * from "./children.schema";
 
 export * from "./feedbacks.schema";
 
 export * from "./lessonPlans.schema";
+=======
+export * from "./teacher.schema";
+
+export * from "./children.schema";
+>>>>>>> origin/feature/nursery

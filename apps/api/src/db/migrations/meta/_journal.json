@@ -8,6 +8,13 @@
       "when": 1756793745649,
       "tag": "0000_naive_thing",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1756790638387,
+      "tag": "0003_perfect_ma_gnuci",
+      "breakpoints": true
     }
   ]
 }

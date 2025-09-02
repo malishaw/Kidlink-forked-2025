@@ -8,11 +8,11 @@ import { usePathname } from "next/navigation";
 type Props = {};
 
 const HotelTabs = [
-  { name: "Create Nursery", href: "/account/manage/nursery" },
-  { name: "Nursery Details", href: "/account/manage/nursery-card" },
+  { name: "Create Class", href: "/account/manage/classes" },
+  { name: "Class Details", href: "/account/manage/class-card" },
 ];
 
-export function NurseryTabBar({}: Props) {
+export function ClassTabBar({}: Props) {
   const pathname = usePathname();
 
   const currentTab = HotelTabs.find((tab) => tab.href === pathname);
