@@ -8,6 +8,13 @@
       "when": 1756728255869,
       "tag": "0000_high_trauma",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1756752634929,
+      "tag": "0001_reflective_jackpot",
+      "breakpoints": true
     }
   ]
 }

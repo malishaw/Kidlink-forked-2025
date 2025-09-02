@@ -7,12 +7,7 @@ import {
 } from "@repo/ui/components/avatar";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/components/card";
+import { CardContent, CardHeader, CardTitle } from "@repo/ui/components/card";
 import {
   AlertCircle,
   Eye,
@@ -22,15 +17,17 @@ import {
   Search,
   Users,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { createParent } from "@/features/parents/actions/create-parent"; // your async create function
+import { createParent } from "@/features/parents/actions/create-parent";
 import { ParentsList as useParentsList } from "@/features/parents/actions/get-parent";
 
 export function ParentsList() {
   const [selectedChild, setSelectedChild] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const { data, isLoading, error } = useParentsList({});
+  const router = useRouter();
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -54,7 +51,7 @@ export function ParentsList() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await createParent(formData); // call your backend
+      await createParent(formData);
       setIsModalOpen(false);
       setFormData({
         name: "",
@@ -63,7 +60,7 @@ export function ParentsList() {
         address: "",
         avatar: "",
       });
-      window.location.reload(); // reload list after creation
+      window.location.reload();
     } catch (err) {
       console.error(err);
       alert("Failed to create parent");
@@ -252,9 +249,12 @@ export function ParentsList() {
       ) : (
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {filteredParents.map((parent: any) => (
-            <Card
+            <div
               key={parent.id}
-              className="group relative overflow-hidden border-0 bg-gradient-to-br from-white via-gray-50 to-white shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 rounded-2xl"
+              className="group relative overflow-hidden border-0 bg-gradient-to-br from-white via-gray-50 to-white shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 rounded-2xl cursor-pointer"
+              onClick={() =>
+                router.push(`/account/manage/parents/${parent.id}`)
+              }
             >
               <div className="absolute inset-0 bg-gradient-to-br from-blue-50/20 via-transparent to-purple-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
@@ -369,7 +369,7 @@ export function ParentsList() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </div>
           ))}
         </div>
       )}
