@@ -1,4 +1,5 @@
 import { sql } from "drizzle-orm";
+<<<<<<< HEAD
 import { pgTable, text, varchar } from "drizzle-orm/pg-core";
 
 import { date } from "drizzle-orm/pg-core";
@@ -19,10 +20,38 @@ export const childrens = pgTable("childrens", {
   gender: varchar("gender", { length: 10 }),
   emergencyContact: varchar("emergency_contact", { length: 255 }),
   medicalNotes: varchar("medical_notes", { length: 500 }),
+=======
+import { pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { organization } from "./auth.schema";
+import { classes } from "./classes.schema";
+
+//import { classes } from "./classes.schema"; // assuming you have a classes schema
+
+export const children = pgTable("children", {
+  id: text("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+
+  organizationId: text("organization_id").references(() => organization.id),
+
+  // parentId: text("parent_id")
+  //   .references(() => user.id)
+  //   .notNull(),
+
+  classesId: text("class_id").references(() => classes.id),
+
+  name: varchar("name", { length: 255 }).notNull(),
+
+  dateOfBirth: timestamp("dob"),
+  gender: varchar("gender", { length: 10 }).notNull(),
+  emergencyContact: varchar("emergency_contact", { length: 255 }).notNull(),
+  medicalNotes:varchar("medical_notes", { length: 500 }),
+>>>>>>> origin/feature/lessonplans
   profileImageUrl: text("profile_image_url"),
   imagesUrl: text("images_url"),
   activities: text("activities"),
 
+<<<<<<< HEAD
   ...timestamps,
 
   // childrenNumber: varchar("children_number", { length: 20 }).notNull(),
@@ -31,4 +60,8 @@ export const childrens = pgTable("childrens", {
   // lastCleanedAt: timestamp("last_cleaned_at"),
 
   // ...timestamps
+=======
+  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+>>>>>>> origin/feature/lessonplans
 });
