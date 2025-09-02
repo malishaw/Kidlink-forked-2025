@@ -81,6 +81,11 @@ const data = {
       url: "/account/manage/children",
       icon: IconBox,
     },
+    {
+      name: "Badges",
+      url: "/account/manage/badges",
+      icon: IconBox,
+    },
   ],
   userManagement: [
     {

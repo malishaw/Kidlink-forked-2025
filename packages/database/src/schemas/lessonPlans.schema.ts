@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth.schema";
-import { children } from "./children.schema";
+import { childrens } from "./children.schema";
 import { classes } from "./classes.schema";
 
 // assuming you have a children schema
@@ -20,7 +20,7 @@ export const lessonPlans = pgTable("lesson_plans", {
   teacherId: text("teacher_id").references(() => user.id),
 
   childId: text("child_id")
-    .references(() => children.id)
+    .references(() => childrens.id)
     .notNull(),
 
   classId: text("class_id").references(() => classes.id),

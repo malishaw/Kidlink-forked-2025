@@ -136,9 +136,35 @@ export const remove = createRoute({
   },
 });
 
+// Get notifications by userId route definition
+export const getByUserId = createRoute({
+  tags,
+  summary: "Get notifications by userId",
+  method: "get",
+  path: "/by-user",
+  request: {
+    query: z.object({ receiverId: z.string().min(1) }),
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      z.array(notification),
+      "Notifications for user"
+    ),
+    [HttpStatusCodes.BAD_REQUEST]: jsonContent(
+      errorMessageSchema,
+      "Missing userId"
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthorized access"
+    ),
+  },
+});
+
 // Export types
 export type ListRoute = typeof list;
 export type GetByIdRoute = typeof getById;
 export type CreateRoute = typeof create;
 export type UpdateRoute = typeof update;
 export type RemoveRoute = typeof remove;
+export type GetByUserIdRoute = typeof getByUserId;

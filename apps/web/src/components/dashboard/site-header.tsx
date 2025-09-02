@@ -21,14 +21,14 @@ export function SiteHeader() {
 
         <div className="ml-auto flex items-center gap-2">
           <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
-            <Link href="/admin/notifications">
+            <Link href="/account/manage/getnotification">
               <BellIcon className="h-4 w-4" />
             </Link>
           </Button>
 
           {/* Mobile notification button */}
           <Button variant="ghost" asChild size="icon" className="sm:hidden">
-            <Link href="/admin/notifications">
+            <Link href="/account/manage/getnotification">
               <BellIcon className="h-4 w-4" />
             </Link>
           </Button>

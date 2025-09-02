@@ -21,4 +21,5 @@ export * from "./class.schema";
 
 export * from "./teacher.schema";
 
+export * from "./badges.schema";
 export * from "./children.schema";

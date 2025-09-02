@@ -80,18 +80,26 @@ export function ChildrensList() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col justify-center items-center py-20 space-y-6">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex flex-col justify-center items-center py-20 space-y-8">
         <div className="relative">
-          <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-          <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-blue-300 rounded-full animate-spin animate-reverse"></div>
+          <div className="w-20 h-20 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
+          <div className="absolute inset-0 w-20 h-20 border-4 border-transparent border-t-pink-400 rounded-full animate-spin animate-reverse"></div>
+          <div className="absolute inset-2 w-16 h-16 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-20 blur-sm"></div>
         </div>
-        <div className="text-center space-y-2">
-          <p className="text-lg font-medium text-gray-700">
-            Loading childrens...
-          </p>
-          <p className="text-sm text-gray-500">
+        <div className="text-center space-y-3">
+          <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            Loading Children...
+          </h3>
+          <p className="text-slate-600 text-lg">
             Please wait while we fetch children information
           </p>
+          <div className="flex gap-2 justify-center text-sm text-slate-500 mt-4">
+            <span>👶 Students</span>
+            <span>•</span>
+            <span>📚 Profiles</span>
+            <span>•</span>
+            <span>🎓 Education</span>
+          </div>
         </div>
       </div>
     );

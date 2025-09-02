@@ -2,10 +2,10 @@ import { createRouter } from "@api/lib/create-app";
 import { AppOpenAPI } from "@api/types";
 
 import { BASE_PATH } from "../lib/constants";
+import badges from "./badges/badges.index";
 import children from "./children/children.index";
 import hotels from "./hotels/hotel.index";
 import index from "./index.route";
-import lessonPlans from "./lessonPlans/lessonPlans.index";
 import media from "./media/media.index";
 import notification from "./notification/notification.index";
 import nurseryClass from "./nursery-class/nursery-class.index";
@@ -34,6 +34,7 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/hotels", hotels)
     .route("/children", children)
     .route("/nurseries", nursery)
+    .route("/badges", badges)
     .route("/classes", nurseryClass);
 }
 

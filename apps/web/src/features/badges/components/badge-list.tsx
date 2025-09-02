@@ -1,170 +1,247 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/components/card";
-import { Badge } from "@repo/ui/components/badge";
-import { Button } from "@repo/ui/components/button"
-import { Trash2, Edit } from "lucide-react"
-import { toast } from "sonner"
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@repo/ui/components/avatar";
-
-
+import { Button } from "@repo/ui/components/button";
+import { Edit, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface BadgeData {
-  id?: string
-  title: string
-  description: string
-  badgeType: string
-  points: number
-  level: string
-  iconUrl: string
-  createdAt?: string
+  id?: string;
+  title: string;
+  description: string;
+  badgeType: string;
+  points: number;
+  level: string;
+  iconUrl: string;
+  createdAt?: string;
 }
 
 interface BadgeListProps {
-  onEditBadge?: (badge: BadgeData) => void
+  onEditBadge?: (badge: BadgeData) => void;
 }
 
 export function BadgeList({ onEditBadge }: BadgeListProps) {
-  const [badges, setBadges] = useState<BadgeData[]>([])
-  const [loading, setLoading] = useState(true)
+  const [badges, setBadges] = useState<BadgeData[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchBadges = () => {
     try {
-      const storedBadges = localStorage.getItem("badges")
+      const storedBadges = localStorage.getItem("badges");
       if (storedBadges) {
-        setBadges(JSON.parse(storedBadges))
+        setBadges(JSON.parse(storedBadges));
       }
     } catch (error) {
-      console.error("Failed to fetch badges:", error)
+      console.error("Failed to fetch badges:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const deleteBadge = (badgeId: string) => {
     try {
-      const existingBadges = JSON.parse(localStorage.getItem("badges") || "[]")
-      const updatedBadges = existingBadges.filter((badge: BadgeData) => badge.id !== badgeId)
-      localStorage.setItem("badges", JSON.stringify(updatedBadges))
-      setBadges(updatedBadges)
-      toast.success("Badge deleted successfully!")
+      const existingBadges = JSON.parse(localStorage.getItem("badges") || "[]");
+      const updatedBadges = existingBadges.filter(
+        (badge: BadgeData) => badge.id !== badgeId
+      );
+      localStorage.setItem("badges", JSON.stringify(updatedBadges));
+      setBadges(updatedBadges);
+      toast.success("Badge deleted successfully!");
     } catch (error) {
-      console.error("Failed to delete badge:", error)
-      toast.error("Failed to delete badge")
+      console.error("Failed to delete badge:", error);
+      toast.error("Failed to delete badge");
     }
-  }
+  };
 
   useEffect(() => {
-    fetchBadges()
+    fetchBadges();
 
     const handleBadgeCreated = () => {
-      fetchBadges()
-    }
+      fetchBadges();
+    };
 
-    window.addEventListener("badgeCreated", handleBadgeCreated)
-    return () => window.removeEventListener("badgeCreated", handleBadgeCreated)
-  }, [])
+    window.addEventListener("badgeCreated", handleBadgeCreated);
+    return () => window.removeEventListener("badgeCreated", handleBadgeCreated);
+  }, []);
 
   const getLevelColor = (level: string) => {
-    const levelLower = level.toLowerCase()
-    if (levelLower.includes("gold")) return "bg-yellow-100 text-yellow-800"
-    if (levelLower.includes("silver")) return "bg-gray-100 text-gray-800"
-    if (levelLower.includes("bronze")) return "bg-orange-100 text-orange-800"
-    return "bg-blue-100 text-blue-800"
-  }
+    const levelLower = level.toLowerCase();
+    if (levelLower.includes("gold"))
+      return "bg-gradient-to-r from-yellow-400 to-yellow-600 text-white shadow-lg";
+    if (levelLower.includes("silver"))
+      return "bg-gradient-to-r from-gray-400 to-gray-600 text-white shadow-lg";
+    if (levelLower.includes("bronze"))
+      return "bg-gradient-to-r from-orange-400 to-orange-600 text-white shadow-lg";
+    return "bg-gradient-to-r from-blue-400 to-blue-600 text-white shadow-lg";
+  };
+
+  const getBadgeTypeIcon = (badgeType: string) => {
+    const type = badgeType.toLowerCase();
+    if (type.includes("achievement")) return "🏆";
+    if (type.includes("progress")) return "📈";
+    if (type.includes("skill")) return "🎯";
+    if (type.includes("participation")) return "👥";
+    if (type.includes("creativity")) return "🎨";
+    if (type.includes("leadership")) return "⭐";
+    return "🏅";
+  };
 
   if (loading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {[...Array(6)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
-            <CardHeader>
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-            </CardHeader>
-            <CardContent>
-              <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-            </CardContent>
-          </Card>
+          <div key={i} className="group">
+            <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl p-6 animate-pulse">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl"></div>
+                <div className="flex-1 space-y-2">
+                  <div className="h-5 bg-gradient-to-r from-gray-200 to-gray-300 rounded-xl w-3/4"></div>
+                  <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-1/2"></div>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-full"></div>
+                <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-2/3"></div>
+                <div className="flex items-center justify-between mt-4">
+                  <div className="h-8 bg-gradient-to-r from-gray-200 to-gray-300 rounded-xl w-20"></div>
+                  <div className="h-6 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-16"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
-    )
+    );
   }
 
   if (badges.length === 0) {
     return (
-      <Card className="text-center py-8">
-        <CardContent>
-          <p className="text-muted-foreground">No badges created yet. Create your first badge to see it here!</p>
-        </CardContent>
-      </Card>
-    )
+      <div className="text-center py-16">
+        <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl p-12 max-w-md mx-auto">
+          <div className="w-24 h-24 bg-gradient-to-br from-amber-400 to-orange-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <span className="text-4xl">🏅</span>
+          </div>
+          <h3 className="text-2xl font-bold text-slate-800 mb-3">
+            No Badges Yet
+          </h3>
+          <p className="text-slate-600 text-lg leading-relaxed">
+            Create your first achievement badge to motivate and reward students
+            for their accomplishments!
+          </p>
+          <div className="mt-6 flex gap-2 justify-center text-sm text-slate-500">
+            <span>🎯 Set Goals</span>
+            <span>•</span>
+            <span>⭐ Reward Progress</span>
+            <span>•</span>
+            <span>🚀 Inspire Excellence</span>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="grid gap-20 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {badges.map((badge, index) => (
-        <Card key={badge.id || index} className="w-80 h-56 hover:shadow-md transition-shadow flex flex-col relative">
-          <CardHeader className="pb-2 flex-shrink-0">
-            <div className="flex items-center gap-3">
-              <Avatar className="w-20 h-20 flex-shrink-0">
-                <AvatarImage src={badge.iconUrl || "/placeholder.svg"} alt={badge.title} />
-                <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
-                  {badge.title.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <CardTitle className="text-lg truncate">{badge.title}</CardTitle>
-                <CardDescription className="text-sm">{badge.badgeType}</CardDescription>
+        <div key={badge.id || index} className="group">
+          <div className="relative bg-white/70 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] overflow-hidden">
+            {/* Decorative Background Elements */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-amber-200/20 to-transparent rounded-full blur-2xl"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-orange-200/20 to-transparent rounded-full blur-2xl"></div>
+
+            <div className="relative z-10 p-6">
+              {/* Header Section */}
+              <div className="flex items-center gap-4 mb-4">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
+                    {badge.iconUrl ? (
+                      <Avatar className="w-14 h-14">
+                        <AvatarImage
+                          src={badge.iconUrl}
+                          alt={badge.title}
+                          className="rounded-xl"
+                        />
+                        <AvatarFallback className="bg-white/20 text-white font-bold text-lg rounded-xl">
+                          {badge.title.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <span className="text-2xl">
+                        {getBadgeTypeIcon(badge.badgeType)}
+                      </span>
+                    )}
+                  </div>
+                  {/* Shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-bold text-slate-800 truncate group-hover:text-amber-700 transition-colors">
+                    {badge.title}
+                  </h3>
+                  <p className="text-sm text-slate-600 flex items-center gap-1">
+                    <span>{getBadgeTypeIcon(badge.badgeType)}</span>
+                    {badge.badgeType}
+                  </p>
+                </div>
+              </div>
+
+              {/* Description */}
+              <p className="text-sm text-slate-600 leading-relaxed line-clamp-2 mb-4 min-h-[2.5rem]">
+                {badge.description}
+              </p>
+
+              {/* Footer Section */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold ${getLevelColor(badge.level)}`}
+                  >
+                    {badge.level}
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <div className="flex items-center gap-1">
+                    <span className="text-xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                      {badge.points}
+                    </span>
+                    <span className="text-xs text-slate-500 font-medium">
+                      pts
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-2 mt-4 pt-4 border-t border-white/50">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEditBadge?.(badge)}
+                  className="flex-1 h-10 bg-blue-50/50 hover:bg-blue-100/70 text-blue-700 rounded-xl transition-all duration-200 hover:scale-105"
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => deleteBadge(badge.id!)}
+                  className="flex-1 h-10 bg-red-50/50 hover:bg-red-100/70 text-red-700 rounded-xl transition-all duration-200 hover:scale-105"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete
+                </Button>
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="flex-1 flex flex-col justify-between space-y-2">
-            <p className="text-sm text-muted-foreground line-clamp-2 flex-1 -mt-4">{badge.description}</p>
-
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className={`text-sm px-3 py-2 ${getLevelColor(badge.level)}`}>
-                {badge.level}
-              </Badge>
-              <div className="text-left">
-                <span className="text-lg font-semibold text-primary">{badge.points}</span>
-                <span className="text-xs text-muted-foreground ml-1">points</span>
-              </div>
-            </div>
-          </CardContent>
-
-          <div className="absolute bottom-3 right-3 flex gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onEditBadge?.(badge)}
-              className="h-8 w-8 p-0 hover:bg-blue-100"
-            >
-              <Edit className="w-5 h-5 text-blue-600" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => deleteBadge(badge.id!)}
-              className="h-8 w-8 p-0 hover:bg-red-100"
-            >
-              <Trash2 className="w-5 h-5 text-red-600" />
-            </Button>
           </div>
-        </Card>
+        </div>
       ))}
     </div>
-  )
+  );
 }
