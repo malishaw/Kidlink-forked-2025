@@ -44,6 +44,7 @@ CREATE TABLE "classes" (
 	"name" varchar(100) NOT NULL,
 	"main_teacher_id" text,
 	"teacher_ids" text[] DEFAULT ARRAY[]::text[] NOT NULL,
+	"child_ids" text[] DEFAULT ARRAY[]::text[] NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -277,6 +278,7 @@ CREATE TABLE "tasks" (
 --> statement-breakpoint
 CREATE TABLE "teacher" (
 	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"class_id" text,
 	"organization_id" text,
 	"name" text NOT NULL,
 	"phone_number" text NOT NULL,

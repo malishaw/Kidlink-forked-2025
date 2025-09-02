@@ -1,1 +1,0 @@
-ALTER TABLE "teacher" ADD COLUMN "class_id" text;

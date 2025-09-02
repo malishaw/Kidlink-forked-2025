@@ -57,8 +57,18 @@ export default function CreateClassForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (name.trim() === "") {
+      alert("Class name is required.");
+      return;
+    }
     createClass(
-      { name, mainTeacherId, teacherIds, childIds },
+      {
+        nurseryId: null,
+        name: name.trim(),
+        mainTeacherId: mainTeacherId.trim() === "" ? null : mainTeacherId,
+        teacherIds,
+        // childIds is not part of the API response, so omit if not needed
+      },
       {
         onSuccess: () => {
           alert("Class created!");

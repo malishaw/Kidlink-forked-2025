@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@repo/ui/components/card";
 import { Skeleton } from "@repo/ui/components/skeleton";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 import { useGetClass } from "../actions/get-classes-action";
 
@@ -81,6 +82,7 @@ function getRecordFromResponse(input: unknown): ClassRecord | null {
 
 export function ClassDetailsCard({ classId, onEdit, compact = false }: Props) {
   const { data, isLoading, isError, refetch } = useGetClass(classId);
+  const router = useRouter();
 
   // Shared classes for regular vs compact
   const cardBase = compact
@@ -177,8 +179,19 @@ export function ClassDetailsCard({ classId, onEdit, compact = false }: Props) {
     updatedAt,
   } = record;
 
+  const handleClick = () => {
+    if (!compact && id) {
+      router.push(`/account/manage/classes/${id}`);
+    }
+  };
   return (
-    <Card className={cardBase}>
+    <Card
+      className={
+        cardBase +
+        (!compact ? " cursor-pointer hover:shadow-lg transition" : "")
+      }
+      onClick={handleClick}
+    >
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className={titleClass}>
           {name ?? <span className="text-muted-foreground">Unnamed class</span>}
