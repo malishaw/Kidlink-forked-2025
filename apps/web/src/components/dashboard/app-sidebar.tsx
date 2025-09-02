@@ -22,7 +22,7 @@ import { PiBuilding } from "react-icons/pi";
 
 const data = {
   user: {
-    name: "shadcn",
+    name: "kidlink",
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
@@ -57,17 +57,17 @@ const data = {
       icon: IconBuildings,
     },
     {
-      name: "Manage Classes",
+      name: "Classes",
       url: "/account/manage/classes",
       icon: IconBox,
     },
     {
-      name: "Teacher Management",
+      name: "Management",
       url: "/account/manage/teachers",
       icon: IconBox,
     },
     {
-      name: "Parent Managemet",
+      name: "Managemet",
       url: "/account/manage/parents",
       icon: IconBox,
     },

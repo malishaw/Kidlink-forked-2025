@@ -6,7 +6,7 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@repo/ui/components/card";
 import { Input } from "@repo/ui/components/input";
 import { useAppForm } from "@repo/ui/components/tanstack-form";
@@ -17,7 +17,6 @@ import { useCallback, useId } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { CheckIcon } from "lucide-react";
-import { CiFacebook } from "react-icons/ci";
 import { toast } from "sonner";
 import { signinSchema, type SigninSchemaT } from "../schemas";
 
@@ -32,9 +31,9 @@ export function SiginForm({
     validators: { onChange: signinSchema },
     defaultValues: {
       email: "",
-      password: ""
+      password: "",
     },
-    onSubmit: ({ value }) => handleSignin(value)
+    onSubmit: ({ value }) => handleSignin(value),
   });
 
   const handleSubmit = useCallback(
@@ -60,8 +59,8 @@ export function SiginForm({
         },
         onError(ctx) {
           toast.error(`Failed: ${ctx.error.message}`, { id: toastId });
-        }
-      }
+        },
+      },
     });
   };
 
@@ -72,15 +71,13 @@ export function SiginForm({
           <CardTitle className="text-xl font-heading font-bold">
             Welcome back
           </CardTitle>
-          <CardDescription>
-            Signin with your Email or Facebook account
-          </CardDescription>
+          <CardDescription>Signin with your Email</CardDescription>
         </CardHeader>
         <CardContent>
           <form.AppForm>
             <form onSubmit={handleSubmit}>
               <div className="grid gap-6">
-                <div className="flex flex-col gap-4">
+                {/* <div className="flex flex-col gap-4">
                   <Button variant="outline" className="w-full">
                     <CiFacebook className="size-5" />
                     Signin with Facebook
@@ -90,7 +87,7 @@ export function SiginForm({
                   <span className="bg-card text-muted-foreground relative z-10 px-2">
                     Or continue with
                   </span>
-                </div>
+                </div> */}
 
                 {/* -------- */}
 
@@ -163,8 +160,8 @@ export function SiginForm({
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our Terms of Service and Privacy
+        Policy.
       </div>
     </div>
   );
