@@ -18,11 +18,7 @@ export const childrens = pgTable("childrens", {
   /////
   gender: varchar("gender", { length: 10 }),
   emergencyContact: varchar("emergency_contact", { length: 255 }),
-<<<<<<< HEAD
   medicalNotes: varchar("medical_notes", { length: 500 }),
-=======
-  medicalNotes: text("medical_notes"),
->>>>>>> origin/feature/nursery
   profileImageUrl: text("profile_image_url"),
   imagesUrl: text("images_url"),
   activities: text("activities"),

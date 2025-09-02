@@ -14,21 +14,10 @@ export const classes = pgTable("classes", {
 
   name: varchar("name", { length: 100 }).notNull(),
 
-<<<<<<< HEAD
-  // main teacher (single)
-=======
->>>>>>> origin/feature/nursery
   mainTeacherId: text("main_teacher_id").references(() => teachers.id, {
     onDelete: "set null",
   }),
 
-<<<<<<< HEAD
-  // all teachers (array of teacher IDs)
-  teacherIds: text("teacher_ids")
-    .array()
-    .default(sql`ARRAY[]::text[]`)
-    .notNull(),
-=======
   teacherIds: text("teacher_ids")
     .array()
     .notNull()
@@ -38,7 +27,6 @@ export const classes = pgTable("classes", {
     .array()
     .notNull()
     .default(sql`ARRAY[]::text[]`),
->>>>>>> origin/feature/nursery
 
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
