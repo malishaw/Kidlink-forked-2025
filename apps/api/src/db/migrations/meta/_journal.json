@@ -15,6 +15,13 @@
       "when": 1756752634929,
       "tag": "0001_reflective_jackpot",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1756790638387,
+      "tag": "0003_perfect_ma_gnuci",
+      "breakpoints": true
     }
   ]
 }

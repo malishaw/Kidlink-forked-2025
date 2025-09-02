@@ -14,16 +14,19 @@ export const classes = pgTable("classes", {
 
   name: varchar("name", { length: 100 }).notNull(),
 
-  // main teacher (single)
   mainTeacherId: text("main_teacher_id").references(() => teachers.id, {
     onDelete: "set null",
   }),
 
-  // all teachers (array of teacher IDs)
   teacherIds: text("teacher_ids")
     .array()
-    .default(sql`ARRAY[]::text[]`)
-    .notNull(),
+    .notNull()
+    .default(sql`ARRAY[]::text[]`),
+
+  childIds: text("child_ids")
+    .array()
+    .notNull()
+    .default(sql`ARRAY[]::text[]`),
 
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()

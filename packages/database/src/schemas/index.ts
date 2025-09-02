@@ -19,4 +19,6 @@ export * from "./payment.schema";
 
 export * from "./class.schema";
 
+export * from "./teacher.schema";
+
 export * from "./children.schema";

@@ -53,7 +53,7 @@ const data = {
   documents: [
     {
       name: "Manage Nursery",
-      url: "/account/manage",
+      url: "/account/manage/nursery",
       icon: IconBuildings,
     },
     {

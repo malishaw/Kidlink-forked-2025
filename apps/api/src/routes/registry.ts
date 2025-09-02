@@ -31,8 +31,8 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/payment", payment)
 
     .route("/hotels", hotels)
-    .route("/nursery", nursery)
     .route("/children", children)
+    .route("/nurseries", nursery)
     .route("/classes", nurseryClass);
 }
 
