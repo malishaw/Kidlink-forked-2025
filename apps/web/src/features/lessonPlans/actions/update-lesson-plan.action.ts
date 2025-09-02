@@ -7,7 +7,7 @@ import type { lessonPlanUpdateType } from "../schemas";
 export async function updateLessonPlan(id: string, data: lessonPlanUpdateType) {
   const client = await getClient();
 
-  const response = await client.api["lesson-plans"][":id"].$patch({
+  const response = await client.api["lessonPlans"][":id"].$patch({
     param: { id },
     json: data,
   });

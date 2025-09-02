@@ -28,7 +28,7 @@ export async function addLessonPlan(data: AddLessonPlanSchema, opts?: Options) {
 
   const client = await getClient();
 
-  const response = await client.api["lesson-plans"].$post({
+  const response = await client.api["lessonPlans"].$post({
     json: {
       title: data.title,
       content: data.content ?? null,

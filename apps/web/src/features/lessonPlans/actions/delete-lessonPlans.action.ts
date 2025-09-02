@@ -6,8 +6,8 @@ import { revalidatePath } from "next/cache";
 export async function deleteLessonPlan(id: string) {
   const client = await getClient();
 
-  const response = await client.api["lesson-plans"][":id"].$delete({
-    param: { id }
+  const response = await client.api["lessonPlans"][":id"].$delete({
+    param: { id },
   });
 
   if (!response.ok) {

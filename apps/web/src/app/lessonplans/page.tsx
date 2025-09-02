@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 async function getLessonPlans() {
   try {
     const client = await getClient();
-    const response = await client.api["lesson-plans"].$get({
+    const response = await client.api["lessonPlans"].$get({
       query: {},
     });
 

@@ -3,8 +3,10 @@ import { AppOpenAPI } from "@api/types";
 
 import { BASE_PATH } from "../lib/constants";
 import children from "./children/children.index";
+import feedbacks from "./feedbacks/feedbacks.index";
 import hotels from "./hotels/hotel.index";
 import index from "./index.route";
+import lessonPlans from "./lessonPlans/lessonPlans.index";
 import media from "./media/media.index";
 import notification from "./notification/notification.index";
 import nurseryClass from "./nursery-class/nursery-class.index";
@@ -33,6 +35,8 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/hotels", hotels)
     .route("/nursery", nursery)
     .route("/children", children)
+    .route("/feedbacks", feedbacks)
+    .route("/lessonPlans", lessonPlans)
     .route("/classes", nurseryClass);
 }
 

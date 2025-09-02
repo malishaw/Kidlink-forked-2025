@@ -1,1 +1,0 @@
-ALTER TABLE "lesson_plans" ALTER COLUMN "child_id" DROP NOT NULL;

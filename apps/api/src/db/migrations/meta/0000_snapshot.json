@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
-  "id": "b0fde281-8766-4dff-b9ca-366942d25ad1",
-=======
-  "id": "bc0f29d7-d461-4a5d-9f58-fdecb021c153",
->>>>>>> origin/feature/lessonplans
+  "id": "3c4f1033-aefd-4ad3-a00a-61290e797da6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -113,123 +109,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-<<<<<<< HEAD
     "public.childrens": {
       "name": "childrens",
-=======
-    "public.badges": {
-      "name": "badges",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "child_id": {
-          "name": "child_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "teacher_id": {
-          "name": "teacher_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "title": {
-          "name": "title",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "awarded_at": {
-          "name": "awarded_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "badges_organization_id_organization_id_fk": {
-          "name": "badges_organization_id_organization_id_fk",
-          "tableFrom": "badges",
-          "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "badges_child_id_children_id_fk": {
-          "name": "badges_child_id_children_id_fk",
-          "tableFrom": "badges",
-          "tableTo": "children",
-          "columnsFrom": [
-            "child_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "badges_teacher_id_user_id_fk": {
-          "name": "badges_teacher_id_user_id_fk",
-          "tableFrom": "badges",
-          "tableTo": "user",
-          "columnsFrom": [
-            "teacher_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.children": {
-      "name": "children",
->>>>>>> origin/feature/lessonplans
       "schema": "",
       "columns": {
         "id": {
@@ -239,22 +120,18 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-<<<<<<< HEAD
         "name": {
           "name": "name",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
-=======
->>>>>>> origin/feature/lessonplans
         "organization_id": {
           "name": "organization_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-<<<<<<< HEAD
         "nursery_id": {
           "name": "nursery_id",
           "type": "text",
@@ -267,29 +144,15 @@
           "primaryKey": false,
           "notNull": false
         },
-=======
->>>>>>> origin/feature/lessonplans
         "class_id": {
           "name": "class_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-<<<<<<< HEAD
         "dob": {
           "name": "dob",
           "type": "date",
-=======
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "dob": {
-          "name": "dob",
-          "type": "timestamp",
->>>>>>> origin/feature/lessonplans
           "primaryKey": false,
           "notNull": false
         },
@@ -297,13 +160,13 @@
           "name": "gender",
           "type": "varchar(10)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "emergency_contact": {
           "name": "emergency_contact",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "medical_notes": {
           "name": "medical_notes",
@@ -329,7 +192,6 @@
           "primaryKey": false,
           "notNull": false
         },
-<<<<<<< HEAD
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -337,37 +199,19 @@
           "notNull": true,
           "default": "now()"
         },
-=======
->>>>>>> origin/feature/lessonplans
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
-<<<<<<< HEAD
-=======
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
->>>>>>> origin/feature/lessonplans
         }
       },
       "indexes": {},
       "foreignKeys": {
-<<<<<<< HEAD
         "childrens_organization_id_organization_id_fk": {
           "name": "childrens_organization_id_organization_id_fk",
           "tableFrom": "childrens",
-=======
-        "children_organization_id_organization_id_fk": {
-          "name": "children_organization_id_organization_id_fk",
-          "tableFrom": "children",
->>>>>>> origin/feature/lessonplans
           "tableTo": "organization",
           "columnsFrom": [
             "organization_id"
@@ -377,22 +221,6 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
-<<<<<<< HEAD
-=======
-        },
-        "children_class_id_classes_id_fk": {
-          "name": "children_class_id_classes_id_fk",
-          "tableFrom": "children",
-          "tableTo": "classes",
-          "columnsFrom": [
-            "class_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
->>>>>>> origin/feature/lessonplans
         }
       },
       "compositePrimaryKeys": {},
@@ -412,33 +240,24 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-<<<<<<< HEAD
         "nursery_id": {
           "name": "nursery_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-=======
->>>>>>> origin/feature/lessonplans
         "name": {
           "name": "name",
           "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true
         },
-<<<<<<< HEAD
         "main_teacher_id": {
           "name": "main_teacher_id",
-=======
-        "teacher_id": {
-          "name": "teacher_id",
->>>>>>> origin/feature/lessonplans
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-<<<<<<< HEAD
         "teacher_ids": {
           "name": "teacher_ids",
           "type": "text[]",
@@ -449,28 +268,13 @@
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
-=======
-        "organization_id": {
-          "name": "organization_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
->>>>>>> origin/feature/lessonplans
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-<<<<<<< HEAD
           "type": "timestamp with time zone",
-=======
-          "type": "timestamp",
->>>>>>> origin/feature/lessonplans
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
@@ -478,26 +282,16 @@
       },
       "indexes": {},
       "foreignKeys": {
-<<<<<<< HEAD
         "classes_nursery_id_nurseries_id_fk": {
           "name": "classes_nursery_id_nurseries_id_fk",
           "tableFrom": "classes",
           "tableTo": "nurseries",
           "columnsFrom": [
             "nursery_id"
-=======
-        "classes_teacher_id_user_id_fk": {
-          "name": "classes_teacher_id_user_id_fk",
-          "tableFrom": "classes",
-          "tableTo": "user",
-          "columnsFrom": [
-            "teacher_id"
->>>>>>> origin/feature/lessonplans
           ],
           "columnsTo": [
             "id"
           ],
-<<<<<<< HEAD
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -507,25 +301,11 @@
           "tableTo": "teacher",
           "columnsFrom": [
             "main_teacher_id"
-=======
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "classes_organization_id_organization_id_fk": {
-          "name": "classes_organization_id_organization_id_fk",
-          "tableFrom": "classes",
-          "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
->>>>>>> origin/feature/lessonplans
           ],
           "columnsTo": [
             "id"
           ],
-<<<<<<< HEAD
           "onDelete": "set null",
-=======
-          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
@@ -611,10 +391,10 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "feedbacks_child_id_children_id_fk": {
-          "name": "feedbacks_child_id_children_id_fk",
+        "feedbacks_child_id_childrens_id_fk": {
+          "name": "feedbacks_child_id_childrens_id_fk",
           "tableFrom": "feedbacks",
-          "tableTo": "children",
+          "tableTo": "childrens",
           "columnsFrom": [
             "child_id"
           ],
@@ -635,7 +415,6 @@
             "id"
           ],
           "onDelete": "no action",
->>>>>>> origin/feature/lessonplans
           "onUpdate": "no action"
         }
       },
@@ -1397,8 +1176,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-<<<<<<< HEAD
-=======
     "public.lesson_plans": {
       "name": "lesson_plans",
       "schema": "",
@@ -1438,7 +1215,7 @@
           "name": "child_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "class_id": {
           "name": "class_id",
@@ -1489,10 +1266,10 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "lesson_plans_child_id_children_id_fk": {
-          "name": "lesson_plans_child_id_children_id_fk",
+        "lesson_plans_child_id_childrens_id_fk": {
+          "name": "lesson_plans_child_id_childrens_id_fk",
           "tableFrom": "lesson_plans",
-          "tableTo": "children",
+          "tableTo": "childrens",
           "columnsFrom": [
             "child_id"
           ],
@@ -1522,7 +1299,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
->>>>>>> origin/feature/lessonplans
     "public.media": {
       "name": "media",
       "schema": "",
@@ -1653,13 +1429,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-<<<<<<< HEAD
     "public.notification": {
       "name": "notification",
-=======
-    "public.notifications": {
-      "name": "notifications",
->>>>>>> origin/feature/lessonplans
       "schema": "",
       "columns": {
         "id": {
@@ -1675,24 +1446,12 @@
           "primaryKey": false,
           "notNull": false
         },
-<<<<<<< HEAD
         "senderId": {
           "name": "senderId",
-=======
-        "title": {
-          "name": "title",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "message": {
-          "name": "message",
->>>>>>> origin/feature/lessonplans
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-<<<<<<< HEAD
         "receiverId": {
           "name": "receiverId",
           "type": "text[]",
@@ -1701,21 +1460,10 @@
         },
         "topic": {
           "name": "topic",
-=======
-        "metadata": {
-          "name": "metadata",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "notification_type": {
-          "name": "notification_type",
->>>>>>> origin/feature/lessonplans
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-<<<<<<< HEAD
         "description": {
           "name": "description",
           "type": "text",
@@ -1736,56 +1484,20 @@
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
-=======
-        "recipient_type": {
-          "name": "recipient_type",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "recipient_id": {
-          "name": "recipient_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "read_at": {
-          "name": "read_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
->>>>>>> origin/feature/lessonplans
         },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-<<<<<<< HEAD
           "notNull": false,
-=======
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
->>>>>>> origin/feature/lessonplans
           "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
-<<<<<<< HEAD
         "notification_organization_id_organization_id_fk": {
           "name": "notification_organization_id_organization_id_fk",
           "tableFrom": "notification",
-=======
-        "notifications_organization_id_organization_id_fk": {
-          "name": "notifications_organization_id_organization_id_fk",
-          "tableFrom": "notifications",
->>>>>>> origin/feature/lessonplans
           "tableTo": "organization",
           "columnsFrom": [
             "organization_id"
@@ -1803,7 +1515,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-<<<<<<< HEAD
     "public.nurseries": {
       "name": "nurseries",
       "schema": "",
@@ -1934,8 +1645,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-=======
->>>>>>> origin/feature/lessonplans
     "public.organization": {
       "name": "organization",
       "schema": "",
@@ -1993,20 +1702,14 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-<<<<<<< HEAD
     "public.parent": {
       "name": "parent",
-=======
-    "public.payments": {
-      "name": "payments",
->>>>>>> origin/feature/lessonplans
       "schema": "",
       "columns": {
         "id": {
           "name": "id",
           "type": "text",
           "primaryKey": true,
-<<<<<<< HEAD
           "notNull": true,
           "default": "gen_random_uuid()"
         },
@@ -2015,15 +1718,11 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
-=======
-          "notNull": true
->>>>>>> origin/feature/lessonplans
         },
         "child_id": {
           "name": "child_id",
           "type": "text",
           "primaryKey": false,
-<<<<<<< HEAD
           "notNull": false
         },
         "name": {
@@ -2148,77 +1847,23 @@
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
-=======
-          "notNull": true
-        },
-        "amount": {
-          "name": "amount",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "payment_method": {
-          "name": "payment_method",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "status": {
-          "name": "status",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'pending'"
-        },
-        "paid_at": {
-          "name": "paid_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
->>>>>>> origin/feature/lessonplans
         },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-<<<<<<< HEAD
           "notNull": false,
-=======
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
->>>>>>> origin/feature/lessonplans
           "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
-<<<<<<< HEAD
         "payment_organization_id_organization_id_fk": {
           "name": "payment_organization_id_organization_id_fk",
           "tableFrom": "payment",
           "tableTo": "organization",
           "columnsFrom": [
             "organization_id"
-=======
-        "payments_child_id_children_id_fk": {
-          "name": "payments_child_id_children_id_fk",
-          "tableFrom": "payments",
-          "tableTo": "children",
-          "columnsFrom": [
-            "child_id"
->>>>>>> origin/feature/lessonplans
           ],
           "columnsTo": [
             "id"
@@ -2226,21 +1871,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-<<<<<<< HEAD
         "payment_parent_id_parent_id_fk": {
           "name": "payment_parent_id_parent_id_fk",
           "tableFrom": "payment",
           "tableTo": "parent",
           "columnsFrom": [
             "parent_id"
-=======
-        "payments_organization_id_organization_id_fk": {
-          "name": "payments_organization_id_organization_id_fk",
-          "tableFrom": "payments",
-          "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
->>>>>>> origin/feature/lessonplans
           ],
           "columnsTo": [
             "id"
@@ -2839,7 +2475,6 @@
           "primaryKey": false,
           "notNull": false
         },
-<<<<<<< HEAD
         "name": {
           "name": "name",
           "type": "text",
@@ -2861,29 +2496,6 @@
         "address": {
           "name": "address",
           "type": "text",
-=======
-        "children_id": {
-          "name": "children_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "lesson_plans_id": {
-          "name": "lesson_plans_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "class_id": {
-          "name": "class_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
->>>>>>> origin/feature/lessonplans
           "primaryKey": false,
           "notNull": true
         },
@@ -2916,48 +2528,6 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
-<<<<<<< HEAD
-=======
-        },
-        "teacher_children_id_children_id_fk": {
-          "name": "teacher_children_id_children_id_fk",
-          "tableFrom": "teacher",
-          "tableTo": "children",
-          "columnsFrom": [
-            "children_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "teacher_lesson_plans_id_lesson_plans_id_fk": {
-          "name": "teacher_lesson_plans_id_lesson_plans_id_fk",
-          "tableFrom": "teacher",
-          "tableTo": "lesson_plans",
-          "columnsFrom": [
-            "lesson_plans_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "teacher_class_id_classes_id_fk": {
-          "name": "teacher_class_id_classes_id_fk",
-          "tableFrom": "teacher",
-          "tableTo": "classes",
-          "columnsFrom": [
-            "class_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
->>>>>>> origin/feature/lessonplans
         }
       },
       "compositePrimaryKeys": {},
@@ -3124,7 +2694,6 @@
         "document"
       ]
     },
-<<<<<<< HEAD
     "public.notification_status": {
       "name": "notification_status",
       "schema": "public",
@@ -3143,8 +2712,6 @@
         "bankTransfer"
       ]
     },
-=======
->>>>>>> origin/feature/lessonplans
     "public.room_status": {
       "name": "room_status",
       "schema": "public",
