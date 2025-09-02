@@ -5,14 +5,19 @@ export interface Class {
   id: string;
   nurseryId?: string | null;
   name: string;
+  mainTeacherId?: string | null;
+  teacherIds: string[];
+  childIds: string[];
   createdAt?: string | null;
   updatedAt?: string | null;
 }
 
 export interface CreateClassInput {
-  // nurseryId is optional on the client; server will auto-pick if omitted
   nurseryId?: string | null;
   name: string;
+  mainTeacherId?: string | null;
+  teacherIds?: string[]; // optional on create
+  childIds?: string[]; // optional on create
 }
 
 export const useCreateClass = () => {
@@ -27,7 +32,7 @@ export const useCreateClass = () => {
       });
 
       if (!response.ok) {
-        // Try to bubble up the API error message if available
+        // Bubble up API error if present
         let msg = "Failed to create class";
         try {
           const err = await response.json();
@@ -40,7 +45,7 @@ export const useCreateClass = () => {
       return json as Class;
     },
     onSuccess: () => {
-      // Invalidate cache so `useGetClasses` refetches
+      // Invalidate so classes list refetches
       queryClient.invalidateQueries({ queryKey: ["classes"] });
     },
   });

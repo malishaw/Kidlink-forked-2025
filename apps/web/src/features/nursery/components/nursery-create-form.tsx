@@ -1,19 +1,20 @@
 "use client";
 
 import type React from "react";
+import { useState } from "react";
 
-import { useCreateNursery } from "@/app/account/actions/create-nursery.action";
+import { Button } from "@repo/ui/components/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@repo/ui/components//card";
-import { Input } from "@repo/ui/components//input";
-import { Button } from "@repo/ui/components/button";
+} from "@repo/ui/components/card";
+import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
-import { useState } from "react";
+
+import { useCreateNursery } from "../actions/create-nursery.action";
 
 export default function CreateNurseryForm() {
   const { mutate: createNursery, isPending } = useCreateNursery();
@@ -85,7 +86,7 @@ export default function CreateNurseryForm() {
   };
 
   return (
-    <Card className="w-[1200px] mx-auto">
+    <Card className="w-full max-w-[1200px] mx-auto">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">Create Nursery</CardTitle>
       </CardHeader>

@@ -11,3 +11,7 @@ export * from "./room.schema";
 export * from "./nursery.schema";
 
 export * from "./class.schema";
+
+export * from "./teacher.schema";
+
+export * from "./children.schema";

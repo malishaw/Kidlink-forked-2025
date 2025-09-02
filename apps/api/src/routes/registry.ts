@@ -19,7 +19,7 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/media", media)
     .route("/property-classes", propertyClasses)
     .route("/hotels", hotels)
-    .route("/nursery", nursery)
+    .route("/nurseries", nursery)
     .route("/classes", nurseryClass);
 }
 

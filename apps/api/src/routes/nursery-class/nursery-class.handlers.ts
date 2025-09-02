@@ -44,6 +44,9 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
       id: classes.id,
       nurseryId: classes.nurseryId,
       name: classes.name,
+      mainTeacherId: classes.mainTeacherId,
+      teacherIds: classes.teacherIds,
+      childIds: classes.childIds,
       createdAt: classes.createdAt,
       updatedAt: classes.updatedAt,
     })
@@ -141,11 +144,21 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
 
   const now = new Date();
 
+  // Normalize arrays if provided (dedupe)
+  const teacherIds = Array.isArray(body.teacherIds)
+    ? Array.from(new Set(body.teacherIds))
+    : undefined;
+  const childIds = Array.isArray(body.childIds)
+    ? Array.from(new Set(body.childIds))
+    : undefined;
+
   const [inserted] = await db
     .insert(classes)
     .values({
       ...body,
       nurseryId: resolvedNurseryId!,
+      teacherIds,
+      childIds,
       createdAt: now,
       updatedAt: now,
     })
@@ -184,6 +197,9 @@ export const getOne: AppRouteHandler<GetByIdRoute> = async (c) => {
       id: classes.id,
       nurseryId: classes.nurseryId,
       name: classes.name,
+      mainTeacherId: classes.mainTeacherId,
+      teacherIds: classes.teacherIds,
+      childIds: classes.childIds,
       createdAt: classes.createdAt,
       updatedAt: classes.updatedAt,
     })
@@ -212,10 +228,12 @@ export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
   const session = c.get("session") as Session | undefined;
 
   if (!session?.userId) {
-    return c.json(
-      { message: HttpStatusPhrases.UNAUTHORIZED },
-      HttpStatusCodes.UNAUTHORIZED
-    );
+    throw new Error(HttpStatusPhrases.UNAUTHORIZED);
+  }
+
+  // Disallow clearing nurseryId to null; ownership checks rely on join
+  if ("nurseryId" in updates && updates.nurseryId === null) {
+    throw new Error("nurseryId cannot be set to null");
   }
 
   // First ensure the class is currently owned (via its parent nursery)
@@ -240,10 +258,7 @@ export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
     .limit(1);
 
   if (!existing.length) {
-    return c.json(
-      { message: HttpStatusPhrases.NOT_FOUND },
-      HttpStatusCodes.NOT_FOUND
-    );
+    throw new Error(HttpStatusPhrases.NOT_FOUND);
   }
 
   // If changing nurseryId, validate the new parent is also owned
@@ -263,27 +278,31 @@ export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
       where: nurseryWhere,
     });
     if (!newParent) {
-      return c.json(
-        { message: "Target nursery not found" },
-        HttpStatusCodes.NOT_FOUND
-      );
+      throw new Error("Target nursery not found");
     }
   }
+
+  // Normalize arrays if present
+  const teacherIds = Array.isArray(updates.teacherIds)
+    ? Array.from(new Set(updates.teacherIds))
+    : undefined;
+  const childIds = Array.isArray(updates.childIds)
+    ? Array.from(new Set(updates.childIds))
+    : undefined;
 
   const [updated] = await db
     .update(classes)
     .set({
       ...updates,
+      ...(teacherIds ? { teacherIds } : {}),
+      ...(childIds ? { childIds } : {}),
       updatedAt: new Date(),
     })
     .where(eq(classes.id, String(id)))
     .returning();
 
   if (!updated) {
-    return c.json(
-      { message: HttpStatusPhrases.NOT_FOUND },
-      HttpStatusCodes.NOT_FOUND
-    );
+    throw new Error(HttpStatusPhrases.NOT_FOUND);
   }
 
   return c.json(updated, HttpStatusCodes.OK);
