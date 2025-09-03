@@ -1,6 +1,6 @@
 import { getClient } from "../rpc/server";
 
-type GetUserReturnT = "user" | "hotelOwner" | "systemAdmin" | null;
+type GetUserReturnT = "user" | "hotelOwner" | "systemAdmin" | "children" | null;
 
 export async function getUserType(): Promise<GetUserReturnT> {
   const rpcClient = await getClient();

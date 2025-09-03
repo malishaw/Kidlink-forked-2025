@@ -11,7 +11,7 @@ import { Label } from "@repo/ui/components/label";
 import {
   Popover,
   PopoverContent,
-  PopoverTrigger
+  PopoverTrigger,
 } from "@repo/ui/components/popover";
 import { Separator } from "@repo/ui/components/separator";
 import { cn } from "@repo/ui/lib/utils";
@@ -38,7 +38,7 @@ const HotelSearchComponent: React.FC<HotelSearchProps> = ({ className }) => {
     adults: 2,
     children: 0,
     priceRange: "",
-    starRating: ""
+    starRating: "",
   });
 
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -54,35 +54,35 @@ const HotelSearchComponent: React.FC<HotelSearchProps> = ({ className }) => {
     if (!dateRange.to) {
       return dateRange.from.toLocaleDateString("en-US", {
         month: "short",
-        day: "numeric"
+        day: "numeric",
       });
     }
     return `${dateRange.from.toLocaleDateString("en-US", {
       month: "short",
-      day: "numeric"
+      day: "numeric",
     })} - ${dateRange.to.toLocaleDateString("en-US", {
       month: "short",
-      day: "numeric"
+      day: "numeric",
     })}`;
   };
 
   const incrementGuests = (type: "rooms" | "adults" | "children") => {
     setSearchData((prev) => ({
       ...prev,
-      [type]: prev[type] + 1
+      [type]: prev[type] + 1,
     }));
   };
 
   const decrementGuests = (type: "rooms" | "adults" | "children") => {
     setSearchData((prev) => ({
       ...prev,
-      [type]: Math.max(type === "adults" ? 1 : 0, prev[type] - 1)
+      [type]: Math.max(type === "adults" ? 1 : 0, prev[type] - 1),
     }));
   };
 
   return (
     <Card className={cn("w-full max-w-6xl mx-auto shadow-lg", className)}>
-      <CardContent className="p-6">
+      <CardContent className="p-0 pr-4 pl-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
           {/* Destination */}
           <div className="lg:col-span-4">
@@ -101,7 +101,7 @@ const HotelSearchComponent: React.FC<HotelSearchProps> = ({ className }) => {
                 onChange={(e) =>
                   setSearchData((prev) => ({
                     ...prev,
-                    destination: e.target.value
+                    destination: e.target.value,
                   }))
                 }
                 className="pl-10"

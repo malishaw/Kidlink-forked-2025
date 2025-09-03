@@ -9,8 +9,8 @@ export async function HotelTypes({}: Props) {
   const hotelTypesRes = await rpcClient.api.hotels.types.$get({
     query: {
       page: "1",
-      limit: "10"
-    }
+      limit: "10",
+    },
   });
 
   if (!hotelTypesRes.ok) {
@@ -28,7 +28,7 @@ export async function HotelTypes({}: Props) {
             src={hotelType.thumbnail || ""}
             width={600}
             height={400}
-            alt="Bloonsoo.com"
+            alt="Kidlink.com"
             className="absolute top-0 left-0 object-cover w-full h-full -z-10"
           />
         </div>

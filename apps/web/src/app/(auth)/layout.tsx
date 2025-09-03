@@ -13,7 +13,7 @@ export default function AuthLayout({ children }: Props) {
           <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-xs">
             <PiBuilding className="size-4" />
           </div>
-          <span className="font-heading text-primary/90">Bloonsoo.com</span>
+          <span className="font-heading text-primary/90">Kidlink.com</span>
         </a>
         {children}
       </div>

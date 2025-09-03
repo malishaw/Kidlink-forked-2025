@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  IconBox,
-  IconBuildings,
-  IconDashboard,
-  IconHelp,
-  IconSearch,
-  IconSettings
-} from "@tabler/icons-react";
+import { IconBox, IconBuildings, IconDashboard } from "@tabler/icons-react";
 import * as React from "react";
 
 import { NavDocuments } from "@/components/dashboard/nav-documents";
@@ -22,65 +15,97 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
 } from "@repo/ui/components/sidebar";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { PiBuilding } from "react-icons/pi";
 
 const data = {
   user: {
-    name: "shadcn",
+    name: "kidlink",
     email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg"
+    avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
     {
       title: "Dashboard",
       url: "#",
-      icon: IconDashboard
-    }
+      icon: IconDashboard,
+    },
   ],
   navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: IconHelp
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch
-    }
+    // {
+    //   title: "Settings",
+    //   url: "#",
+    //   icon: IconSettings,
+    // },
+    // {
+    //   title: "Get Help",
+    //   url: "#",
+    //   icon: IconHelp,
+    // },
+    // {
+    //   title: "Search",
+    //   url: "#",
+    //   icon: IconSearch,
+    // },
   ],
   documents: [
     {
-      name: "Manage Hotel",
-      url: "/account/manage",
-      icon: IconBuildings
+      name: "Manage Nursery",
+      url: "/account/manage/nursery",
+      icon: IconBuildings,
     },
     {
-      name: "Hotel Rooms",
-      url: "/account/manage/rooms",
-      icon: IconBox
-    }
+      name: "Classes",
+      url: "/account/manage/classes",
+      icon: IconBox,
+    },
+    {
+      name: "Teachers",
+      url: "/account/manage/teachers",
+      icon: IconBox,
+    },
+    {
+      name: "Parents",
+      url: "/account/manage/parents",
+      icon: IconBox,
+    },
+    {
+      name: "Notifications",
+      url: "/account/manage/notification",
+      icon: IconBox,
+    },
+
+    {
+      name: "Children",
+      url: "/account/manage/children",
+      icon: IconBox,
+    },
+    {
+      name: "Feedback",
+      url: "/account/manage/feedback",
+
+      icon: IconBox,
+    },
+    {
+      name: "Badges",
+      url: "/account/manage/badges",
+      icon: IconBox,
+    },
   ],
   userManagement: [
     {
       name: "All Users",
       url: "/dashboard/users",
-      icon: IconBuildings
+      icon: IconBuildings,
     },
     {
       name: "Organizations",
       url: "/dashboard/organizations",
-      icon: IconBuildings
-    }
-  ]
+      icon: IconBuildings,
+    },
+  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
