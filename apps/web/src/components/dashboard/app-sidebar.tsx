@@ -62,12 +62,12 @@ const data = {
       icon: IconBox,
     },
     {
-      name: "Management",
+      name: "Teachers",
       url: "/account/manage/teachers",
       icon: IconBox,
     },
     {
-      name: "Managemet",
+      name: "Parents",
       url: "/account/manage/parents",
       icon: IconBox,
     },
