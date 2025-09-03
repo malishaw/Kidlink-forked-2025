@@ -8,12 +8,12 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar
+  useSidebar,
 } from "@repo/ui/components/sidebar";
 import Link from "next/link";
 
 export function NavDocuments({
-  items
+  items,
 }: {
   items: {
     name: string;
@@ -25,7 +25,7 @@ export function NavDocuments({
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Hotel Management</SidebarGroupLabel>
+      <SidebarGroupLabel>Nursery Management</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.name}>

@@ -1,12 +1,6 @@
 "use client";
 
 import { Button } from "@repo/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/components/card";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import { Plus, X } from "lucide-react";
@@ -57,8 +51,18 @@ export default function CreateClassForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (name.trim() === "") {
+      alert("Class name is required.");
+      return;
+    }
     createClass(
-      { name, mainTeacherId, teacherIds, childIds },
+      {
+        nurseryId: null,
+        name: name.trim(),
+        mainTeacherId: mainTeacherId.trim() === "" ? null : mainTeacherId,
+        teacherIds,
+        // childIds is not part of the API response, so omit if not needed
+      },
       {
         onSuccess: () => {
           alert("Class created!");
@@ -78,161 +82,207 @@ export default function CreateClassForm() {
   };
 
   return (
-    <Card className="w-[600px] ml-0">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">Create Class</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="bg-white/90 backdrop-blur-sm border-0 shadow-2xl rounded-3xl overflow-hidden max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6">
+        <div className="flex items-center gap-4">
+          <div className="h-12 w-12 bg-white/20 rounded-xl flex items-center justify-center">
+            <Plus className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-white">Create New Class</h2>
+            <p className="text-indigo-100">
+              Add a new class to your management system
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Form Content */}
+      <div className="p-8">
+        <form onSubmit={handleSubmit} className="space-y-8">
           {/* Class Name */}
-          <div className="space-y-2">
-            <Label htmlFor="name">Class Name *</Label>
+          <div className="space-y-3">
+            <Label
+              htmlFor="name"
+              className="text-lg font-semibold text-slate-800 flex items-center gap-2"
+            >
+              📚 Class Name *
+            </Label>
             <Input
               id="name"
               name="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter class name"
+              placeholder="Enter a memorable class name..."
               required
+              className="h-12 text-lg border-2 border-slate-200 rounded-xl focus:border-indigo-500 focus:ring-indigo-200 transition-all duration-200"
             />
           </div>
 
           {/* Main Teacher ID */}
-          <div className="space-y-2">
-            <Label htmlFor="mainTeacherId">Main Teacher ID</Label>
+          <div className="space-y-3">
+            <Label
+              htmlFor="mainTeacherId"
+              className="text-lg font-semibold text-slate-800 flex items-center gap-2"
+            >
+              👨‍🏫 Main Teacher ID
+            </Label>
             <Input
               id="mainTeacherId"
               name="mainTeacherId"
               value={mainTeacherId}
               onChange={(e) => setMainTeacherId(e.target.value)}
-              placeholder="Enter main teacher id"
+              placeholder="Enter the main teacher's ID..."
+              className="h-12 text-lg border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-blue-200 transition-all duration-200"
             />
           </div>
 
           {/* Teacher IDs */}
-          <div className="space-y-2">
-            <Label htmlFor="teacherId">Teacher IDs</Label>
-            <div className="relative flex gap-2">
-              <Input
-                id="teacherId"
-                name="teacherId"
-                value={teacherInput}
-                onChange={(e) => setTeacherInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addTeacherId();
-                  }
-                }}
-                placeholder="Enter a teacher id and press Enter"
-                className="pr-8"
-              />
-              {teacherIds.length > 0 && (
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 select-none text-muted-foreground"
-                  title="You can add more"
+          <div className="space-y-4">
+            <Label
+              htmlFor="teacherId"
+              className="text-lg font-semibold text-slate-800 flex items-center gap-2"
+            >
+              👥 Additional Teachers
+            </Label>
+            <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-200">
+              <div className="flex gap-3 mb-4">
+                <Input
+                  id="teacherId"
+                  name="teacherId"
+                  value={teacherInput}
+                  onChange={(e) => setTeacherInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addTeacherId();
+                    }
+                  }}
+                  placeholder="Enter teacher ID and press Enter or click Add"
+                  className="flex-1 h-11 border-2 border-slate-300 rounded-xl focus:border-green-500 focus:ring-green-200"
+                />
+                <Button
+                  type="button"
+                  onClick={addTeacherId}
+                  className="h-11 px-6 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 rounded-xl"
                 >
-                  +
-                </span>
-              )}
-              <Button type="button" onClick={addTeacherId} variant="secondary">
-                <Plus className="h-4 w-4 mr-1" />
-                Add
-              </Button>
-            </div>
-
-            {teacherIds.length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-2">
-                {teacherIds.map((id) => (
-                  <div
-                    key={id}
-                    className="flex items-center gap-2 rounded-2xl border px-3 py-1 text-sm"
-                  >
-                    <span className="font-mono">{id}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeTeacherId(id)}
-                      className="text-muted-foreground hover:text-foreground"
-                      aria-label={`Remove ${id}`}
-                      title={`Remove ${id}`}
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Teacher
+                </Button>
               </div>
-            )}
+
+              {teacherIds.length > 0 && (
+                <div className="space-y-3">
+                  <div className="text-sm font-medium text-slate-600">
+                    Added Teachers ({teacherIds.length})
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {teacherIds.map((id) => (
+                      <div
+                        key={id}
+                        className="flex items-center gap-2 bg-green-100 text-green-800 rounded-xl px-4 py-2 border border-green-200"
+                      >
+                        <span className="font-mono font-medium">{id}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeTeacherId(id)}
+                          className="text-green-600 hover:text-green-800 hover:bg-green-200 rounded-full p-1 transition-colors"
+                          aria-label={`Remove ${id}`}
+                          title={`Remove ${id}`}
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Children IDs */}
-          <div className="space-y-2">
-            <Label htmlFor="childId">Children IDs</Label>
-            <div className="relative flex gap-2">
-              <Input
-                id="childId"
-                name="childId"
-                value={childInput}
-                onChange={(e) => setChildInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addChildId();
-                  }
-                }}
-                placeholder="Enter a child id and press Enter"
-                className="pr-8"
-              />
-              {childIds.length > 0 && (
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 select-none text-muted-foreground"
-                  title="You can add more"
+          <div className="space-y-4">
+            <Label
+              htmlFor="childId"
+              className="text-lg font-semibold text-slate-800 flex items-center gap-2"
+            >
+              🧒 Students
+            </Label>
+            <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-200">
+              <div className="flex gap-3 mb-4">
+                <Input
+                  id="childId"
+                  name="childId"
+                  value={childInput}
+                  onChange={(e) => setChildInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addChildId();
+                    }
+                  }}
+                  placeholder="Enter student ID and press Enter or click Add"
+                  className="flex-1 h-11 border-2 border-slate-300 rounded-xl focus:border-purple-500 focus:ring-purple-200"
+                />
+                <Button
+                  type="button"
+                  onClick={addChildId}
+                  className="h-11 px-6 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 rounded-xl"
                 >
-                  +
-                </span>
-              )}
-              <Button type="button" onClick={addChildId} variant="secondary">
-                <Plus className="h-4 w-4 mr-1" />
-                Add
-              </Button>
-            </div>
-
-            {childIds.length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-2">
-                {childIds.map((id) => (
-                  <div
-                    key={id}
-                    className="flex items-center gap-2 rounded-2xl border px-3 py-1 text-sm"
-                  >
-                    <span className="font-mono">{id}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeChildId(id)}
-                      className="text-muted-foreground hover:text-foreground"
-                      aria-label={`Remove ${id}`}
-                      title={`Remove ${id}`}
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Student
+                </Button>
               </div>
-            )}
+
+              {childIds.length > 0 && (
+                <div className="space-y-3">
+                  <div className="text-sm font-medium text-slate-600">
+                    Added Students ({childIds.length})
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {childIds.map((id) => (
+                      <div
+                        key={id}
+                        className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-xl px-4 py-2 border border-purple-200"
+                      >
+                        <span className="font-mono font-medium">{id}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeChildId(id)}
+                          className="text-purple-600 hover:text-purple-800 hover:bg-purple-200 rounded-full p-1 transition-colors"
+                          aria-label={`Remove ${id}`}
+                          title={`Remove ${id}`}
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Submit */}
-          <div className="pt-4">
+          {/* Submit Button */}
+          <div className="pt-6">
             <Button
               type="submit"
               disabled={isPending || !canSubmit}
-              className="w-full md:w-auto px-8"
+              className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
             >
-              {isPending ? "Saving..." : "Save Class"}
+              {isPending ? (
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Creating Class...
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">🎓 Create Class</div>
+              )}
             </Button>
           </div>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

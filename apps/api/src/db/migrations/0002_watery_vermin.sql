@@ -1,0 +1,1 @@
+ALTER TABLE "childrens" ADD COLUMN "badge_id" text;

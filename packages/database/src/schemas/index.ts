@@ -19,10 +19,15 @@ export * from "./payment.schema";
 
 export * from "./class.schema";
 
+<<<<<<< HEAD
 export * from "./children.schema";
 
 export * from "./feedback.schema";
 
 export * from "./lessonPlans.schema";
+=======
+export * from "./teacher.schema";
+>>>>>>> origin/origin/tharusha
 
+export * from "./badges.schema";
 export * from "./children.schema";

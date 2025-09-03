@@ -1,5 +1,5 @@
 {
-  "id": "8866a20f-b11f-41ed-a98b-4a25a8982271",
+  "id": "a07a2e41-5087-40c0-a9f7-fa44d0c0d9cb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -93,12 +93,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -213,12 +209,8 @@
           "name": "childrens_organization_id_organization_id_fk",
           "tableFrom": "childrens",
           "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -293,12 +285,8 @@
           "name": "classes_nursery_id_nurseries_id_fk",
           "tableFrom": "classes",
           "tableTo": "nurseries",
-          "columnsFrom": [
-            "nursery_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["nursery_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -306,12 +294,8 @@
           "name": "classes_main_teacher_id_teacher_id_fk",
           "tableFrom": "classes",
           "tableTo": "teacher",
-          "columnsFrom": [
-            "main_teacher_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["main_teacher_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -390,9 +374,9 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -402,25 +386,17 @@
           "name": "feedback_organization_id_organization_id_fk",
           "tableFrom": "feedback",
           "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "feedback_child_id_childrens_id_fk": {
-          "name": "feedback_child_id_childrens_id_fk",
-          "tableFrom": "feedback",
-          "tableTo": "childrens",
-          "columnsFrom": [
-            "child_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+        "classes_main_teacher_id_teacher_id_fk": {
+          "name": "classes_main_teacher_id_teacher_id_fk",
+          "tableFrom": "classes",
+          "tableTo": "teacher",
+          "columnsFrom": ["main_teacher_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -428,12 +404,8 @@
           "name": "feedback_teacher_id_user_id_fk",
           "tableFrom": "feedback",
           "tableTo": "user",
-          "columnsFrom": [
-            "teacher_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["teacher_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -519,12 +491,8 @@
           "name": "hotel_amenities_hotel_id_hotels_id_fk",
           "tableFrom": "hotel_amenities",
           "tableTo": "hotels",
-          "columnsFrom": [
-            "hotel_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["hotel_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -651,12 +619,8 @@
           "name": "hotel_images_hotel_id_hotels_id_fk",
           "tableFrom": "hotel_images",
           "tableTo": "hotels",
-          "columnsFrom": [
-            "hotel_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["hotel_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -664,12 +628,8 @@
           "name": "hotel_images_room_type_id_room_types_id_fk",
           "tableFrom": "hotel_images",
           "tableTo": "room_types",
-          "columnsFrom": [
-            "room_type_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["room_type_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -775,12 +735,8 @@
           "name": "hotel_policies_hotel_id_hotels_id_fk",
           "tableFrom": "hotel_policies",
           "tableTo": "hotels",
-          "columnsFrom": [
-            "hotel_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["hotel_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1058,12 +1014,8 @@
           "name": "hotels_organization_id_organization_id_fk",
           "tableFrom": "hotels",
           "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1071,12 +1023,8 @@
           "name": "hotels_created_by_user_id_fk",
           "tableFrom": "hotels",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -1084,12 +1032,8 @@
           "name": "hotels_hotel_type_hotel_types_id_fk",
           "tableFrom": "hotels",
           "tableTo": "hotel_types",
-          "columnsFrom": [
-            "hotel_type"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["hotel_type"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -1097,12 +1041,8 @@
           "name": "hotels_property_class_property_classes_id_fk",
           "tableFrom": "hotels",
           "tableTo": "property_classes",
-          "columnsFrom": [
-            "property_class"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["property_class"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1167,12 +1107,8 @@
           "name": "invitation_organization_id_organization_id_fk",
           "tableFrom": "invitation",
           "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1180,12 +1116,8 @@
           "name": "invitation_inviter_id_user_id_fk",
           "tableFrom": "invitation",
           "tableTo": "user",
-          "columnsFrom": [
-            "inviter_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["inviter_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1264,12 +1196,8 @@
           "name": "lesson_plans_organization_id_organization_id_fk",
           "tableFrom": "lesson_plans",
           "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1277,12 +1205,8 @@
           "name": "lesson_plans_teacher_id_user_id_fk",
           "tableFrom": "lesson_plans",
           "tableTo": "user",
-          "columnsFrom": [
-            "teacher_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["teacher_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1290,12 +1214,8 @@
           "name": "lesson_plans_child_id_childrens_id_fk",
           "tableFrom": "lesson_plans",
           "tableTo": "childrens",
-          "columnsFrom": [
-            "child_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["child_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1303,12 +1223,8 @@
           "name": "lesson_plans_class_id_classes_id_fk",
           "tableFrom": "lesson_plans",
           "tableTo": "classes",
-          "columnsFrom": [
-            "class_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["class_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1420,12 +1336,8 @@
           "name": "member_organization_id_organization_id_fk",
           "tableFrom": "member",
           "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1433,12 +1345,8 @@
           "name": "member_user_id_user_id_fk",
           "tableFrom": "member",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1519,12 +1427,8 @@
           "name": "notification_organization_id_organization_id_fk",
           "tableFrom": "notification",
           "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1636,12 +1540,8 @@
           "name": "nurseries_organization_id_organization_id_fk",
           "tableFrom": "nurseries",
           "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1649,12 +1549,8 @@
           "name": "nurseries_created_by_user_id_fk",
           "tableFrom": "nurseries",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1713,9 +1609,7 @@
         "organization_slug_unique": {
           "name": "organization_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},
@@ -1790,12 +1684,8 @@
           "name": "parent_organization_id_organization_id_fk",
           "tableFrom": "parent",
           "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1882,12 +1772,8 @@
           "name": "payment_organization_id_organization_id_fk",
           "tableFrom": "payment",
           "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1895,12 +1781,8 @@
           "name": "payment_parent_id_parent_id_fk",
           "tableFrom": "payment",
           "tableTo": "parent",
-          "columnsFrom": [
-            "parent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["parent_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2023,12 +1905,8 @@
           "name": "room_type_amenities_room_type_id_room_types_id_fk",
           "tableFrom": "room_type_amenities",
           "tableTo": "room_types",
-          "columnsFrom": [
-            "room_type_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["room_type_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2152,12 +2030,8 @@
           "name": "room_types_hotel_id_hotels_id_fk",
           "tableFrom": "room_types",
           "tableTo": "hotels",
-          "columnsFrom": [
-            "hotel_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["hotel_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2297,12 +2171,8 @@
           "name": "rooms_hotel_id_hotels_id_fk",
           "tableFrom": "rooms",
           "tableTo": "hotels",
-          "columnsFrom": [
-            "hotel_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["hotel_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -2310,12 +2180,8 @@
           "name": "rooms_room_type_id_room_types_id_fk",
           "tableFrom": "rooms",
           "tableTo": "room_types",
-          "columnsFrom": [
-            "room_type_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["room_type_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2397,12 +2263,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2412,9 +2274,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -2489,6 +2349,12 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
+        "class_id": {
+          "name": "class_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "organization_id": {
           "name": "organization_id",
           "type": "text",
@@ -2540,12 +2406,8 @@
           "name": "teacher_organization_id_organization_id_fk",
           "tableFrom": "teacher",
           "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2634,9 +2496,7 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -2697,40 +2557,22 @@
     "public.hotel_status": {
       "name": "hotel_status",
       "schema": "public",
-      "values": [
-        "active",
-        "inactive",
-        "under_maintenance",
-        "pending_approval"
-      ]
+      "values": ["active", "inactive", "under_maintenance", "pending_approval"]
     },
     "public.media_type": {
       "name": "media_type",
       "schema": "public",
-      "values": [
-        "image",
-        "video",
-        "audio",
-        "document"
-      ]
+      "values": ["image", "video", "audio", "document"]
     },
     "public.notification_status": {
       "name": "notification_status",
       "schema": "public",
-      "values": [
-        "event",
-        "parents meeting",
-        "found colection",
-        "others"
-      ]
+      "values": ["event", "parents meeting", "found colection", "others"]
     },
     "public.payment_method": {
       "name": "payment_method",
       "schema": "public",
-      "values": [
-        "card",
-        "bankTransfer"
-      ]
+      "values": ["card", "bankTransfer"]
     },
     "public.room_status": {
       "name": "room_status",

@@ -6,6 +6,7 @@ export const teachers = pgTable("teacher", {
   id: text("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
+  classId: text("class_id"),
   organizationId: text("organization_id").references(() => organization.id),
   name: text("name").notNull(),
   phoneNumber: text("phone_number").notNull(),

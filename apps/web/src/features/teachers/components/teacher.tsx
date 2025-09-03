@@ -21,6 +21,7 @@ import {
   List,
   Users,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { createTeacher } from "@/features/teachers/actions/create-teacher";
@@ -31,6 +32,7 @@ export function TeachersList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<"name" | "children" | "recent">("name");
+  const router = useRouter();
 
   const { data, isLoading, error } = useTeachersList({});
 
@@ -308,6 +310,10 @@ export function TeachersList() {
             <Card
               key={teacher.id}
               className={`group relative overflow-hidden border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 rounded-3xl ${viewMode === "list" ? "flex flex-row gap-4 p-4" : ""}`}
+              onClick={() =>
+                router.push(`/account/manage/teachers/${teacher.id}`)
+              }
+              style={{ cursor: "pointer" }}
             >
               <CardHeader className="flex items-center gap-4">
                 <Avatar className="h-16 w-16 shadow-lg ring-4 ring-white group-hover:ring-blue-100 transition-all duration-300">
@@ -354,7 +360,10 @@ export function TeachersList() {
                         </div>
                         <Button
                           size="sm"
-                          onClick={() => setSelectedChild(child)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedChild(child);
+                          }}
                           className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 shadow-sm hover:shadow-md text-xs px-3"
                         >
                           <Eye className="h-3 w-3 mr-2" /> View

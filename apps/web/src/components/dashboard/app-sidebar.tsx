@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  IconBox,
-  IconBuildings,
-  IconDashboard,
-  IconHelp,
-  IconSearch,
-  IconSettings,
-} from "@tabler/icons-react";
+import { IconBox, IconBuildings, IconDashboard } from "@tabler/icons-react";
 import * as React from "react";
 
 import { NavDocuments } from "@/components/dashboard/nav-documents";
@@ -29,7 +22,7 @@ import { PiBuilding } from "react-icons/pi";
 
 const data = {
   user: {
-    name: "shadcn",
+    name: "kidlink",
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
@@ -41,21 +34,21 @@ const data = {
     },
   ],
   navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: IconHelp,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
-    },
+    // {
+    //   title: "Settings",
+    //   url: "#",
+    //   icon: IconSettings,
+    // },
+    // {
+    //   title: "Get Help",
+    //   url: "#",
+    //   icon: IconHelp,
+    // },
+    // {
+    //   title: "Search",
+    //   url: "#",
+    //   icon: IconSearch,
+    // },
   ],
   documents: [
     {
@@ -64,17 +57,17 @@ const data = {
       icon: IconBuildings,
     },
     {
-      name: "Manage Classes",
+      name: "Classes",
       url: "/account/manage/classes",
       icon: IconBox,
     },
     {
-      name: "Teacher Management",
+      name: "Management",
       url: "/account/manage/teachers",
       icon: IconBox,
     },
     {
-      name: "Parent Managemet",
+      name: "Managemet",
       url: "/account/manage/parents",
       icon: IconBox,
     },
@@ -92,6 +85,12 @@ const data = {
     {
       name: "Feedback",
       url: "/account/manage/feedback",
+
+      icon: IconBox,
+    },
+    {
+      name: "Badges",
+      url: "/account/manage/badges",
       icon: IconBox,
     },
   ],

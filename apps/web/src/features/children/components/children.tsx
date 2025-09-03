@@ -6,12 +6,7 @@ import {
   AvatarImage,
 } from "@repo/ui/components/avatar";
 import { Button } from "@repo/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/components/card";
+import { CardContent, CardHeader, CardTitle } from "@repo/ui/components/card";
 import {
   Award,
   ChevronDown,
@@ -21,6 +16,7 @@ import {
   List,
   Users,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { createChildren } from "@/features/children/actions/create-children";
@@ -28,6 +24,7 @@ import { ChildrensList as useChildrensList } from "@/features/children/actions/g
 
 export function ChildrensList() {
   const [selectedChild, setSelectedChild] = useState<any>(null);
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<"name" | "children" | "recent">("name");
@@ -83,18 +80,26 @@ export function ChildrensList() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col justify-center items-center py-20 space-y-6">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex flex-col justify-center items-center py-20 space-y-8">
         <div className="relative">
-          <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-          <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-blue-300 rounded-full animate-spin animate-reverse"></div>
+          <div className="w-20 h-20 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
+          <div className="absolute inset-0 w-20 h-20 border-4 border-transparent border-t-pink-400 rounded-full animate-spin animate-reverse"></div>
+          <div className="absolute inset-2 w-16 h-16 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-20 blur-sm"></div>
         </div>
-        <div className="text-center space-y-2">
-          <p className="text-lg font-medium text-gray-700">
-            Loading childrens...
-          </p>
-          <p className="text-sm text-gray-500">
+        <div className="text-center space-y-3">
+          <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            Loading Children...
+          </h3>
+          <p className="text-slate-600 text-lg">
             Please wait while we fetch children information
           </p>
+          <div className="flex gap-2 justify-center text-sm text-slate-500 mt-4">
+            <span>👶 Students</span>
+            <span>•</span>
+            <span>📚 Profiles</span>
+            <span>•</span>
+            <span>🎓 Education</span>
+          </div>
         </div>
       </div>
     );
@@ -336,9 +341,12 @@ export function ChildrensList() {
           }
         >
           {sortedChildrens.map((children: any) => (
-            <Card
+            <div
               key={children.id}
-              className={`group relative overflow-hidden border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 rounded-3xl ${viewMode === "list" ? "flex flex-row gap-4 p-4" : ""}`}
+              className={`group relative overflow-hidden border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 rounded-3xl cursor-pointer ${viewMode === "list" ? "flex flex-row gap-4 p-4" : ""}`}
+              onClick={() =>
+                router.push(`/account/manage/children/${children.id}`)
+              }
             >
               <CardHeader className="flex items-center gap-4">
                 <Avatar className="h-16 w-16 shadow-lg ring-4 ring-white group-hover:ring-blue-100 transition-all duration-300">
@@ -380,14 +388,17 @@ export function ChildrensList() {
                     {children.children.map((child: any) => (
                       <div
                         key={child.id}
-                        className="flex items-center justify-between p-2 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200"
+                        className="flex items-center justify-between p-2 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/account/manage/children/${child.id}`);
+                        }}
                       >
                         <div className="text-sm font-medium">
                           {child.name} ({child.class})
                         </div>
                         <Button
                           size="sm"
-                          onClick={() => setSelectedChild(child)}
                           className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 shadow-sm hover:shadow-md text-xs px-3"
                         >
                           <Eye className="h-3 w-3 mr-2" /> View
@@ -397,7 +408,7 @@ export function ChildrensList() {
                   </div>
                 </CardContent>
               )}
-            </Card>
+            </div>
           ))}
         </div>
       </div>

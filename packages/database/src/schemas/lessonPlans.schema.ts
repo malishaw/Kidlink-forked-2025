@@ -19,7 +19,13 @@ export const lessonPlans = pgTable("lesson_plans", {
 
   teacherId: text("teacher_id").references(() => user.id),
 
+<<<<<<< HEAD
   childId: text("child_id").references(() => childrens.id),
+=======
+  childId: text("child_id")
+    .references(() => childrens.id)
+    .notNull(),
+>>>>>>> origin/origin/tharusha
 
   classId: text("class_id").references(() => classes.id),
 
