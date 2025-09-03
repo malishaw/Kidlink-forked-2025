@@ -3,7 +3,7 @@ import { AppOpenAPI } from "@api/types";
 
 import { BASE_PATH } from "../lib/constants";
 import children from "./children/children.index";
-import feedbacks from "./feedbacks/feedbacks.index";
+import feedbacks from "./feedbacks/feedback.index";
 import hotels from "./hotels/hotel.index";
 import index from "./index.route";
 import lessonPlans from "./lessonPlans/lessonPlans.index";

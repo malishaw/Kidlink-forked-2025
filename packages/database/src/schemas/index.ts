@@ -21,7 +21,7 @@ export * from "./class.schema";
 
 export * from "./children.schema";
 
-export * from "./feedbacks.schema";
+export * from "./feedback.schema";
 
 export * from "./lessonPlans.schema";
 

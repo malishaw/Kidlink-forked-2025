@@ -1,9 +1,12 @@
-import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth.schema";
 import { childrens } from "./children.schema";
 
-export const feedbacks = pgTable("feedbacks", {
-  id: serial("id").primaryKey(),
+export const feedbacks = pgTable("feedback", {
+  id: text("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
 
   organizationId: text("organization_id").references(() => organization.id),
 
@@ -16,9 +19,10 @@ export const feedbacks = pgTable("feedbacks", {
   content: text("content"),
 
   // store multiple image URLs/paths; Postgres text[]
+  rating: text("rating"),
   images: text("images").array(),
-
-  reply: text("reply"),
+  teacherFeedback: text("teacher_feedback").notNull(),
+  reply: text("reply").notNull(),
 
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

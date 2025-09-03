@@ -1,5 +1,5 @@
 {
-  "id": "3c4f1033-aefd-4ad3-a00a-61290e797da6",
+  "id": "8866a20f-b11f-41ed-a98b-4a25a8982271",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -265,6 +265,13 @@
           "notNull": true,
           "default": "ARRAY[]::text[]"
         },
+        "child_ids": {
+          "name": "child_ids",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "ARRAY[]::text[]"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -315,15 +322,16 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.feedbacks": {
-      "name": "feedbacks",
+    "public.feedback": {
+      "name": "feedback",
       "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "text",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "organization_id": {
           "name": "organization_id",
@@ -349,9 +357,21 @@
           "primaryKey": false,
           "notNull": false
         },
+        "rating": {
+          "name": "rating",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "images": {
           "name": "images",
           "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "teacher_feedback": {
+          "name": "teacher_feedback",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -378,9 +398,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "feedbacks_organization_id_organization_id_fk": {
-          "name": "feedbacks_organization_id_organization_id_fk",
-          "tableFrom": "feedbacks",
+        "feedback_organization_id_organization_id_fk": {
+          "name": "feedback_organization_id_organization_id_fk",
+          "tableFrom": "feedback",
           "tableTo": "organization",
           "columnsFrom": [
             "organization_id"
@@ -391,9 +411,9 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "feedbacks_child_id_childrens_id_fk": {
-          "name": "feedbacks_child_id_childrens_id_fk",
-          "tableFrom": "feedbacks",
+        "feedback_child_id_childrens_id_fk": {
+          "name": "feedback_child_id_childrens_id_fk",
+          "tableFrom": "feedback",
           "tableTo": "childrens",
           "columnsFrom": [
             "child_id"
@@ -404,9 +424,9 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "feedbacks_teacher_id_user_id_fk": {
-          "name": "feedbacks_teacher_id_user_id_fk",
-          "tableFrom": "feedbacks",
+        "feedback_teacher_id_user_id_fk": {
+          "name": "feedback_teacher_id_user_id_fk",
+          "tableFrom": "feedback",
           "tableTo": "user",
           "columnsFrom": [
             "teacher_id"
