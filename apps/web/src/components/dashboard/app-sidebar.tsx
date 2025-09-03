@@ -76,9 +76,16 @@ const data = {
       url: "/account/manage/notification",
       icon: IconBox,
     },
+
     {
       name: "Children",
       url: "/account/manage/children",
+      icon: IconBox,
+    },
+    {
+      name: "Feedback",
+      url: "/account/manage/feedback",
+
       icon: IconBox,
     },
     {

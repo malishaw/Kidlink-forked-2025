@@ -1,13 +1,16 @@
-import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth.schema";
 import { childrens } from "./children.schema";
 
-export const feedbacks = pgTable("feedbacks", {
-  id: serial("id").primaryKey(),
+export const feedbacks = pgTable("feedback", {
+  id: text("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
 
   organizationId: text("organization_id").references(() => organization.id),
 
-  // children.id is serial (integer)
+  // childrens.id is serial (integer)
   childId: text("child_id").references(() => childrens.id),
 
   // user.id is text in your auth schema; use text here (change to integer if your users table uses int IDs)
@@ -16,9 +19,10 @@ export const feedbacks = pgTable("feedbacks", {
   content: text("content"),
 
   // store multiple image URLs/paths; Postgres text[]
+  rating: text("rating"),
   images: text("images").array(),
-
-  reply: text("reply"),
+  teacherFeedback: text("teacher_feedback").notNull(),
+  reply: text("reply").notNull(),
 
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

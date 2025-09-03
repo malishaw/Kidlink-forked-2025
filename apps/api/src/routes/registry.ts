@@ -4,6 +4,7 @@ import { AppOpenAPI } from "@api/types";
 import { BASE_PATH } from "../lib/constants";
 import badges from "./badges/badges.index";
 import children from "./children/children.index";
+import feedbacks from "./feedbacks/feedback.index";
 import hotels from "./hotels/hotel.index";
 import index from "./index.route";
 import media from "./media/media.index";
@@ -16,6 +17,7 @@ import propertyClasses from "./property-classes/property-classes.index";
 import system from "./system/system.index";
 import tasks from "./tasks/tasks.index";
 import teacher from "./teachers/teacher.index";
+
 import user from "./user/user.index";
 
 export function registerRoutes(app: AppOpenAPI) {
@@ -34,6 +36,7 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/hotels", hotels)
     .route("/children", children)
     .route("/nurseries", nursery)
+    .route("/feedbacks", feedbacks)
     .route("/badges", badges)
     .route("/classes", nurseryClass);
 }

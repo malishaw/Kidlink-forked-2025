@@ -19,7 +19,11 @@ export * from "./payment.schema";
 
 export * from "./class.schema";
 
-export * from "./teacher.schema";
+export * from "./children.schema";
+
+export * from "./feedback.schema";
+
+export * from "./lessonPlans.schema";
 
 export * from "./badges.schema";
 export * from "./children.schema";

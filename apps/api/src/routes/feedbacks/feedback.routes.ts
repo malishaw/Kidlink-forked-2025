@@ -10,17 +10,17 @@ import {
   stringIdParamSchema,
 } from "@api/lib/helpers";
 import {
-  feedbacksInsertSchema,
-  feedbacksSchema,
-  feedbacksUpdateSchema,
-} from "./feedbacks.schema";
+  feedback,
+  feedbackInsertSchema,
+  feedbackUpdateSchema,
+} from "./feedback.schema";
 
-const tags: string[] = ["feedbacks"];
+const tags: string[] = ["Feedback"];
 
 // List route definition
 export const list = createRoute({
   tags,
-  summary: "List all feedbacks",
+  summary: "List all feedback",
   path: "/",
   method: "get",
   request: {
@@ -28,8 +28,8 @@ export const list = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      getPaginatedSchema(z.array(feedbacksSchema)),
-      "The list of feedbacks"
+      getPaginatedSchema(z.array(feedback)),
+      "The list of feedback"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -41,68 +41,65 @@ export const list = createRoute({
 // Get by ID route definition
 export const getById = createRoute({
   tags,
-  summary: "Get feedbacks by ID",
+  summary: "Get feedback by ID",
   method: "get",
   path: "/:id",
   request: {
     params: stringIdParamSchema,
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(feedbacksSchema, "The feedbacks item"),
+    [HttpStatusCodes.OK]: jsonContent(feedback, "The feedback item"),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
       "Unauthorized access"
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       errorMessageSchema,
-      "feedbacks not found"
+      "Feedback not found"
     ),
   },
 });
 
-// Create feedbacks route definition
+// Create Feedback route definition
 export const create = createRoute({
   tags,
-  summary: "Create feedbacks",
+  summary: "Create feedback",
   method: "post",
   path: "/",
   request: {
-    body: jsonContentRequired(
-      feedbacksInsertSchema,
-      "Create uploaded feedbacks"
-    ),
+    body: jsonContentRequired(feedbackInsertSchema, "Create uploaded feedback"),
   },
   responses: {
-    [HttpStatusCodes.CREATED]: jsonContent(
-      feedbacksSchema,
-      "The feedbacks created"
-    ),
+    [HttpStatusCodes.CREATED]: jsonContent(feedback, "The feedback created"),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
       "Unauthorized access"
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       errorMessageSchema,
-      "feedbacks not created"
+      "Feedback not created"
     ),
   },
 });
 
-// Update feedbacks route definition
+// Update feedback route definition
 export const update = createRoute({
   tags,
-  summary: "Update feedbacks",
+  summary: "Update Feedback",
   method: "patch",
   path: "/:id",
   request: {
     params: stringIdParamSchema,
     body: jsonContentRequired(
-      feedbacksUpdateSchema,
-      "Update feedbacks details schema"
+      feedbackUpdateSchema,
+      "Update feedback details schema"
     ),
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(feedbacksSchema, "The feedbacks item"),
+    [HttpStatusCodes.OK]: jsonContent(
+      feedbackUpdateSchema,
+      "The feedback item"
+    ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(errorMessageSchema, "Not found"),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -111,21 +108,25 @@ export const update = createRoute({
   },
 });
 
-// Delete feedbacks route definition
+// Delete feedback route schema
 export const remove = createRoute({
+  tags,
+  summary: "Remove Feedback",
   method: "delete",
   path: "/:id",
-  tags: ["feedbacks"],
-  summary: "Delete a feedbacks by ID",
   request: {
-    params: z.object({ id: z.string() }),
+    params: stringIdParamSchema,
   },
   responses: {
-    204: {
-      description: "No Content",
-    },
-    401: jsonContent(errorMessageSchema, "Unauthorized"),
-    404: jsonContent(errorMessageSchema, "Not Found"),
+    [HttpStatusCodes.OK]: jsonContent(
+      z.object({ message: z.string() }),
+      "The feedback item"
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(errorMessageSchema, "Not found"),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthorized access"
+    ),
   },
 });
 
