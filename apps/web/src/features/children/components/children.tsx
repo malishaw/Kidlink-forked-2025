@@ -7,6 +7,7 @@ import {
 } from "@repo/ui/components/avatar";
 import { Button } from "@repo/ui/components/button";
 import { CardContent, CardHeader, CardTitle } from "@repo/ui/components/card";
+import { useQuery } from "@tanstack/react-query";
 import {
   Award,
   ChevronDown,
@@ -17,10 +18,11 @@ import {
   Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { createChildren } from "@/features/children/actions/create-children";
 import { ChildrensList as useChildrensList } from "@/features/children/actions/get-children";
+import { getClient } from "@/lib/rpc/client";
 
 export function ChildrensList() {
   const [selectedChild, setSelectedChild] = useState<any>(null);
@@ -30,6 +32,66 @@ export function ChildrensList() {
   const [sortBy, setSortBy] = useState<"name" | "children" | "recent">("name");
 
   const { data, isLoading, error } = useChildrensList({});
+
+  const childrensData = data?.data || [];
+
+  // Fetch all classes
+  const {
+    data: classesResponse,
+    isLoading: classesLoading,
+    error: classesError,
+  } = useQuery({
+    queryKey: ["all-classes"],
+    queryFn: async () => {
+      const rpcClient = await getClient();
+      const classesRes = await rpcClient.api["classes"].$get();
+
+      if (!classesRes.ok) {
+        const errorData = await classesRes.json();
+        throw new Error(errorData.message || "Failed to fetch classes");
+      }
+
+      const classes = await classesRes.json();
+      return classes;
+    },
+  });
+
+  const classesData = classesResponse?.data || [];
+
+  const getClassName = (classId) => {
+    if (classesLoading) return "Loading...";
+    const classData = classesData.find((cls) => cls.id === classId);
+    return classData?.name || "No assigned class";
+  };
+
+  // Fetch all badges
+  const {
+    data: badgesResponse,
+    isLoading: badgesLoading,
+    error: badgesError,
+  } = useQuery({
+    queryKey: ["all-badges"],
+    queryFn: async () => {
+      const rpcClient = await getClient();
+      const badgesRes = await rpcClient.api["badges"].$get();
+
+      if (!badgesRes.ok) {
+        const errorData = await badgesRes.json();
+        throw new Error(errorData.message || "Failed to fetch badges");
+      }
+
+      const badges = await badgesRes.json();
+      return badges;
+    },
+  });
+
+  const badgesData = badgesResponse?.data || [];
+
+  const getBadgeName = (badgeId) => {
+    if (badgesLoading) return "Loading...";
+    const badgeData = badgesData.find((badge) => badge.id === badgeId);
+    return badgeData?.title || "No badge assigned";
+  };
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -78,7 +140,48 @@ export function ChildrensList() {
     }
   };
 
-  if (isLoading) {
+  const [classNames, setClassNames] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const fetchClassNames = async () => {
+      const classIdMap: Record<string, string> = { ...classNames };
+      const classIdsToFetch = childrensData
+        .map((child) => child.classId)
+        .filter((classId) => classId && !classIdMap[classId]);
+
+      if (classIdsToFetch.length === 0) return;
+
+      for (const classId of classIdsToFetch) {
+        try {
+          const { data } = await useGetClassById(classId);
+          classIdMap[classId] = data?.name || "Unknown class";
+        } catch {
+          classIdMap[classId] = "Error fetching class";
+        }
+      }
+
+      setClassNames(classIdMap);
+    };
+
+    fetchClassNames();
+  }, [childrensData, classNames]);
+
+  // Add a function to fetch parent names based on parent ID
+  const getParentName = (parentId) => {
+    if (!parentId) return "No assigned parent";
+    const {
+      data: parentData,
+      isLoading: parentLoading,
+      error: parentError,
+    } = useGetParentById(parentId);
+
+    if (parentLoading) return "Loading...";
+    if (parentError) return "Error fetching parent";
+
+    return parentData?.name || "Unknown parent";
+  };
+
+  if (isLoading || classesLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex flex-col justify-center items-center py-20 space-y-8">
         <div className="relative">
@@ -105,7 +208,7 @@ export function ChildrensList() {
     );
   }
 
-  if (error) {
+  if (error || classesError) {
     return (
       <div className="bg-gradient-to-br from-red-50 via-pink-50 to-red-100 border border-red-200 rounded-2xl p-8 text-center shadow-lg">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-red-100 to-red-200 rounded-full mb-6 shadow-inner">
@@ -115,13 +218,11 @@ export function ChildrensList() {
           Failed to load childrens
         </h3>
         <p className="text-red-600 mb-6 max-w-md mx-auto">
-          Error: {error.message}
+          Error: {error?.message || classesError?.message}
         </p>
       </div>
     );
   }
-
-  const childrensData = data?.data || [];
 
   const filteredChildrens = childrensData.filter(
     (children: any) =>
@@ -363,6 +464,12 @@ export function ChildrensList() {
                     {children.name}
                   </CardTitle>
                   <p className="text-sm text-gray-600">{children.email}</p>
+                  <p className="text-sm text-gray-600">
+                    {getClassName(children.classId)}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Badge: {getBadgeName(children.badgeId)}
+                  </p>
                   <p className="text-sm text-gray-600">
                     {children.phoneNumber}
                   </p>

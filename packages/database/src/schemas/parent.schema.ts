@@ -7,7 +7,7 @@ export const parents = pgTable("parent", {
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   organizationId: text("organization_id").references(() => organization.id),
-  childId: text("child_id"),
+  childId: text("child_id").array(),
   name: text("name").notNull(),
   phoneNumber: text("phone_number").notNull(),
   email: text("email").notNull(),

@@ -1,5 +1,5 @@
 {
-  "id": "da3b012d-d937-4ef4-8e05-47afa228cba0",
+  "id": "49e89b18-5fea-455d-abef-30211a11fd9a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1890,7 +1890,7 @@
         },
         "child_id": {
           "name": "child_id",
-          "type": "text",
+          "type": "text[]",
           "primaryKey": false,
           "notNull": false
         },

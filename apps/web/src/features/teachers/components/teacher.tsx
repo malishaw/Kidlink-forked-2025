@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/card";
+import { useQuery } from "@tanstack/react-query";
 import {
   Award,
   ChevronDown,
@@ -26,6 +27,7 @@ import { useState } from "react";
 
 import { createTeacher } from "@/features/teachers/actions/create-teacher";
 import { TeachersList as useTeachersList } from "@/features/teachers/actions/get-teacher";
+import { getClient } from "@/lib/rpc/client";
 
 export function TeachersList() {
   const [selectedChild, setSelectedChild] = useState<any>(null);
@@ -74,6 +76,30 @@ export function TeachersList() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const { data: classesResponse, isLoading: classesLoading } = useQuery({
+    queryKey: ["all-classes"],
+    queryFn: async () => {
+      const rpcClient = await getClient();
+      const classesRes = await rpcClient.api["classes"].$get();
+
+      if (!classesRes.ok) {
+        const errorData = await classesRes.json();
+        throw new Error(errorData.message || "Failed to fetch classes");
+      }
+
+      const classes = await classesRes.json();
+      return classes;
+    },
+  });
+
+  const classesData = classesResponse?.data || []; // Ensure classesData is an array
+
+  const getClassName = (classId) => {
+    if (classesLoading) return "Loading...";
+    const classData = classesData.find((cls) => cls.id === classId);
+    return classData?.name || "No assigned class";
   };
 
   if (isLoading) {
@@ -332,6 +358,12 @@ export function TeachersList() {
                   <p className="text-sm text-gray-600">{teacher.email}</p>
                   <p className="text-sm text-gray-600">{teacher.phoneNumber}</p>
                   <p className="text-sm text-gray-600">{teacher.address}</p>
+                  <p className="text-sm text-gray-600">
+                    Class:{" "}
+                    {teacher.classId
+                      ? getClassName(teacher.classId)
+                      : "No assigned class"}
+                  </p>
                   <p className="text-xs text-gray-400">
                     Organization: {teacher.organizationId}
                   </p>
