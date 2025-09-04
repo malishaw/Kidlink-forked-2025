@@ -388,22 +388,204 @@ export function ChildrensList() {
                   onChange={handleFormChange}
                   className="w-full border border-gray-200 rounded-xl px-4 py-2"
                 />
-                <input
-                  type="text"
-                  name="profileImageUrl"
-                  placeholder="Profile Image URL"
-                  value={formData.profileImageUrl}
-                  onChange={handleFormChange}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2"
-                />
-                <input
-                  type="text"
-                  name="imagesUrl"
-                  placeholder="Images URL"
-                  value={formData.imagesUrl}
-                  onChange={handleFormChange}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2"
-                />
+                {/* Profile Image Section */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Profile Picture
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <div className="relative h-24 w-24 rounded-xl overflow-hidden border-2 border-gray-200">
+                      {formData.profileImageUrl ? (
+                        <img
+                          src={formData.profileImageUrl}
+                          alt="Profile preview"
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = "/placeholder.svg";
+                          }}
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-gray-50 flex items-center justify-center">
+                          <Users className="h-8 w-8 text-gray-400" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            try {
+                              // Create a temporary URL for preview
+                              const previewUrl = URL.createObjectURL(file);
+                              setFormData({
+                                ...formData,
+                                profileImageUrl: previewUrl,
+                              });
+
+                              // Here you would typically upload the file to your server
+                              // const uploadedUrl = await uploadImage(file);
+                              // setFormData({ ...formData, profileImageUrl: uploadedUrl });
+                            } catch (error) {
+                              console.error("Error uploading image:", error);
+                              alert("Failed to upload profile image");
+                            }
+                          }
+                        }}
+                        className="hidden"
+                        id="profile-image-upload"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() =>
+                          document
+                            .getElementById("profile-image-upload")
+                            ?.click()
+                        }
+                        className="w-full"
+                      >
+                        Upload Profile Image
+                      </Button>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          name="profileImageUrl"
+                          placeholder="or paste profile image URL"
+                          value={formData.profileImageUrl}
+                          onChange={handleFormChange}
+                          className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm"
+                        />
+                        {formData.profileImageUrl && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-6 p-1 text-gray-400 hover:text-gray-600"
+                            onClick={() =>
+                              setFormData({ ...formData, profileImageUrl: "" })
+                            }
+                          >
+                            ✕
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Additional Images Section */}
+                {/* <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Additional Images
+                  </label>
+                  <div className="flex flex-wrap gap-4">
+                    {formData.imagesUrl &&
+                      formData.imagesUrl.split(",").map((url, index) => (
+                        <div
+                          key={index}
+                          className="relative h-20 w-20 rounded-lg overflow-hidden border-2 border-gray-200"
+                        >
+                          <img
+                            src={url.trim()}
+                            alt={`Additional image ${index + 1}`}
+                            className="h-full w-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = "/placeholder.svg";
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const urls = formData.imagesUrl
+                                .split(",")
+                                .filter((_, i) => i !== index);
+                              setFormData({
+                                ...formData,
+                                imagesUrl: urls.join(","),
+                              });
+                            }}
+                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    <div className="h-20 w-20">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={async (e) => {
+                          const files = Array.from(e.target.files || []);
+                          if (files.length > 0) {
+                            try {
+                              // Create temporary URLs for preview
+                              const previewUrls = files.map((file) =>
+                                URL.createObjectURL(file)
+                              );
+                              const currentUrls = formData.imagesUrl
+                                ? formData.imagesUrl.split(",")
+                                : [];
+                              setFormData({
+                                ...formData,
+                                imagesUrl: [
+                                  ...currentUrls,
+                                  ...previewUrls,
+                                ].join(","),
+                              });
+
+                              // Here you would typically upload the files to your server
+                              // const uploadedUrls = await Promise.all(files.map(file => uploadImage(file)));
+                              // setFormData({ ...formData, imagesUrl: uploadedUrls.join(',') });
+                            } catch (error) {
+                              console.error("Error uploading images:", error);
+                              alert("Failed to upload images");
+                            }
+                          }
+                        }}
+                        className="hidden"
+                        id="additional-images-upload"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() =>
+                          document
+                            .getElementById("additional-images-upload")
+                            ?.click()
+                        }
+                        className="w-full h-full flex flex-col items-center justify-center text-gray-500 border-2 border-dashed rounded-lg hover:bg-gray-50"
+                      >
+                        <span className="text-2xl mb-1">+</span>
+                        <span className="text-xs">Add Images</span>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="imagesUrl"
+                      placeholder="or paste comma-separated image URLs"
+                      value={formData.imagesUrl}
+                      onChange={handleFormChange}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm"
+                    />
+                    {formData.imagesUrl && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-6 p-1 text-gray-400 hover:text-gray-600"
+                        onClick={() =>
+                          setFormData({ ...formData, imagesUrl: "" })
+                        }
+                      >
+                        ✕
+                      </Button>
+                    )}
+                  </div>
+                </div> */}
                 <input
                   type="text"
                   name="activities"

@@ -168,7 +168,7 @@ export function SignupForm({
                     }}
                   />
                   <Label htmlFor="hotelOwnerCheck" className="text-xs">
-                    Continue as Hotel Owner
+                    Continue as Nursery Admin
                   </Label>
                 </div>
 
