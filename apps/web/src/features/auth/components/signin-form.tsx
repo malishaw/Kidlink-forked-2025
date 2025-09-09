@@ -1,5 +1,6 @@
 "use client";
 
+import { authClient } from "@/lib/auth-client";
 import { Button } from "@repo/ui/components/button";
 import {
   Card,
@@ -9,160 +10,141 @@ import {
   CardTitle,
 } from "@repo/ui/components/card";
 import { Input } from "@repo/ui/components/input";
-import { useAppForm } from "@repo/ui/components/tanstack-form";
+import { Label } from "@repo/ui/components/label";
 import { cn } from "@repo/ui/lib/utils";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useId } from "react";
-
-import { authClient } from "@/lib/auth-client";
-import { CheckIcon } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { signinSchema, type SigninSchemaT } from "../schemas";
 
 export function SiginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const toastId = useId();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isPending, setIsPending] = useState(false);
   const router = useRouter();
 
-  const form = useAppForm({
-    validators: { onChange: signinSchema },
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-    onSubmit: ({ value }) => handleSignin(value),
-  });
+  const { signIn } = authClient;
 
-  const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      form.handleSubmit();
-    },
-    [form]
-  );
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const handleSignin = async (values: SigninSchemaT) => {
-    await authClient.signIn.email({
-      email: values.email,
-      password: values.password,
-      fetchOptions: {
-        onRequest() {
-          toast.loading("Signing in...", { id: toastId });
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    setIsPending(true);
+
+    try {
+      const { error } = await signIn.email(
+        {
+          email,
+          password,
+          rememberMe,
         },
-        onSuccess(ctx) {
-          toast.success("User signed in successfully!", { id: toastId });
-          router.refresh();
-        },
-        onError(ctx) {
-          toast.error(`Failed: ${ctx.error.message}`, { id: toastId });
-        },
-      },
-    });
+        {
+          onRequest: () => {
+            setIsPending(true);
+          },
+          onSuccess: () => {
+            toast.success("Signed in successfully!");
+            // Redirect to organization selection after successful sign-in
+            router.push("/organization-selection");
+          },
+          onError: (ctx) => {
+            setIsPending(false);
+            toast.error(ctx.error.message || "Sign in failed");
+          },
+        }
+      );
+
+      if (error) {
+        toast.error(error.message || "Sign in failed");
+      }
+    } catch (error) {
+      console.error("Sign in error:", error);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl font-heading font-bold">
-            Welcome back
-          </CardTitle>
-          <CardDescription>Signin with your Email</CardDescription>
+        <CardHeader>
+          <CardTitle>Sign In</CardTitle>
+          <CardDescription>
+            Enter your email and password to access your account
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <form.AppForm>
-            <form onSubmit={handleSubmit}>
-              <div className="grid gap-6">
-                {/* <div className="flex flex-col gap-4">
-                  <Button variant="outline" className="w-full">
-                    <CiFacebook className="size-5" />
-                    Signin with Facebook
-                  </Button>
-                </div>
-                <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-                  <span className="bg-card text-muted-foreground relative z-10 px-2">
-                    Or continue with
-                  </span>
-                </div> */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isPending}
+                required
+              />
+            </div>
 
-                {/* -------- */}
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isPending}
+                required
+              />
+            </div>
 
-                <form.AppField
-                  name="email"
-                  children={(field) => (
-                    <field.FormItem>
-                      <field.FormLabel>Email</field.FormLabel>
-                      <field.FormControl>
-                        <Input
-                          placeholder="john@example.com"
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          onBlur={field.handleBlur}
-                        />
-                      </field.FormControl>
-                      <field.FormMessage />
-                    </field.FormItem>
-                  )}
-                />
+            <div className="flex items-center space-x-2">
+              <input
+                id="remember"
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                disabled={isPending}
+                className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <Label htmlFor="remember" className="text-sm">
+                Remember me
+              </Label>
+            </div>
 
-                <form.AppField
-                  name="password"
-                  children={(field) => (
-                    <field.FormItem>
-                      <field.FormLabel className="flex items-center justify-between w-full">
-                        <span>Password</span>
-                        <Link
-                          href="/forgot-password"
-                          className="text-xs text-foreground/80 underline"
-                        >
-                          Forgot password?
-                        </Link>
-                      </field.FormLabel>
-                      <field.FormControl>
-                        <Input
-                          placeholder=""
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          onBlur={field.handleBlur}
-                        />
-                      </field.FormControl>
-                      <field.FormMessage />
-                    </field.FormItem>
-                  )}
-                />
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                "Sign In"
+              )}
+            </Button>
+          </form>
 
-                {/* -------- */}
-
-                <div className="grid gap-6">
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    loading={form.state.isSubmitting}
-                    icon={form.state.isSubmitSuccessful && <CheckIcon />}
-                  >
-                    Sign In
-                  </Button>
-                </div>
-                <div className="text-center text-sm">
-                  {`Don't have an account?`}
-                  {` `}
-                  <Link href="/signup" className="underline underline-offset-4">
-                    Sign Up
-                  </Link>
-                </div>
-              </div>
-            </form>
-          </form.AppForm>
+          <div className="mt-4 text-center text-sm">
+            Don't have an account?{" "}
+            <Link href="/signup" className="text-blue-600 hover:underline">
+              Sign up
+            </Link>
+          </div>
         </CardContent>
       </Card>
-      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our Terms of Service and Privacy
-        Policy.
-      </div>
     </div>
   );
 }

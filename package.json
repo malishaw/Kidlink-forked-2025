@@ -29,7 +29,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "better-auth": "^1.2.8",
+    "better-auth": "^1.3.9",
     "zod": "^3.25.55"
   }
 }

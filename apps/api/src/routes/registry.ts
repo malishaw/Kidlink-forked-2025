@@ -11,13 +11,13 @@ import media from "./media/media.index";
 import notification from "./notification/notification.index";
 import nurseryClass from "./nursery-class/nursery-class.index";
 import nursery from "./nursery/nursery.index";
+import organization from "./organization/organization.index";
 import parent from "./parents/parent.index";
 import payment from "./payments/payment.index";
 import propertyClasses from "./property-classes/property-classes.index";
 import system from "./system/system.index";
 import tasks from "./tasks/tasks.index";
 import teacher from "./teachers/teacher.index";
-
 import user from "./user/user.index";
 
 export function registerRoutes(app: AppOpenAPI) {
@@ -38,6 +38,7 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/nurseries", nursery)
     .route("/feedbacks", feedbacks)
     .route("/badges", badges)
+    .route("/organization", organization)
     .route("/classes", nurseryClass);
 }
 
