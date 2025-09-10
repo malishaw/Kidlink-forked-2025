@@ -1,15 +1,18 @@
 "use client";
 
+import { useGetNurseries } from "@/features/nursery/actions/get-nursery-action";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import { Plus, X } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
-import { useCreateClass } from "../actions/create-class-action";
+import { createClass } from "../actions/create-class-action";
 
 export default function CreateClassForm() {
-  const { mutate: createClass, isPending } = useCreateClass();
+  const { data: nurseries, isLoading: isNurseriesLoading } = useGetNurseries();
+
   const [name, setName] = useState("");
+  const [isPending, setIsPending] = useState(false);
 
   // Main teacher
   const [mainTeacherId, setMainTeacherId] = useState("");
@@ -21,6 +24,10 @@ export default function CreateClassForm() {
   // Children IDs
   const [childInput, setChildInput] = useState("");
   const [childIds, setChildIds] = useState<string[]>([]);
+
+  // Get the first (and only) nursery ID
+  const nurseryId = nurseries?.[0]?.id || "";
+  const nurseryTitle = nurseries?.[0]?.title || "";
 
   const addTeacherId = useCallback(() => {
     const trimmed = teacherInput.trim();
@@ -46,39 +53,65 @@ export default function CreateClassForm() {
     setChildIds((prev) => prev.filter((c) => c !== id));
   }, []);
 
-  const canSubmit = useMemo(() => name.trim().length > 0, [name]);
+  const canSubmit = useMemo(
+    () => name.trim().length > 0 && nurseryId.length > 0,
+    [name, nurseryId]
+  );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsPending(true);
 
-    if (name.trim() === "") {
-      alert("Class name is required.");
-      return;
-    }
-    createClass(
-      {
-        nurseryId: null,
+    try {
+      if (name.trim() === "") {
+        alert("Class name is required.");
+        return;
+      }
+
+      if (!nurseryId) {
+        alert(
+          "No nursery available. Please ensure a nursery is created first."
+        );
+        return;
+      }
+
+      // Filter out empty strings and null values
+      const filteredTeacherIds = teacherIds.filter(
+        (id) => id != null && id.trim() !== ""
+      );
+      const filteredChildIds = childIds.filter(
+        (id) => id != null && id.trim() !== ""
+      );
+
+      console.log("Submitting class data:", {
+        nurseryId,
         name: name.trim(),
         mainTeacherId: mainTeacherId.trim() === "" ? null : mainTeacherId,
-        teacherIds,
-        // childIds is not part of the API response, so omit if not needed
-      },
-      {
-        onSuccess: () => {
-          alert("Class created!");
-          setName("");
-          setMainTeacherId("");
-          setTeacherIds([]);
-          setTeacherInput("");
-          setChildIds([]);
-          setChildInput("");
-        },
-        onError: (err: any) => {
-          console.error(err);
-          alert(err?.message || "Error creating class");
-        },
-      }
-    );
+        teacherIds: filteredTeacherIds,
+        childIds: filteredChildIds,
+      });
+
+      await createClass({
+        nurseryId,
+        name: name.trim(),
+        mainTeacherId: mainTeacherId.trim() === "" ? null : mainTeacherId,
+        teacherIds: filteredTeacherIds,
+        childIds: filteredChildIds,
+      });
+
+      alert("Class created!");
+      setName("");
+      setMainTeacherId("");
+      setTeacherIds([]);
+      setTeacherInput("");
+      setChildIds([]);
+      setChildInput("");
+    } catch (error: any) {
+      console.error("Create class error:", error);
+      alert(error?.message || "Error creating class");
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
@@ -101,6 +134,22 @@ export default function CreateClassForm() {
       {/* Form Content */}
       <div className="p-8">
         <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Nursery Display */}
+          <div className="space-y-3">
+            <Label className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+              🏫 Nursery
+            </Label>
+            <div className="w-full h-12 text-lg border-2 border-slate-200 rounded-xl bg-gray-50 px-4 flex items-center">
+              {isNurseriesLoading ? (
+                <span className="text-gray-500">Loading nursery...</span>
+              ) : nurseryTitle ? (
+                <span className="text-slate-700">{nurseryTitle}</span>
+              ) : (
+                <span className="text-red-500">No nursery available</span>
+              )}
+            </div>
+          </div>
+
           {/* Class Name */}
           <div className="space-y-3">
             <Label

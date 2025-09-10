@@ -14,9 +14,24 @@ import type {
   UpdateRoute,
 } from "./parent.routes";
 
-// 🔍 List all parents
+// 🔍 List all parents with filtering by organization ID
 export const list: AppRouteHandler<ListRoute> = async (c) => {
-  const results = await db.query.parents.findMany({});
+  const session = c.get("session");
+
+  if (!session?.activeOrganizationId) {
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
+
+  const organizationId = session.activeOrganizationId;
+
+  // Fetch parents filtered by the current organization ID
+  const results = await db.query.parents.findMany({
+    where: eq(parents.organizationId, organizationId),
+  });
+
   const page = 1; // or from query params
   const limit = results.length; // or from query params
   const totalCount = results.length;

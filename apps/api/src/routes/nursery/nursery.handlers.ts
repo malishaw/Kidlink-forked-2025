@@ -32,10 +32,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   }
 
   const where = session.activeOrganizationId
-    ? and(
-        eq(nurseries.createdBy, session.userId),
-        eq(nurseries.organizationId, session.activeOrganizationId)
-      )
+    ? and(eq(nurseries.organizationId, session.activeOrganizationId))
     : eq(nurseries.createdBy, session.userId);
 
   const results = await db.query.nurseries.findMany({ where });

@@ -3,11 +3,29 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import { db } from "@api/db";
+import type { AppRouteHandler } from "@api/types";
 import { badges } from "@repo/database";
 
-// 🔍 List all badges
-export const list = async (c: any) => {
-  const results = await db.query.badges.findMany({});
+import type { ListRoute } from "./badges.routes";
+
+// 🔍 List all badges with filtering by organization ID
+export const list: AppRouteHandler<ListRoute> = async (c) => {
+  const session = c.get("session");
+
+  if (!session?.activeOrganizationId) {
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
+
+  const organizationId = session.activeOrganizationId;
+
+  // Fetch badges filtered by the current organization ID
+  const results = await db.query.badges.findMany({
+    where: eq(badges.organizationId, organizationId),
+  });
+
   const page = 1; // or from query params
   const limit = results.length; // or from query params
   const totalCount = results.length;

@@ -16,7 +16,22 @@ import type {
 
 // 🔍 List all childrens
 export const list: AppRouteHandler<ListRoute> = async (c) => {
-  const results = await db.query.childrens.findMany({});
+  const session = c.get("session");
+
+  if (!session?.activeOrganizationId) {
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
+
+  const organizationId = session.activeOrganizationId;
+
+  // Fetch children filtered by the current organization ID
+  const results = await db.query.childrens.findMany({
+    where: eq(childrens.organizationId, organizationId),
+  });
+
   const page = 1; // or from query params
   const limit = results.length; // or from query params
   const totalCount = results.length;
