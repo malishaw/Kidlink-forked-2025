@@ -2,6 +2,8 @@ import { createRouter } from "@api/lib/create-app";
 import { AppOpenAPI } from "@api/types";
 
 import { BASE_PATH } from "../lib/constants";
+import chat from "./chat/chat.index";
+import chatWs from "./chat/websocket.routes";
 import hotels from "./hotels/hotel.index";
 import index from "./index.route";
 import media from "./media/media.index";
@@ -16,7 +18,9 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/system", system)
     .route("/media", media)
     .route("/property-classes", propertyClasses)
-    .route("/hotels", hotels);
+    .route("/hotels", hotels)
+    .route("/chat", chat)
+    .route("/", chatWs); // WebSocket routes at root level
 }
 
 // stand alone router type used for api client

@@ -1,6 +1,47 @@
+CREATE TYPE "public"."chat_type" AS ENUM('direct', 'group');--> statement-breakpoint
 CREATE TYPE "public"."hotel_status" AS ENUM('active', 'inactive', 'under_maintenance', 'pending_approval');--> statement-breakpoint
+CREATE TYPE "public"."media_type" AS ENUM('image', 'video', 'audio', 'document');--> statement-breakpoint
+CREATE TYPE "public"."message_status" AS ENUM('sent', 'delivered', 'read');--> statement-breakpoint
 CREATE TYPE "public"."room_status" AS ENUM('available', 'occupied', 'maintenance', 'out_of_order', 'dirty');--> statement-breakpoint
 CREATE TYPE "public"."view_type" AS ENUM('ocean', 'city', 'garden', 'mountain', 'pool', 'courtyard', 'street', 'interior');--> statement-breakpoint
+CREATE TABLE "account" (
+	"id" text PRIMARY KEY NOT NULL,
+	"account_id" text NOT NULL,
+	"provider_id" text NOT NULL,
+	"user_id" text NOT NULL,
+	"access_token" text,
+	"refresh_token" text,
+	"id_token" text,
+	"access_token_expires_at" timestamp,
+	"refresh_token_expires_at" timestamp,
+	"scope" text,
+	"password" text,
+	"created_at" timestamp NOT NULL,
+	"updated_at" timestamp NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "chat_participants" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"chat_id" text NOT NULL,
+	"user_id" text NOT NULL,
+	"joined_at" timestamp DEFAULT NOW() NOT NULL,
+	"is_admin" boolean DEFAULT false NOT NULL,
+	"is_muted" boolean DEFAULT false NOT NULL,
+	"left_at" timestamp
+);
+--> statement-breakpoint
+CREATE TABLE "chats" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"name" text,
+	"description" text,
+	"type" "chat_type" NOT NULL,
+	"avatar" text,
+	"is_active" boolean DEFAULT true NOT NULL,
+	"created_by" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
 CREATE TABLE "hotel_amenities" (
 	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"hotel_id" text NOT NULL,
@@ -27,7 +68,9 @@ CREATE TABLE "hotel_policies" (
 	"policy_type" varchar(100) NOT NULL,
 	"policy_text" text NOT NULL,
 	"effective_date" date DEFAULT now() NOT NULL,
-	"is_active" boolean DEFAULT true NOT NULL
+	"is_active" boolean DEFAULT true NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE "hotel_types" (
@@ -61,10 +104,68 @@ CREATE TABLE "hotels" (
 	"property_class" text,
 	"check_in_time" varchar(5) DEFAULT '15:00',
 	"check_out_time" varchar(5) DEFAULT '11:00',
-	"hotel_policies" jsonb,
 	"status" "hotel_status" DEFAULT 'pending_approval' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "invitation" (
+	"id" text PRIMARY KEY NOT NULL,
+	"organization_id" text NOT NULL,
+	"email" text NOT NULL,
+	"role" text,
+	"status" text DEFAULT 'pending' NOT NULL,
+	"expires_at" timestamp NOT NULL,
+	"inviter_id" text NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "media" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"url" text NOT NULL,
+	"type" "media_type" NOT NULL,
+	"filename" text NOT NULL,
+	"size" integer NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "member" (
+	"id" text PRIMARY KEY NOT NULL,
+	"organization_id" text NOT NULL,
+	"user_id" text NOT NULL,
+	"role" text DEFAULT 'member' NOT NULL,
+	"created_at" timestamp NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "message_read_status" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"message_id" text NOT NULL,
+	"user_id" text NOT NULL,
+	"status" "message_status" NOT NULL,
+	"timestamp" timestamp DEFAULT NOW() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "messages" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"chat_id" text NOT NULL,
+	"sender_id" text NOT NULL,
+	"content" text NOT NULL,
+	"message_type" text DEFAULT 'text' NOT NULL,
+	"reply_to_id" text,
+	"is_edited" boolean DEFAULT false NOT NULL,
+	"edited_at" timestamp,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "organization" (
+	"id" text PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"slug" text,
+	"logo" text,
+	"created_at" timestamp NOT NULL,
+	"metadata" text,
+	CONSTRAINT "organization_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
 CREATE TABLE "property_classes" (
@@ -113,6 +214,64 @@ CREATE TABLE "rooms" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
+CREATE TABLE "session" (
+	"id" text PRIMARY KEY NOT NULL,
+	"expires_at" timestamp NOT NULL,
+	"token" text NOT NULL,
+	"created_at" timestamp NOT NULL,
+	"updated_at" timestamp NOT NULL,
+	"ip_address" text,
+	"user_agent" text,
+	"user_id" text NOT NULL,
+	"impersonated_by" text,
+	"active_organization_id" text,
+	CONSTRAINT "session_token_unique" UNIQUE("token")
+);
+--> statement-breakpoint
+CREATE TABLE "tasks" (
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "tasks_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"name" text NOT NULL,
+	"done" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "typing_indicators" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"chat_id" text NOT NULL,
+	"user_id" text NOT NULL,
+	"started_at" timestamp DEFAULT NOW() NOT NULL,
+	"expires_at" timestamp NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "user" (
+	"id" text PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"email" text NOT NULL,
+	"email_verified" boolean NOT NULL,
+	"image" text,
+	"created_at" timestamp NOT NULL,
+	"updated_at" timestamp NOT NULL,
+	"role" text,
+	"banned" boolean,
+	"ban_reason" text,
+	"ban_expires" timestamp,
+	CONSTRAINT "user_email_unique" UNIQUE("email")
+);
+--> statement-breakpoint
+CREATE TABLE "verification" (
+	"id" text PRIMARY KEY NOT NULL,
+	"identifier" text NOT NULL,
+	"value" text NOT NULL,
+	"expires_at" timestamp NOT NULL,
+	"created_at" timestamp,
+	"updated_at" timestamp
+);
+--> statement-breakpoint
+ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "chat_participants" ADD CONSTRAINT "chat_participants_chat_id_chats_id_fk" FOREIGN KEY ("chat_id") REFERENCES "public"."chats"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "chat_participants" ADD CONSTRAINT "chat_participants_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "chats" ADD CONSTRAINT "chats_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hotel_amenities" ADD CONSTRAINT "hotel_amenities_hotel_id_hotels_id_fk" FOREIGN KEY ("hotel_id") REFERENCES "public"."hotels"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hotel_images" ADD CONSTRAINT "hotel_images_hotel_id_hotels_id_fk" FOREIGN KEY ("hotel_id") REFERENCES "public"."hotels"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hotel_images" ADD CONSTRAINT "hotel_images_room_type_id_room_types_id_fk" FOREIGN KEY ("room_type_id") REFERENCES "public"."room_types"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -121,10 +280,21 @@ ALTER TABLE "hotels" ADD CONSTRAINT "hotels_organization_id_organization_id_fk" 
 ALTER TABLE "hotels" ADD CONSTRAINT "hotels_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hotels" ADD CONSTRAINT "hotels_hotel_type_hotel_types_id_fk" FOREIGN KEY ("hotel_type") REFERENCES "public"."hotel_types"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hotels" ADD CONSTRAINT "hotels_property_class_property_classes_id_fk" FOREIGN KEY ("property_class") REFERENCES "public"."property_classes"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "invitation" ADD CONSTRAINT "invitation_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "invitation" ADD CONSTRAINT "invitation_inviter_id_user_id_fk" FOREIGN KEY ("inviter_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "member" ADD CONSTRAINT "member_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "member" ADD CONSTRAINT "member_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "message_read_status" ADD CONSTRAINT "message_read_status_message_id_messages_id_fk" FOREIGN KEY ("message_id") REFERENCES "public"."messages"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "message_read_status" ADD CONSTRAINT "message_read_status_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "messages" ADD CONSTRAINT "messages_chat_id_chats_id_fk" FOREIGN KEY ("chat_id") REFERENCES "public"."chats"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "messages" ADD CONSTRAINT "messages_sender_id_user_id_fk" FOREIGN KEY ("sender_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "room_type_amenities" ADD CONSTRAINT "room_type_amenities_room_type_id_room_types_id_fk" FOREIGN KEY ("room_type_id") REFERENCES "public"."room_types"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "room_types" ADD CONSTRAINT "room_types_hotel_id_hotels_id_fk" FOREIGN KEY ("hotel_id") REFERENCES "public"."hotels"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "rooms" ADD CONSTRAINT "rooms_hotel_id_hotels_id_fk" FOREIGN KEY ("hotel_id") REFERENCES "public"."hotels"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "rooms" ADD CONSTRAINT "rooms_room_type_id_room_types_id_fk" FOREIGN KEY ("room_type_id") REFERENCES "public"."room_types"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "typing_indicators" ADD CONSTRAINT "typing_indicators_chat_id_chats_id_fk" FOREIGN KEY ("chat_id") REFERENCES "public"."chats"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "typing_indicators" ADD CONSTRAINT "typing_indicators_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "hotel_amenities_hotel_idx" ON "hotel_amenities" USING btree ("hotel_id");--> statement-breakpoint
 CREATE INDEX "hotel_amenities_type_idx" ON "hotel_amenities" USING btree ("amenity_type");--> statement-breakpoint
 CREATE INDEX "hotel_images_hotel_idx" ON "hotel_images" USING btree ("hotel_id");--> statement-breakpoint

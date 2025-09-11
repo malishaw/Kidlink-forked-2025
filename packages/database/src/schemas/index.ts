@@ -7,3 +7,5 @@ export * from "./media.schema";
 export * from "./hotel.schema";
 
 export * from "./room.schema";
+
+export * from "./chat.schema";
