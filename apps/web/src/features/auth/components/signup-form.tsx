@@ -3,7 +3,6 @@ import { CheckIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useId } from "react";
-import { CiFacebook } from "react-icons/ci";
 import { toast } from "sonner";
 
 import { Button } from "@repo/ui/components/button";
@@ -12,16 +11,13 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@repo/ui/components/card";
 import { Input } from "@repo/ui/components/input";
 import { useAppForm } from "@repo/ui/components/tanstack-form";
 import { cn } from "@repo/ui/lib/utils";
-import { useQueryState } from "nuqs";
 
 import { authClient } from "@/lib/auth-client";
-import { Checkbox } from "@repo/ui/components/checkbox";
-import { Label } from "@repo/ui/components/label";
 import { signupSchema, type SignupSchema } from "../schemas";
 
 export function SignupForm({
@@ -30,16 +26,15 @@ export function SignupForm({
 }: React.ComponentProps<"div">) {
   const toastId = useId();
   const router = useRouter();
-  const [mode, setMode] = useQueryState("mode");
 
   const form = useAppForm({
     validators: { onChange: signupSchema },
     defaultValues: {
       email: "",
       password: "",
-      confirmPassword: ""
+      confirmPassword: "",
     },
-    onSubmit: ({ value }) => handleSignup(value)
+    onSubmit: ({ value }) => handleSignup(value),
   });
 
   const handleSubmit = useCallback(
@@ -62,16 +57,13 @@ export function SignupForm({
         },
         onSuccess(ctx) {
           toast.success("User registered successfully !", { id: toastId });
-          if (mode === "hotelOwner") {
-            router.push("/setup-organization");
-          } else {
-            router.push("/signin");
-          }
+          // Always redirect to user selection page after successful signup
+          router.push("/user-selection");
         },
         onError(ctx) {
           toast.error(`Failed: ${ctx.error.message}`, { id: toastId });
-        }
-      }
+        },
+      },
     });
   };
 
@@ -82,15 +74,13 @@ export function SignupForm({
           <CardTitle className="text-xl font-heading font-bold">
             Get Started
           </CardTitle>
-          <CardDescription>
-            Signup with your Email or Facebook account
-          </CardDescription>
+          <CardDescription>Signup with your Email</CardDescription>
         </CardHeader>
         <CardContent>
           <form.AppForm>
             <form onSubmit={handleSubmit}>
               <div className="grid gap-6">
-                <div className="flex flex-col gap-4">
+                {/* <div className="flex flex-col gap-4">
                   <Button variant="outline" className="w-full">
                     <CiFacebook className="size-5" />
                     Signup with Facebook
@@ -100,7 +90,7 @@ export function SignupForm({
                   <span className="bg-card text-muted-foreground relative z-10 px-2">
                     Or continue with
                   </span>
-                </div>
+                </div> */}
 
                 {/* -------- */}
 
@@ -158,23 +148,6 @@ export function SignupForm({
                   )}
                 />
 
-                <div className="my-2 flex items-center gap-2">
-                  <Checkbox
-                    id="hotelOwnerCheck"
-                    checked={mode === "hotelOwner"}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setMode("hotelOwner");
-                      } else {
-                        setMode("");
-                      }
-                    }}
-                  />
-                  <Label htmlFor="hotelOwnerCheck" className="text-xs">
-                    Continue as Hotel Owner
-                  </Label>
-                </div>
-
                 {/* -------- */}
 
                 <div className="grid gap-6">
@@ -199,8 +172,8 @@ export function SignupForm({
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our Terms of Service and Privacy
+        Policy.
       </div>
     </div>
   );
