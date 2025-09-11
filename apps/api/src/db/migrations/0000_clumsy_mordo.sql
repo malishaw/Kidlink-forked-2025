@@ -231,7 +231,7 @@ CREATE TABLE "organization" (
 CREATE TABLE "parent" (
 	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"organization_id" text,
-	"child_id" text,
+	"child_id" text[],
 	"name" text NOT NULL,
 	"phone_number" text NOT NULL,
 	"email" text NOT NULL,

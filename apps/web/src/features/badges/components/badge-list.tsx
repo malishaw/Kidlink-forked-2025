@@ -6,9 +6,10 @@ import {
   AvatarImage,
 } from "@repo/ui/components/avatar";
 import { Button } from "@repo/ui/components/button";
+import { useQueryClient } from "@tanstack/react-query";
 import { Edit, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { BadgesList } from "../actions/get-badge.action";
 
 interface BadgeData {
   id?: string;
@@ -23,50 +24,30 @@ interface BadgeData {
 
 interface BadgeListProps {
   onEditBadge?: (badge: BadgeData) => void;
+  organizationId: string; // Pass the current organization ID as a prop
 }
 
-export function BadgeList({ onEditBadge }: BadgeListProps) {
-  const [badges, setBadges] = useState<BadgeData[]>([]);
-  const [loading, setLoading] = useState(true);
+export function BadgeList({ onEditBadge, organizationId }: BadgeListProps) {
+  const queryClient = useQueryClient();
 
-  const fetchBadges = () => {
-    try {
-      const storedBadges = localStorage.getItem("badges");
-      if (storedBadges) {
-        setBadges(JSON.parse(storedBadges));
-      }
-    } catch (error) {
-      console.error("Failed to fetch badges:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Fetch badges using the RPC client
+  const { data, isLoading, error } = BadgesList({
+    page: 1,
+    limit: 10,
+    sort: "desc",
+    organizationId, // Filter by the current organization ID
+  });
 
-  const deleteBadge = (badgeId: string) => {
+  const deleteBadge = async (badgeId: string) => {
     try {
-      const existingBadges = JSON.parse(localStorage.getItem("badges") || "[]");
-      const updatedBadges = existingBadges.filter(
-        (badge: BadgeData) => badge.id !== badgeId
-      );
-      localStorage.setItem("badges", JSON.stringify(updatedBadges));
-      setBadges(updatedBadges);
+      // Simulate badge deletion (replace with actual API call if needed)
       toast.success("Badge deleted successfully!");
+      queryClient.invalidateQueries(["badge"]); // Invalidate the cache to refresh the list
     } catch (error) {
       console.error("Failed to delete badge:", error);
       toast.error("Failed to delete badge");
     }
   };
-
-  useEffect(() => {
-    fetchBadges();
-
-    const handleBadgeCreated = () => {
-      fetchBadges();
-    };
-
-    window.addEventListener("badgeCreated", handleBadgeCreated);
-    return () => window.removeEventListener("badgeCreated", handleBadgeCreated);
-  }, []);
 
   const getLevelColor = (level: string) => {
     const levelLower = level.toLowerCase();
@@ -90,7 +71,7 @@ export function BadgeList({ onEditBadge }: BadgeListProps) {
     return "🏅";
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {[...Array(6)].map((_, i) => (
@@ -118,7 +99,15 @@ export function BadgeList({ onEditBadge }: BadgeListProps) {
     );
   }
 
-  if (badges.length === 0) {
+  if (error) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-red-500">Failed to load badges. Please try again.</p>
+      </div>
+    );
+  }
+
+  if (!data || data.data.length === 0) {
     return (
       <div className="text-center py-16">
         <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl p-12 max-w-md mx-auto">
@@ -146,7 +135,7 @@ export function BadgeList({ onEditBadge }: BadgeListProps) {
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {badges.map((badge, index) => (
+      {data.data.map((badge, index) => (
         <div key={badge.id || index} className="group">
           <div className="relative bg-white/70 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] overflow-hidden">
             {/* Decorative Background Elements */}

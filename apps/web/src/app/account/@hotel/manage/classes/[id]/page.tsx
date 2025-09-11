@@ -15,8 +15,8 @@ export default function ClassDetailPage() {
   const childrenQuery = ChildrensList({ page: 1, limit: 50 });
 
   // Assign additional teacher state
-  const [selectedAdditionalTeacher, setSelectedAdditionalTeacher] =
-    React.useState<string>("");
+  const [selectedAdditionalTeachers, setSelectedAdditionalTeachers] =
+    React.useState<string[]>([]);
   const [assignAdditionalTeacherLoading, setAssignAdditionalTeacherLoading] =
     React.useState(false);
   const [assignAdditionalTeacherError, setAssignAdditionalTeacherError] =
@@ -52,23 +52,22 @@ export default function ClassDetailPage() {
   const [assignError, setAssignError] = React.useState<string>("");
   // Handler to assign additional teacher (append to teacherIds)
   const handleAssignAdditionalTeacher = async () => {
-    if (!selectedAdditionalTeacher || !classId) return;
+    if (!selectedAdditionalTeachers.length || !classId) return;
     setAssignAdditionalTeacherLoading(true);
     setAssignAdditionalTeacherError("");
     try {
       const currentTeacherIds = Array.isArray(data?.teacherIds)
         ? data.teacherIds
         : [];
-      const newTeacherIds = currentTeacherIds.includes(
-        selectedAdditionalTeacher
-      )
-        ? currentTeacherIds
-        : [...currentTeacherIds, selectedAdditionalTeacher];
+      const newTeacherIds = Array.from(
+        new Set([...currentTeacherIds, ...selectedAdditionalTeachers])
+      );
       await updateClass(classId, { teacherIds: newTeacherIds });
       refetch();
+      setSelectedAdditionalTeachers([]);
     } catch (err: any) {
       setAssignAdditionalTeacherError(
-        err.message || "Failed to assign teacher"
+        err.message || "Failed to assign teachers"
       );
     } finally {
       setAssignAdditionalTeacherLoading(false);
@@ -81,7 +80,8 @@ export default function ClassDetailPage() {
     setAssignError("");
     try {
       await updateClass(classId, { mainTeacherId: selectedTeacher });
-      // Optionally, refetch class details here
+      refetch();
+      setSelectedTeacher("");
     } catch (err: any) {
       setAssignError(err.message || "Failed to assign teacher");
     } finally {
@@ -170,7 +170,7 @@ export default function ClassDetailPage() {
           </div>
         </div>
         {/* Assignment Cards */}
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-3 gap-8">
           {/* Assign Children Section */}
           <div className="bg-white/90 backdrop-blur-sm border-0 shadow-xl rounded-2xl p-6">
             <div className="flex items-center gap-3 mb-6">
@@ -276,35 +276,15 @@ export default function ClassDetailPage() {
               </h2>
             </div>
 
-            {/* Currently assigned teachers */}
-            {data?.teacherIds && data.teacherIds.length > 0 && (
-              <div className="mb-6">
-                <h3 className="font-medium text-slate-700 mb-3">
-                  Currently Assigned Teachers ({data.teacherIds.length})
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {data.teacherIds.map((teacherId: string) => {
-                    const teacher = teachersQuery.data?.data?.find(
-                      (t: any) => t.id === teacherId
-                    );
-                    return (
-                      <span
-                        key={teacherId}
-                        className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                      >
-                        {teacher?.name || teacherId}
-                      </span>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
             {/* Main teacher display */}
             {data?.mainTeacherId && (
               <div className="mb-6 p-4 bg-blue-50 rounded-lg">
                 <h3 className="font-medium text-blue-800 mb-1">Main Teacher</h3>
-                <p className="text-blue-700">{data.mainTeacherId}</p>
+                <p className="text-blue-700">
+                  {teachersQuery.data?.data?.find(
+                    (teacher: any) => teacher.id === data?.mainTeacherId
+                  )?.name || "Not assigned"}
+                </p>
               </div>
             )}
 
@@ -356,6 +336,112 @@ export default function ClassDetailPage() {
                 {assignError && (
                   <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
                     <p className="text-red-700 text-sm">{assignError}</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Assign Multiple Teachers Section */}
+          <div className="bg-white/90 backdrop-blur-sm border-0 shadow-xl rounded-2xl p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <span className="text-green-600 font-bold">👩‍🏫</span>
+              </div>
+              <h2 className="text-xl font-bold text-slate-800">
+                Assign Additional Teachers
+              </h2>
+            </div>
+
+            {/* Currently assigned teachers */}
+            {data?.teacherIds && data.teacherIds.length > 0 && (
+              <div className="mb-6">
+                <h3 className="font-medium text-slate-700 mb-3">
+                  Currently Assigned Teachers ({data.teacherIds.length})
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {data.teacherIds.map((teacherId: string) => {
+                    const teacher = teachersQuery.data?.data?.find(
+                      (t: any) => t.id === teacherId
+                    );
+                    return (
+                      <span
+                        key={teacherId}
+                        className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
+                      >
+                        {teacher?.name || teacherId}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {teachersQuery.isLoading ? (
+              <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
+                <div className="w-5 h-5 border-2 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
+                <span className="text-green-700">Loading teachers...</span>
+              </div>
+            ) : teachersQuery.isError ? (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-700">Failed to load teachers</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-700 mb-2 block">
+                    Select Teachers (Hold Ctrl/Cmd for multiple)
+                  </label>
+                  <select
+                    multiple
+                    className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors min-h-[120px]"
+                    value={selectedAdditionalTeachers}
+                    onChange={(e) => {
+                      const options = Array.from(e.target.selectedOptions);
+                      setSelectedAdditionalTeachers(
+                        options.map((opt) => opt.value)
+                      );
+                    }}
+                    disabled={assignAdditionalTeacherLoading}
+                  >
+                    {teachersQuery.data?.data?.map((teacher: any) => (
+                      <option
+                        key={teacher.id}
+                        value={teacher.id}
+                        className="py-2"
+                      >
+                        {teacher.name || teacher.id}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {selectedAdditionalTeachers.length} teachers selected
+                  </p>
+                </div>
+
+                <button
+                  className="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-medium rounded-xl hover:from-green-700 hover:to-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
+                  onClick={handleAssignAdditionalTeacher}
+                  disabled={
+                    assignAdditionalTeacherLoading ||
+                    !selectedAdditionalTeachers.length
+                  }
+                >
+                  {assignAdditionalTeacherLoading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Assigning...
+                    </>
+                  ) : (
+                    <>👩‍🏫 Assign {selectedAdditionalTeachers.length} Teachers</>
+                  )}
+                </button>
+
+                {assignAdditionalTeacherError && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-700 text-sm">
+                      {assignAdditionalTeacherError}
+                    </p>
                   </div>
                 )}
               </div>

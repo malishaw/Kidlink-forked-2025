@@ -14,9 +14,24 @@ import type {
   UpdateRoute,
 } from "./teacher.routes";
 
-// 🔍 List all teachers
+// 🔍 List all teachers with filtering by organization ID
 export const list: AppRouteHandler<ListRoute> = async (c) => {
-  const results = await db.query.teachers.findMany({});
+  const session = c.get("session");
+
+  if (!session?.activeOrganizationId) {
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
+
+  const organizationId = session.activeOrganizationId;
+
+  // Fetch teachers filtered by the current organization ID
+  const results = await db.query.teachers.findMany({
+    where: eq(teachers.organizationId, organizationId),
+  });
+
   const page = 1; // or from query params
   const limit = results.length; // or from query params
   const totalCount = results.length;

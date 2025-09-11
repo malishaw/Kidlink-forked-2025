@@ -7,6 +7,7 @@ import {
 } from "@repo/ui/components/avatar";
 import { Button } from "@repo/ui/components/button";
 import { CardContent, CardHeader, CardTitle } from "@repo/ui/components/card";
+import { useQuery } from "@tanstack/react-query";
 import {
   Award,
   ChevronDown,
@@ -17,10 +18,11 @@ import {
   Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { createChildren } from "@/features/children/actions/create-children";
 import { ChildrensList as useChildrensList } from "@/features/children/actions/get-children";
+import { getClient } from "@/lib/rpc/client";
 
 export function ChildrensList() {
   const [selectedChild, setSelectedChild] = useState<any>(null);
@@ -30,6 +32,66 @@ export function ChildrensList() {
   const [sortBy, setSortBy] = useState<"name" | "children" | "recent">("name");
 
   const { data, isLoading, error } = useChildrensList({});
+
+  const childrensData = data?.data || [];
+
+  // Fetch all classes
+  const {
+    data: classesResponse,
+    isLoading: classesLoading,
+    error: classesError,
+  } = useQuery({
+    queryKey: ["all-classes"],
+    queryFn: async () => {
+      const rpcClient = await getClient();
+      const classesRes = await rpcClient.api["classes"].$get();
+
+      if (!classesRes.ok) {
+        const errorData = await classesRes.json();
+        throw new Error(errorData.message || "Failed to fetch classes");
+      }
+
+      const classes = await classesRes.json();
+      return classes;
+    },
+  });
+
+  const classesData = classesResponse?.data || [];
+
+  const getClassName = (classId) => {
+    if (classesLoading) return "Loading...";
+    const classData = classesData.find((cls) => cls.id === classId);
+    return classData?.name || "No assigned class";
+  };
+
+  // Fetch all badges
+  const {
+    data: badgesResponse,
+    isLoading: badgesLoading,
+    error: badgesError,
+  } = useQuery({
+    queryKey: ["all-badges"],
+    queryFn: async () => {
+      const rpcClient = await getClient();
+      const badgesRes = await rpcClient.api["badges"].$get();
+
+      if (!badgesRes.ok) {
+        const errorData = await badgesRes.json();
+        throw new Error(errorData.message || "Failed to fetch badges");
+      }
+
+      const badges = await badgesRes.json();
+      return badges;
+    },
+  });
+
+  const badgesData = badgesResponse?.data || [];
+
+  const getBadgeName = (badgeId) => {
+    if (badgesLoading) return "Loading...";
+    const badgeData = badgesData.find((badge) => badge.id === badgeId);
+    return badgeData?.title || "No badge assigned";
+  };
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -78,7 +140,48 @@ export function ChildrensList() {
     }
   };
 
-  if (isLoading) {
+  const [classNames, setClassNames] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const fetchClassNames = async () => {
+      const classIdMap: Record<string, string> = { ...classNames };
+      const classIdsToFetch = childrensData
+        .map((child) => child.classId)
+        .filter((classId) => classId && !classIdMap[classId]);
+
+      if (classIdsToFetch.length === 0) return;
+
+      for (const classId of classIdsToFetch) {
+        try {
+          const { data } = await useGetClassById(classId);
+          classIdMap[classId] = data?.name || "Unknown class";
+        } catch {
+          classIdMap[classId] = "Error fetching class";
+        }
+      }
+
+      setClassNames(classIdMap);
+    };
+
+    fetchClassNames();
+  }, [childrensData, classNames]);
+
+  // Add a function to fetch parent names based on parent ID
+  const getParentName = (parentId) => {
+    if (!parentId) return "No assigned parent";
+    const {
+      data: parentData,
+      isLoading: parentLoading,
+      error: parentError,
+    } = useGetParentById(parentId);
+
+    if (parentLoading) return "Loading...";
+    if (parentError) return "Error fetching parent";
+
+    return parentData?.name || "Unknown parent";
+  };
+
+  if (isLoading || classesLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex flex-col justify-center items-center py-20 space-y-8">
         <div className="relative">
@@ -105,7 +208,7 @@ export function ChildrensList() {
     );
   }
 
-  if (error) {
+  if (error || classesError) {
     return (
       <div className="bg-gradient-to-br from-red-50 via-pink-50 to-red-100 border border-red-200 rounded-2xl p-8 text-center shadow-lg">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-red-100 to-red-200 rounded-full mb-6 shadow-inner">
@@ -115,13 +218,11 @@ export function ChildrensList() {
           Failed to load childrens
         </h3>
         <p className="text-red-600 mb-6 max-w-md mx-auto">
-          Error: {error.message}
+          Error: {error?.message || classesError?.message}
         </p>
       </div>
     );
   }
-
-  const childrensData = data?.data || [];
 
   const filteredChildrens = childrensData.filter(
     (children: any) =>
@@ -287,22 +388,204 @@ export function ChildrensList() {
                   onChange={handleFormChange}
                   className="w-full border border-gray-200 rounded-xl px-4 py-2"
                 />
-                <input
-                  type="text"
-                  name="profileImageUrl"
-                  placeholder="Profile Image URL"
-                  value={formData.profileImageUrl}
-                  onChange={handleFormChange}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2"
-                />
-                <input
-                  type="text"
-                  name="imagesUrl"
-                  placeholder="Images URL"
-                  value={formData.imagesUrl}
-                  onChange={handleFormChange}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2"
-                />
+                {/* Profile Image Section */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Profile Picture
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <div className="relative h-24 w-24 rounded-xl overflow-hidden border-2 border-gray-200">
+                      {formData.profileImageUrl ? (
+                        <img
+                          src={formData.profileImageUrl}
+                          alt="Profile preview"
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = "/placeholder.svg";
+                          }}
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-gray-50 flex items-center justify-center">
+                          <Users className="h-8 w-8 text-gray-400" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            try {
+                              // Create a temporary URL for preview
+                              const previewUrl = URL.createObjectURL(file);
+                              setFormData({
+                                ...formData,
+                                profileImageUrl: previewUrl,
+                              });
+
+                              // Here you would typically upload the file to your server
+                              // const uploadedUrl = await uploadImage(file);
+                              // setFormData({ ...formData, profileImageUrl: uploadedUrl });
+                            } catch (error) {
+                              console.error("Error uploading image:", error);
+                              alert("Failed to upload profile image");
+                            }
+                          }
+                        }}
+                        className="hidden"
+                        id="profile-image-upload"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() =>
+                          document
+                            .getElementById("profile-image-upload")
+                            ?.click()
+                        }
+                        className="w-full"
+                      >
+                        Upload Profile Image
+                      </Button>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          name="profileImageUrl"
+                          placeholder="or paste profile image URL"
+                          value={formData.profileImageUrl}
+                          onChange={handleFormChange}
+                          className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm"
+                        />
+                        {formData.profileImageUrl && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-6 p-1 text-gray-400 hover:text-gray-600"
+                            onClick={() =>
+                              setFormData({ ...formData, profileImageUrl: "" })
+                            }
+                          >
+                            ✕
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Additional Images Section */}
+                {/* <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Additional Images
+                  </label>
+                  <div className="flex flex-wrap gap-4">
+                    {formData.imagesUrl &&
+                      formData.imagesUrl.split(",").map((url, index) => (
+                        <div
+                          key={index}
+                          className="relative h-20 w-20 rounded-lg overflow-hidden border-2 border-gray-200"
+                        >
+                          <img
+                            src={url.trim()}
+                            alt={`Additional image ${index + 1}`}
+                            className="h-full w-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = "/placeholder.svg";
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const urls = formData.imagesUrl
+                                .split(",")
+                                .filter((_, i) => i !== index);
+                              setFormData({
+                                ...formData,
+                                imagesUrl: urls.join(","),
+                              });
+                            }}
+                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    <div className="h-20 w-20">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={async (e) => {
+                          const files = Array.from(e.target.files || []);
+                          if (files.length > 0) {
+                            try {
+                              // Create temporary URLs for preview
+                              const previewUrls = files.map((file) =>
+                                URL.createObjectURL(file)
+                              );
+                              const currentUrls = formData.imagesUrl
+                                ? formData.imagesUrl.split(",")
+                                : [];
+                              setFormData({
+                                ...formData,
+                                imagesUrl: [
+                                  ...currentUrls,
+                                  ...previewUrls,
+                                ].join(","),
+                              });
+
+                              // Here you would typically upload the files to your server
+                              // const uploadedUrls = await Promise.all(files.map(file => uploadImage(file)));
+                              // setFormData({ ...formData, imagesUrl: uploadedUrls.join(',') });
+                            } catch (error) {
+                              console.error("Error uploading images:", error);
+                              alert("Failed to upload images");
+                            }
+                          }
+                        }}
+                        className="hidden"
+                        id="additional-images-upload"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() =>
+                          document
+                            .getElementById("additional-images-upload")
+                            ?.click()
+                        }
+                        className="w-full h-full flex flex-col items-center justify-center text-gray-500 border-2 border-dashed rounded-lg hover:bg-gray-50"
+                      >
+                        <span className="text-2xl mb-1">+</span>
+                        <span className="text-xs">Add Images</span>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="imagesUrl"
+                      placeholder="or paste comma-separated image URLs"
+                      value={formData.imagesUrl}
+                      onChange={handleFormChange}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm"
+                    />
+                    {formData.imagesUrl && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-6 p-1 text-gray-400 hover:text-gray-600"
+                        onClick={() =>
+                          setFormData({ ...formData, imagesUrl: "" })
+                        }
+                      >
+                        ✕
+                      </Button>
+                    )}
+                  </div>
+                </div> */}
                 <input
                   type="text"
                   name="activities"
@@ -363,6 +646,12 @@ export function ChildrensList() {
                     {children.name}
                   </CardTitle>
                   <p className="text-sm text-gray-600">{children.email}</p>
+                  <p className="text-sm text-gray-600">
+                    {getClassName(children.classId)}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Badge: {getBadgeName(children.badgeId)}
+                  </p>
                   <p className="text-sm text-gray-600">
                     {children.phoneNumber}
                   </p>

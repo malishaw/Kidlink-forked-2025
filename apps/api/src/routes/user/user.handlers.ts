@@ -7,7 +7,12 @@ import { db } from "@api/db";
 import type { AppRouteHandler } from "@api/types";
 import { user } from "@repo/database";
 
-import type { CountRoute, GetByIdRoute, ListRoute } from "./user.routes";
+import type {
+  CountRoute,
+  GetByIdRoute,
+  ListRoute,
+  UpdateUserRoute,
+} from "./user.routes";
 
 // List all users
 export const list: AppRouteHandler<ListRoute> = async (c) => {
@@ -56,4 +61,25 @@ export const count: AppRouteHandler<CountRoute> = async (c) => {
     .from(user);
 
   return c.json({ count: Number(count ?? 0) }, HttpStatusCodes.OK);
+};
+
+// Update user by ID
+export const updateUser: AppRouteHandler<UpdateUserRoute> = async (c) => {
+  const { id } = c.req.valid("param");
+  const updateData = c.req.valid("body");
+
+  const updatedUser = await db
+    .update(user)
+    .set(updateData)
+    .where(eq(user.id, String(id)))
+    .returning();
+
+  if (!updatedUser.length) {
+    return c.json(
+      { message: HttpStatusPhrases.NOT_FOUND },
+      HttpStatusCodes.NOT_FOUND
+    );
+  }
+
+  return c.json(updatedUser[0], HttpStatusCodes.OK);
 };
