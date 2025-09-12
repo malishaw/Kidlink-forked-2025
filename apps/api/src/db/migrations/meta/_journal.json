@@ -22,6 +22,20 @@
       "when": 1757502116561,
       "tag": "0002_early_silvermane",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1757673683175,
+      "tag": "0003_military_prowler",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1757674339124,
+      "tag": "0004_organic_wasp",
+      "breakpoints": true
     }
   ]
 }

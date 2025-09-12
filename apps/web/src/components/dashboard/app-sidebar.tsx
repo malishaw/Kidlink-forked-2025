@@ -89,6 +89,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "/account/manage/user-management",
         icon: IconBuildings,
       },
+      {
+        name: "Lesson Plans",
+        url: "/account/manage/lessonplans",
+        icon: IconBuildings,
+      },
+      {
+        name: "Payments",
+        url: "/account/manage/payment",
+        icon: IconBuildings,
+      },
     ],
   };
 
