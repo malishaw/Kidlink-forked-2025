@@ -4,12 +4,14 @@ import { useGetNurseries } from "@/features/nursery/actions/get-nursery-action";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
+import { useQueryClient } from "@tanstack/react-query";
 import { Plus, X } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { createClass } from "../actions/create-class-action";
 
-export default function CreateClassForm() {
+export default function CreateClassForm({ onSuccess }: { onSuccess?: () => void }) {
   const { data: nurseries, isLoading: isNurseriesLoading } = useGetNurseries();
+  const queryClient = useQueryClient();
 
   const [name, setName] = useState("");
   const [isPending, setIsPending] = useState(false);
@@ -99,6 +101,9 @@ export default function CreateClassForm() {
         childIds: filteredChildIds,
       });
 
+      // Refetch the classes list
+      queryClient.invalidateQueries({ queryKey: ["classes-list"] });
+
       alert("Class created!");
       setName("");
       setMainTeacherId("");
@@ -106,6 +111,9 @@ export default function CreateClassForm() {
       setTeacherInput("");
       setChildIds([]);
       setChildInput("");
+
+      // Call onSuccess callback if provided
+      onSuccess?.();
     } catch (error: any) {
       console.error("Create class error:", error);
       alert(error?.message || "Error creating class");

@@ -3,9 +3,11 @@
 import CreateClassForm from "@/features/classes/components/create-class-form";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Home() {
   const router = useRouter();
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Fetch all classes
   const classesQuery = useQuery({

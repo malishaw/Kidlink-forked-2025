@@ -9,7 +9,7 @@ type Props = {};
 
 const HotelTabs = [
   { name: "Create Nursery", href: "/account/manage/nursery" },
-  { name: "Nursery Details", href: "/account/manage/nursery-card" },
+  // { name: "Nursery Details", href: "/account/manage/nursery-card" },
 ];
 
 export function NurseryTabBar({}: Props) {
