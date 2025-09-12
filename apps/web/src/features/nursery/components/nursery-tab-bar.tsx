@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 type Props = {};
 
 const HotelTabs = [
-  { name: "Create Nursery", href: "/account/manage/nursery" },
+  { name: "Nursery Information", href: "/account/manage/nursery" },
   // { name: "Nursery Details", href: "/account/manage/nursery-card" },
 ];
 
