@@ -5,6 +5,7 @@ import { BASE_PATH } from "../lib/constants";
 import badges from "./badges/badges.index";
 import children from "./children/children.index";
 import classes from "./classes/classes.index";
+import event from "./event/event.index";
 import feedbacks from "./feedbacks/feedbacks.index";
 import hotels from "./hotels/hotel.index";
 import index from "./index.route";
@@ -32,7 +33,8 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/notifications", notifications)
     .route("/payments", payments)
     .route("/badges", badges)
-    .route("/teachers", teachers);
+    .route("/teachers", teachers)
+    .route("/events", event);
 }
 
 // stand alone router type used for api client

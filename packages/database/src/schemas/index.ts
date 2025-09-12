@@ -22,4 +22,5 @@ export * from "./payments.schema";
 
 export * from "./badges.schema";
 
+export * from "./event.schema";
 export * from "./teacher.schema";
