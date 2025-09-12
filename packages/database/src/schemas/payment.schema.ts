@@ -1,25 +1,26 @@
-import { sql } from "drizzle-orm";
-import { pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  numeric,
+  pgTable,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { organization } from "./auth.schema";
-import { parents } from "./parent.schema";
-export const paymentMethodStatusEnum = pgEnum("payment_method", [
-  "card",
-  "bankTransfer",
-]);
+import { childrens } from "./children.schema";
 
-export const payments = pgTable("payment", {
+export const payments = pgTable("payments", {
   id: text("id")
     .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  organizationId: text("organization_id").references(() => organization.id),
-  childId: text("child_id"),
-  parentId: text("parent_id").references(() => parents.id),
-  paymentMethod: paymentMethodStatusEnum("payment_method")
-    .default("bankTransfer")
+    .$defaultFn(() => crypto.randomUUID()),
+  childId: text("child_id")
+    .references(() => childrens.id)
     .notNull(),
-  amount: text("amount").notNull(),
-  phoneNumber: text("phone_number").notNull(),
-  email: text("email").notNull(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-  createdAt: timestamp("created_at").defaultNow(),
+  amount: numeric("amount").notNull(),
+  paymentMethod: varchar("payment_method", { length: 50 }).notNull(), // e.g., cash, card
+  status: varchar("status", { length: 20 }).default("pending").notNull(), // pending, completed, failed
+  paidAt: timestamp("paid_at"),
+  organizationId: text("organization_id").references(() => organization.id),
+
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

@@ -3,9 +3,11 @@
 import CreateClassForm from "@/features/classes/components/create-class-form";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Home() {
   const router = useRouter();
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   // Fetch all classes
   const classesQuery = useQuery({
@@ -62,18 +64,31 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-slate-800 mb-4">
-            Class Management
-          </h1>
-          <p className="text-xl text-slate-600 mb-8">
-            Create and manage your classes
-          </p>
-
-          {/* Create Class Form Component */}
-          <div className="max-w-2xl mx-auto">
-            <CreateClassForm />
+        <div className="flex items-center justify-between mb-12">
+          {/* Left Side - Title and Description */}
+          <div>
+            <h1 className="text-4xl font-bold text-slate-800 mb-2">
+              Class Management
+            </h1>
+            <p className="text-xl text-slate-600">
+              Create and manage your classes
+            </p>
           </div>
+
+          {/* Right Side - Add Class Button */}
+          <button
+            onClick={() => setIsPanelOpen(true)}
+            className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white font-semibold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
+          >
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Add Class
+          </button>
         </div>
 
         {/* Classes Section */}
@@ -215,6 +230,16 @@ export default function Home() {
             </div>
           )}
         </section>
+
+        {/* Create Class Right Side Panel */}
+        <CreateClassForm
+          isOpen={isPanelOpen}
+          onClose={() => setIsPanelOpen(false)}
+          onSuccess={() => {
+            setIsPanelOpen(false);
+            classesQuery.refetch(); // Refresh the classes list
+          }}
+        />
       </div>
     </div>
   );

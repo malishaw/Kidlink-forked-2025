@@ -4,12 +4,22 @@ import { useGetNurseries } from "@/features/nursery/actions/get-nursery-action";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { Plus, X } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Plus } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { createClass } from "../actions/create-class-action";
 
-export default function CreateClassForm() {
+export default function CreateClassForm({
+  isOpen,
+  onClose,
+  onSuccess,
+}: {
+  isOpen?: boolean;
+  onClose?: () => void;
+  onSuccess?: () => void;
+}) {
   const { data: nurseries, isLoading: isNurseriesLoading } = useGetNurseries();
+  const queryClient = useQueryClient();
 
   const [name, setName] = useState("");
   const [isPending, setIsPending] = useState(false);
@@ -99,6 +109,9 @@ export default function CreateClassForm() {
         childIds: filteredChildIds,
       });
 
+      // Refetch the classes list
+      queryClient.invalidateQueries({ queryKey: ["classes-list"] });
+
       alert("Class created!");
       setName("");
       setMainTeacherId("");
@@ -106,6 +119,9 @@ export default function CreateClassForm() {
       setTeacherInput("");
       setChildIds([]);
       setChildInput("");
+
+      // Call onSuccess callback if provided
+      onSuccess?.();
     } catch (error: any) {
       console.error("Create class error:", error);
       alert(error?.message || "Error creating class");
@@ -114,224 +130,114 @@ export default function CreateClassForm() {
     }
   };
 
+  // Only show as right side panel
+  if (!isOpen) return null;
+
   return (
-    <div className="bg-white/90 backdrop-blur-sm border-0 shadow-2xl rounded-3xl overflow-hidden max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6">
-        <div className="flex items-center gap-4">
-          <div className="h-12 w-12 bg-white/20 rounded-xl flex items-center justify-center">
-            <Plus className="h-6 w-6 text-white" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-white">Create New Class</h2>
-            <p className="text-indigo-100">
-              Add a new class to your management system
-            </p>
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-transparent bg-opacity-30 backdrop-blur-sm z-40"
+        onClick={onClose}
+      />
+
+      {/* Right Side Panel */}
+      <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto">
+        {/* Panel Header */}
+        <div className="sticky top-0 bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 z-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-white/20 rounded-lg flex items-center justify-center">
+                <Plus className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white">Create Class</h2>
+                <p className="text-indigo-100 text-sm">Add new class</p>
+              </div>
+            </div>
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="text-white/80 hover:text-white hover:bg-white/20 rounded-lg p-2 transition-colors"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
-      </div>
 
-      {/* Form Content */}
-      <div className="p-8">
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Nursery Display */}
-          <div className="space-y-3">
-            <Label className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-              🏫 Nursery
-            </Label>
-            <div className="w-full h-12 text-lg border-2 border-slate-200 rounded-xl bg-gray-50 px-4 flex items-center">
-              {isNurseriesLoading ? (
-                <span className="text-gray-500">Loading nursery...</span>
-              ) : nurseryTitle ? (
-                <span className="text-slate-700">{nurseryTitle}</span>
-              ) : (
-                <span className="text-red-500">No nursery available</span>
-              )}
-            </div>
-          </div>
-
-          {/* Class Name */}
-          <div className="space-y-3">
-            <Label
-              htmlFor="name"
-              className="text-lg font-semibold text-slate-800 flex items-center gap-2"
-            >
-              📚 Class Name *
-            </Label>
-            <Input
-              id="name"
-              name="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter a memorable class name..."
-              required
-              className="h-12 text-lg border-2 border-slate-200 rounded-xl focus:border-indigo-500 focus:ring-indigo-200 transition-all duration-200"
-            />
-          </div>
-
-          {/* Main Teacher ID */}
-          <div className="space-y-3">
-            <Label
-              htmlFor="mainTeacherId"
-              className="text-lg font-semibold text-slate-800 flex items-center gap-2"
-            >
-              👨‍🏫 Main Teacher ID
-            </Label>
-            <Input
-              id="mainTeacherId"
-              name="mainTeacherId"
-              value={mainTeacherId}
-              onChange={(e) => setMainTeacherId(e.target.value)}
-              placeholder="Enter the main teacher's ID..."
-              className="h-12 text-lg border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-blue-200 transition-all duration-200"
-            />
-          </div>
-
-          {/* Teacher IDs */}
-          <div className="space-y-4">
-            <Label
-              htmlFor="teacherId"
-              className="text-lg font-semibold text-slate-800 flex items-center gap-2"
-            >
-              👥 Additional Teachers
-            </Label>
-            <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-200">
-              <div className="flex gap-3 mb-4">
-                <Input
-                  id="teacherId"
-                  name="teacherId"
-                  value={teacherInput}
-                  onChange={(e) => setTeacherInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addTeacherId();
-                    }
-                  }}
-                  placeholder="Enter teacher ID and press Enter or click Add"
-                  className="flex-1 h-11 border-2 border-slate-300 rounded-xl focus:border-green-500 focus:ring-green-200"
-                />
-                <Button
-                  type="button"
-                  onClick={addTeacherId}
-                  className="h-11 px-6 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 rounded-xl"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Teacher
-                </Button>
+        {/* Panel Content */}
+        <div className="p-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Nursery Display */}
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                🏫 Nursery
+              </Label>
+              <div className="w-full h-10 text-sm border-2 border-slate-200 rounded-lg bg-gray-50 px-3 flex items-center">
+                {isNurseriesLoading ? (
+                  <span className="text-gray-500">Loading...</span>
+                ) : nurseryTitle ? (
+                  <span className="text-slate-700">{nurseryTitle}</span>
+                ) : (
+                  <span className="text-red-500">No nursery available</span>
+                )}
               </div>
-
-              {teacherIds.length > 0 && (
-                <div className="space-y-3">
-                  <div className="text-sm font-medium text-slate-600">
-                    Added Teachers ({teacherIds.length})
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    {teacherIds.map((id) => (
-                      <div
-                        key={id}
-                        className="flex items-center gap-2 bg-green-100 text-green-800 rounded-xl px-4 py-2 border border-green-200"
-                      >
-                        <span className="font-mono font-medium">{id}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeTeacherId(id)}
-                          className="text-green-600 hover:text-green-800 hover:bg-green-200 rounded-full p-1 transition-colors"
-                          aria-label={`Remove ${id}`}
-                          title={`Remove ${id}`}
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
-          </div>
 
-          {/* Children IDs */}
-          <div className="space-y-4">
-            <Label
-              htmlFor="childId"
-              className="text-lg font-semibold text-slate-800 flex items-center gap-2"
-            >
-              🧒 Students
-            </Label>
-            <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-200">
-              <div className="flex gap-3 mb-4">
-                <Input
-                  id="childId"
-                  name="childId"
-                  value={childInput}
-                  onChange={(e) => setChildInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addChildId();
-                    }
-                  }}
-                  placeholder="Enter student ID and press Enter or click Add"
-                  className="flex-1 h-11 border-2 border-slate-300 rounded-xl focus:border-purple-500 focus:ring-purple-200"
-                />
-                <Button
-                  type="button"
-                  onClick={addChildId}
-                  className="h-11 px-6 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 rounded-xl"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Student
-                </Button>
-              </div>
-
-              {childIds.length > 0 && (
-                <div className="space-y-3">
-                  <div className="text-sm font-medium text-slate-600">
-                    Added Students ({childIds.length})
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    {childIds.map((id) => (
-                      <div
-                        key={id}
-                        className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-xl px-4 py-2 border border-purple-200"
-                      >
-                        <span className="font-mono font-medium">{id}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeChildId(id)}
-                          className="text-purple-600 hover:text-purple-800 hover:bg-purple-200 rounded-full p-1 transition-colors"
-                          aria-label={`Remove ${id}`}
-                          title={`Remove ${id}`}
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+            {/* Class Name */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="name"
+                className="text-sm font-semibold text-slate-800 flex items-center gap-2"
+              >
+                📚 Class Name *
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter class name..."
+                required
+                className="h-10 text-sm border-2 border-slate-200 rounded-lg focus:border-indigo-500 focus:ring-indigo-200 transition-all duration-200"
+              />
             </div>
-          </div>
 
-          {/* Submit Button */}
-          <div className="pt-6">
-            <Button
-              type="submit"
-              disabled={isPending || !canSubmit}
-              className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
-            >
-              {isPending ? (
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Creating Class...
-                </div>
-              ) : (
-                <div className="flex items-center gap-3">🎓 Create Class</div>
-              )}
-            </Button>
-          </div>
-        </form>
+            {/* Submit Button */}
+            <div className="pt-4">
+              <Button
+                type="submit"
+                disabled={isPending || !canSubmit}
+                className="w-full h-10 text-sm font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                {isPending ? (
+                  <div className="flex items-center gap-2 justify-center">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Creating...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 justify-center">
+                    🎓 Create Class
+                  </div>
+                )}
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

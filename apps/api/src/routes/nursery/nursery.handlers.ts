@@ -9,6 +9,7 @@ import { nurseries } from "@repo/database";
 import type {
   CreateRoute,
   GetByIdRoute,
+  GetMyNurseryRoute,
   ListRoute,
   RemoveRoute,
   UpdateRoute,
@@ -196,4 +197,33 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   }
 
   return c.body(null, HttpStatusCodes.NO_CONTENT);
+};
+
+export const getMyNursery: AppRouteHandler<GetMyNurseryRoute> = async (c) => {
+  const session = c.get("session") as Session | undefined;
+
+  if (!session?.userId) {
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
+
+  // Optionally filter by organization as well
+  const where = session.activeOrganizationId
+    ? and(
+        eq(nurseries.createdBy, session.userId),
+        eq(nurseries.organizationId, session.activeOrganizationId)
+      )
+    : eq(nurseries.createdBy, session.userId);
+
+  const nursery = await db.query.nurseries.findFirst({
+    where,
+  });
+
+  if (!nursery) {
+    return c.json({ message: "Nursery not found" }, HttpStatusCodes.NOT_FOUND);
+  }
+
+  return c.json(nursery, HttpStatusCodes.OK);
 };

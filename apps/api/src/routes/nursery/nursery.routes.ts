@@ -123,9 +123,22 @@ export const remove = createRoute({
   },
 });
 
+export const getMyNursery = createRoute({
+  tags,
+  summary: "Get my nursery",
+  method: "get",
+  path: "/my",
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(nursery, "The nursery"),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(errorMessageSchema, "Unauthorized"),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(errorMessageSchema, "Nursery not found"),
+  },
+});
+
 // Export types
 export type ListRoute = typeof list;
 export type GetByIdRoute = typeof getById;
 export type CreateRoute = typeof create;
 export type UpdateRoute = typeof update;
 export type RemoveRoute = typeof remove;
+export type GetMyNurseryRoute = typeof getMyNursery;
