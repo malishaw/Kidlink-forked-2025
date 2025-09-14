@@ -3,12 +3,20 @@
 import { ChildrensList } from "@/features/children/actions/get-children";
 import { createFeedback } from "@/features/feedback/actions/create-feedback";
 import { authClient } from "@/lib/auth-client";
-import { MessageCircle, Star, X } from "lucide-react";
-import { useState } from "react";
+import { Star, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
-export default function FeedbackForm() {
+export default function FeedbackForm({
+  isOpen = false,
+  onClose = () => {},
+  childId = "",
+}: {
+  isOpen?: boolean;
+  onClose?: () => void;
+  childId?: string;
+}) {
   const [formData, setFormData] = useState({
-    childId: "",
+    childId: childId || "",
     teacherId: "",
     content: "",
     rating: "",
@@ -16,8 +24,14 @@ export default function FeedbackForm() {
     teacherFeedback: "",
     reply: "",
   });
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Update childId when prop changes
+  useEffect(() => {
+    if (childId) {
+      setFormData((prev) => ({ ...prev, childId }));
+    }
+  }, [childId]);
 
   // Fetch children for the dropdown
   const { data: childrenData, isLoading: isChildrenLoading } = ChildrensList({
@@ -56,9 +70,9 @@ export default function FeedbackForm() {
     try {
       // Pass teacher ID in the body, not the email
       await createFeedback({ ...formData, teacherId });
-      setIsModalOpen(false);
+      onClose();
       setFormData({
-        childId: "",
+        childId: childId || "",
         teacherId: "",
         content: "",
         rating: "",
@@ -104,39 +118,15 @@ export default function FeedbackForm() {
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 via-white to-purple-50 rounded-2xl p-8 shadow-sm border border-gray-200">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl shadow-sm">
-              <MessageCircle className="h-6 w-6 text-blue-600" />
-            </div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Feedbacks
-            </h2>
-          </div>
-          <p className="text-gray-600">
-            Share your thoughts and help us improve our services
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-4 py-2 rounded-lg font-semibold shadow-md"
-          >
-            + Give Feedback
-          </button>
-        </div>
-      </div>
-
+    <>
       {/* Feedback Modal */}
-      {isModalOpen && (
+      {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-3xl shadow-xl w-full max-w-lg relative flex flex-col">
             {/* Exit Button */}
             <div className="sticky top-0 z-10 bg-white rounded-t-3xl">
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={onClose}
                 className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 transition-all"
               >
                 <X className="w-5 h-5" />
@@ -263,7 +253,7 @@ export default function FeedbackForm() {
                   <button
                     type="button"
                     className="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 font-semibold"
-                    onClick={() => setIsModalOpen(false)}
+                    onClick={onClose}
                   >
                     Cancel
                   </button>
@@ -280,6 +270,6 @@ export default function FeedbackForm() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

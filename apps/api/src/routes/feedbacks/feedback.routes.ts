@@ -60,6 +60,32 @@ export const getById = createRoute({
   },
 });
 
+// Get feedbacks by child ID route definition
+export const getByChildId = createRoute({
+  tags,
+  summary: "Get feedbacks by child ID",
+  method: "get",
+  path: "/child/:childId",
+  request: {
+    params: z.object({ childId: z.string() }),
+    query: queryParamsSchema,
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      getPaginatedSchema(z.array(feedback)),
+      "The list of feedbacks for the child"
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthorized access"
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      errorMessageSchema,
+      "Child not found"
+    ),
+  },
+});
+
 // Create Feedback route definition
 export const create = createRoute({
   tags,
@@ -133,6 +159,7 @@ export const remove = createRoute({
 // Export types
 export type ListRoute = typeof list;
 export type GetByIdRoute = typeof getById;
+export type GetByChildIdRoute = typeof getByChildId;
 export type CreateRoute = typeof create;
 export type UpdateRoute = typeof update;
 export type RemoveRoute = typeof remove;

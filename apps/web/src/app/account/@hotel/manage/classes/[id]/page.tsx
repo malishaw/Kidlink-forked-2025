@@ -3,6 +3,8 @@
 import { ChildrensList } from "@/features/children/actions/get-children";
 import { useGetClassById } from "@/features/classes/actions/get-class-by-id";
 import { updateClass } from "@/features/classes/actions/update-class-action";
+import { useGetLessonPlansByClassId } from "@/features/lessonPlans/actions/get-lessonPlans-by-class-id";
+import { AddNewLessonPlan } from "@/features/lessonPlans/components/add-new-lessonPlans";
 import { TeachersList } from "@/features/teachers/actions/get-teacher";
 import { useParams } from "next/navigation";
 import * as React from "react";
@@ -90,6 +92,14 @@ export default function ClassDetailPage() {
   };
 
   const { data, isLoading, isError, refetch } = useGetClassById(classId);
+
+  // Lesson plans query for this specific class
+  const lessonPlansQuery = useGetLessonPlansByClassId(classId, {
+    page: 1,
+    limit: 20,
+    search: "",
+    sort: "desc",
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6">
@@ -444,6 +454,160 @@ export default function ClassDetailPage() {
                     </p>
                   </div>
                 )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Lesson Plans Section */}
+        <div className="bg-white/90 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
+          <div className="p-6 border-b border-slate-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-orange-100 rounded-lg">
+                  <span className="text-orange-600 font-bold text-lg">📚</span>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-800">
+                    Lesson Plans
+                  </h2>
+                  <p className="text-slate-600">
+                    Manage lesson plans for this class
+                  </p>
+                </div>
+              </div>
+              <AddNewLessonPlan />
+            </div>
+          </div>
+
+          <div className="p-6">
+            {lessonPlansQuery.isLoading ? (
+              <div className="flex items-center justify-center gap-3 p-8 bg-orange-50 rounded-lg">
+                <div className="w-6 h-6 border-2 border-orange-200 border-t-orange-600 rounded-full animate-spin"></div>
+                <span className="text-orange-700 font-medium">
+                  Loading lesson plans...
+                </span>
+              </div>
+            ) : lessonPlansQuery.isError ? (
+              <div className="p-6 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-700 flex items-center gap-2">
+                  <span className="text-red-500">⚠️</span>
+                  Error loading lesson plans: {lessonPlansQuery.error?.message}
+                </p>
+              </div>
+            ) : !lessonPlansQuery.data?.data ||
+              lessonPlansQuery.data.data.length === 0 ? (
+              <div className="text-center p-12 bg-slate-50 rounded-lg">
+                <span className="text-6xl mb-4 block">📚</span>
+                <h3 className="text-lg font-semibold text-slate-600 mb-2">
+                  No Lesson Plans Yet
+                </h3>
+                <p className="text-slate-500 mb-4">
+                  No lesson plans have been created for this class yet.
+                </p>
+                <AddNewLessonPlan />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-slate-600">
+                    Showing {lessonPlansQuery.data.data.length} of{" "}
+                    {lessonPlansQuery.data.meta?.totalCount || 0} lesson plans
+                  </p>
+                </div>
+
+                <div className="grid gap-4">
+                  {lessonPlansQuery.data.data.map((lessonPlan: any) => (
+                    <div
+                      key={lessonPlan.id}
+                      className="p-6 bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl border border-slate-200 hover:shadow-md transition-all duration-200"
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-orange-100 rounded-full">
+                            <span className="text-orange-600 font-bold">
+                              📖
+                            </span>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-slate-800 text-lg">
+                              {lessonPlan.title}
+                            </h4>
+                            <p className="text-sm text-slate-500 flex items-center gap-2">
+                              <span>🕒</span>
+                              {lessonPlan.createdAt
+                                ? new Date(
+                                    lessonPlan.createdAt
+                                  ).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  })
+                                : "Date not available"}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-slate-500">
+                          {lessonPlan.teacherId && (
+                            <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs">
+                              👨‍🏫 Teacher: {lessonPlan.teacherId}
+                            </span>
+                          )}
+                          {/* {lessonPlan.classId && (
+                            <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">
+                              🏫 Class: {lessonPlan.classId}
+                            </span>
+                          )} */}
+                        </div>
+                      </div>
+
+                      {lessonPlan.content && (
+                        <div className="mt-4 p-4 bg-white rounded-lg border border-slate-200">
+                          <h5 className="font-medium text-slate-700 mb-2 flex items-center gap-2">
+                            <span>📝</span>
+                            Content:
+                          </h5>
+                          <p className="text-slate-600 leading-relaxed">
+                            {lessonPlan.content}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="mt-4 pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+                        <div className="flex items-center gap-4">
+                          <span>ID: {lessonPlan.id}</span>
+                          {/* {lessonPlan.organizationId && (
+                            <span>Org: {lessonPlan.organizationId}</span>
+                          )} */}
+                        </div>
+                        {lessonPlan.updatedAt &&
+                          lessonPlan.updatedAt !== lessonPlan.createdAt && (
+                            <span>
+                              Updated:{" "}
+                              {new Date(
+                                lessonPlan.updatedAt
+                              ).toLocaleDateString()}
+                            </span>
+                          )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pagination info */}
+                {lessonPlansQuery.data.meta &&
+                  lessonPlansQuery.data.meta.totalCount >
+                    lessonPlansQuery.data.data.length && (
+                    <div className="text-center py-4 text-slate-500">
+                      <p>
+                        Showing {lessonPlansQuery.data.data.length} of{" "}
+                        {lessonPlansQuery.data.meta.totalCount} lesson plans
+                      </p>
+                      <button className="mt-2 px-4 py-2 bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg transition-colors">
+                        Load More
+                      </button>
+                    </div>
+                  )}
               </div>
             )}
           </div>
