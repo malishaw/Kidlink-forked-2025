@@ -67,6 +67,10 @@ export default function FeedbackForm() {
         reply: "",
       });
       alert("Feedback submitted successfully!");
+      // Automatically refresh the page after successful submission
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000); // Wait 1 second to show the success message
     } catch (err) {
       alert("Failed to submit feedback");
     } finally {

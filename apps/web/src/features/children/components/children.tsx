@@ -6,7 +6,7 @@ import {
   AvatarImage,
 } from "@repo/ui/components/avatar";
 import { Button } from "@repo/ui/components/button";
-import { CardContent, CardHeader, CardTitle } from "@repo/ui/components/card";
+import { CardHeader, CardTitle } from "@repo/ui/components/card";
 import { useQuery } from "@tanstack/react-query";
 import {
   Award,
@@ -23,6 +23,20 @@ import { useEffect, useState } from "react";
 import { createChildren } from "@/features/children/actions/create-children";
 import { ChildrensList as useChildrensList } from "@/features/children/actions/get-children";
 import { getClient } from "@/lib/rpc/client";
+
+const useGetClassById = async (classId: string) => {
+  // Placeholder implementation for fetching class by ID
+  return { data: { name: "Sample Class" } };
+};
+
+const useGetParentById = (parentId: string) => {
+  // Placeholder implementation for fetching parent by ID
+  return {
+    data: { name: "Sample Parent" },
+    isLoading: false,
+    error: null,
+  };
+};
 
 export function ChildrensList() {
   const [selectedChild, setSelectedChild] = useState<any>(null);
@@ -58,9 +72,11 @@ export function ChildrensList() {
 
   const classesData = classesResponse?.data || [];
 
-  const getClassName = (classId) => {
+  const getClassName = (classId: string): string => {
     if (classesLoading) return "Loading...";
-    const classData = classesData.find((cls) => cls.id === classId);
+    const classData = classesData.find(
+      (cls: { id: string }) => cls.id === classId
+    );
     return classData?.name || "No assigned class";
   };
 
@@ -86,12 +102,6 @@ export function ChildrensList() {
   });
 
   const badgesData = badgesResponse?.data || [];
-
-  const getBadgeName = (badgeId) => {
-    if (badgesLoading) return "Loading...";
-    const badgeData = badgesData.find((badge) => badge.id === badgeId);
-    return badgeData?.title || "No badge assigned";
-  };
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -126,10 +136,17 @@ export function ChildrensList() {
       setIsModalOpen(false);
       setFormData({
         name: "",
-        email: "",
-        phoneNumber: "",
-        address: "",
-        avatar: "",
+        organizationId: "",
+        nurseryId: "",
+        parentId: "",
+        classId: "",
+        dateOfBirth: "",
+        gender: "",
+        emergencyContact: "",
+        medicalNotes: "",
+        profileImageUrl: "",
+        imagesUrl: "",
+        activities: "",
       });
       window.location.reload();
     } catch (err) {
@@ -167,7 +184,7 @@ export function ChildrensList() {
   }, [childrensData, classNames]);
 
   // Add a function to fetch parent names based on parent ID
-  const getParentName = (parentId) => {
+  const getParentName = (parentId: string): string => {
     if (!parentId) return "No assigned parent";
     const {
       data: parentData,
@@ -179,6 +196,14 @@ export function ChildrensList() {
     if (parentError) return "Error fetching parent";
 
     return parentData?.name || "Unknown parent";
+  };
+
+  const getBadgeName = (badgeId: string): string => {
+    if (badgesLoading) return "Loading...";
+    const badgeData = badgesData.find(
+      (badge: { id: string }) => badge.id === badgeId
+    );
+    return badgeData?.title || "No badge assigned";
   };
 
   if (isLoading || classesLoading) {
@@ -282,7 +307,7 @@ export function ChildrensList() {
                   {sortedChildrens.length !== 1 ? "s" : ""}
                 </span>
               </div>
-              <div className="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full">
+              {/* <div className="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full">
                 <Award className="h-4 w-4 text-purple-600" />
                 <span className="text-sm font-semibold text-purple-700">
                   {sortedChildrens.reduce(
@@ -291,7 +316,7 @@ export function ChildrensList() {
                   )}{" "}
                   Students
                 </span>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -343,7 +368,7 @@ export function ChildrensList() {
         {/* Create Children Modal */}
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-lg relative">
+            <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-lg relative max-h-[90vh] overflow-y-auto">
               <h2 className="text-2xl font-bold mb-4">Create New Children</h2>
               <form onSubmit={handleFormSubmit} className="space-y-4">
                 <input
@@ -626,77 +651,165 @@ export function ChildrensList() {
           {sortedChildrens.map((children: any) => (
             <div
               key={children.id}
-              className={`group relative overflow-hidden border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 rounded-3xl cursor-pointer ${viewMode === "list" ? "flex flex-row gap-4 p-4" : ""}`}
+              className={`group relative overflow-hidden bg-white/90 backdrop-blur-md shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 rounded-3xl cursor-pointer border border-white/50 ${viewMode === "list" ? "flex flex-row gap-6 p-6" : "p-6"}`}
               onClick={() =>
                 router.push(`/account/manage/children/${children.id}`)
               }
             >
-              <CardHeader className="flex items-center gap-4">
-                <Avatar className="h-16 w-16 shadow-lg ring-4 ring-white group-hover:ring-blue-100 transition-all duration-300">
-                  <AvatarImage src={children.avatar || "/placeholder.svg"} />
-                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white font-bold text-lg">
-                    {children.name
-                      .split(" ")
-                      .map((n: string) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-blue-700 transition-colors duration-200">
-                    {children.name}
-                  </CardTitle>
-                  <p className="text-sm text-gray-600">{children.email}</p>
-                  <p className="text-sm text-gray-600">
-                    {getClassName(children.classId)}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Badge: {getBadgeName(children.badgeId)}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {children.phoneNumber}
-                  </p>
-                  <p className="text-sm text-gray-600">{children.address}</p>
-                  <p className="text-xs text-gray-400">
-                    Organization: {children.organizationId}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    Created: {new Date(children.createdAt).toLocaleString()}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    Updated: {new Date(children.updatedAt).toLocaleString()}
-                  </p>
-                </div>
-              </CardHeader>
+              {/* Background Gradient Effects */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/60 via-purple-50/40 to-pink-50/60"></div>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full blur-2xl"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-200/20 to-transparent rounded-full blur-2xl"></div>
 
-              {children.children && children.children.length > 0 && (
-                <CardContent className="mt-4">
-                  <h4 className="font-semibold mb-2">
-                    Students ({children.children.length})
-                  </h4>
-                  <div className="space-y-2">
-                    {children.children.map((child: any) => (
-                      <div
-                        key={child.id}
-                        className="flex items-center justify-between p-2 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          router.push(`/account/manage/children/${child.id}`);
-                        }}
-                      >
-                        <div className="text-sm font-medium">
-                          {child.name} ({child.class})
-                        </div>
-                        <Button
-                          size="sm"
-                          className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 shadow-sm hover:shadow-md text-xs px-3"
-                        >
-                          <Eye className="h-3 w-3 mr-2" /> View
-                        </Button>
-                      </div>
-                    ))}
+              <div className="relative z-10 space-y-6">
+                {/* Header Section */}
+                <CardHeader className="flex items-center gap-4 p-0">
+                  <div className="relative">
+                    <Avatar className="h-16 w-16 shadow-lg ring-4 ring-white/80 group-hover:ring-blue-200/80 transition-all duration-300">
+                      <AvatarImage
+                        src={children.avatar || "/placeholder.svg"}
+                      />
+                      <AvatarFallback className="bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 text-white font-bold text-lg">
+                        {children.name
+                          .split(" ")
+                          .map((n: string) => n[0])
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                    {/* Active Status Indicator */}
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow-md"></div>
                   </div>
-                </CardContent>
-              )}
+                  <div className="flex-1">
+                    <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-blue-700 transition-colors duration-200 mb-2">
+                      {children.name}
+                    </CardTitle>
+                    <div className="flex flex-wrap gap-2">
+                      <div className="px-3 py-1 bg-blue-100/80 text-blue-700 rounded-full text-xs font-medium">
+                        {getClassName(children.classId)}
+                      </div>
+                      {children.badgeId && (
+                        <div className="px-3 py-1 bg-amber-100/80 text-amber-700 rounded-full text-xs font-medium flex items-center gap-1">
+                          🏆 {getBadgeName(children.badgeId)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardHeader>
+
+                {/* Contact Information */}
+                {(children.email ||
+                  children.phoneNumber ||
+                  children.address) && (
+                  <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 space-y-3">
+                    <h4 className="font-semibold text-gray-700 text-sm flex items-center gap-2">
+                      📞 Contact Information
+                    </h4>
+                    <div className="space-y-2">
+                      {children.email && (
+                        <div className="flex items-center gap-3 text-sm">
+                          <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
+                          <span className="text-gray-600 truncate">
+                            {children.email}
+                          </span>
+                        </div>
+                      )}
+                      {children.phoneNumber && (
+                        <div className="flex items-center gap-3 text-sm">
+                          <div className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
+                          <span className="text-gray-600">
+                            {children.phoneNumber}
+                          </span>
+                        </div>
+                      )}
+                      {children.address && (
+                        <div className="flex items-center gap-3 text-sm">
+                          <div className="w-2 h-2 bg-purple-400 rounded-full flex-shrink-0"></div>
+                          <span className="text-gray-600 truncate">
+                            {children.address}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Timeline Information */}
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4">
+                  <h4 className="font-semibold text-gray-700 text-sm flex items-center gap-2 mb-3">
+                    📅 Timeline
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div className="space-y-1">
+                      <span className="font-medium text-gray-600">Created</span>
+                      <div className="text-gray-500">
+                        {new Date(children.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="font-medium text-gray-600">Updated</span>
+                      <div className="text-gray-500">
+                        {new Date(children.updatedAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Students Section */}
+                {children.children && children.children.length > 0 && (
+                  <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4">
+                    <h4 className="font-semibold text-gray-700 text-sm flex items-center gap-2 mb-3">
+                      👥 Students ({children.children.length})
+                    </h4>
+                    <div className="space-y-2">
+                      {children.children.map((child: any) => (
+                        <div
+                          key={child.id}
+                          className="flex items-center justify-between p-3 bg-white/80 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer border border-white/60"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/account/manage/children/${child.id}`);
+                          }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                              {child.name.charAt(0)}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="text-sm font-medium text-gray-700 truncate">
+                                {child.name}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {child.class}
+                              </div>
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            className="bg-gradient-to-r from-blue-400 to-purple-500 hover:from-blue-500 hover:to-purple-600 text-white shadow-sm hover:shadow-md text-xs px-3 py-1 rounded-lg flex-shrink-0"
+                          >
+                            <Eye className="h-3 w-3 mr-1" />
+                            View
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Button */}
+                <div className="pt-2">
+                  <Button
+                    className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/account/manage/children/${children.id}`);
+                    }}
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Profile
+                  </Button>
+                </div>
+              </div>
             </div>
           ))}
         </div>
