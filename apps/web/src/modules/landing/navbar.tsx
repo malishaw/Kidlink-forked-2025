@@ -50,7 +50,7 @@ export function Navbar() {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
-          <Button
+          {/* <Button
             asChild
             variant={isHomePage ? "ghost" : "outline"}
             className={cn(
@@ -61,7 +61,7 @@ export function Navbar() {
             )}
           >
             <Link href="/account">+ Post Jobs</Link>
-          </Button>
+          </Button> */}
           <Button
             asChild
             variant={"secondary"}
@@ -71,7 +71,7 @@ export function Navbar() {
           >
             <Link href="/account">My Account</Link>
           </Button>
-          <Button
+          {/* <Button
             asChild
             variant={isHomePage ? "ghost" : "outline"}
             className={cn(
@@ -82,7 +82,7 @@ export function Navbar() {
             )}
           >
             <Link href="/profile">My Profile</Link>
-          </Button>
+          </Button> */}
         </div>
       </div>
     </header>
