@@ -26,4 +26,5 @@ export * from "./feedback.schema";
 export * from "./lessonPlans.schema";
 
 export * from "./badges.schema";
+export * from "./chat.schema";
 export * from "./children.schema";
