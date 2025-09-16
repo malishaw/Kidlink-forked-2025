@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1758012739125,
-      "tag": "0000_oval_lily_hollister",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1758007621023,
-      "tag": "0001_solid_excalibur",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1758010804972,
-      "tag": "0002_thankful_rumiko_fujikawa",
+      "when": 1758016566466,
+      "tag": "0000_broad_hydra",
       "breakpoints": true
     }
   ]

@@ -131,6 +131,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconBuildings,
       },
       {
+        name: "Chat",
+        url: "/account/manage/chat",
+        icon: IconBuildings,
+      },
+      {
         name: "Payments",
         url: "/account/manage/payment",
         icon: IconBuildings,
