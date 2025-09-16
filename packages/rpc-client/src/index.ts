@@ -39,9 +39,9 @@ const client = hc<Router>("", {
   fetch: (input: RequestInfo | URL, init?: RequestInit) => {
     return fetch(input, {
       ...init,
-      credentials: "include" // Required for sending cookies cross-origin
+      credentials: "include", // Required for sending cookies cross-origin
     });
-  }
+  },
 });
 
 export type Client = typeof client;

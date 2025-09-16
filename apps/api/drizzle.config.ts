@@ -5,6 +5,6 @@ export default defineConfig({
   out: "./src/db/migrations",
   dialect: "postgresql",
   dbCredentials: {
-    url: "postgresql://postgres:vihanga123@localhost:5432/kidlink-db?schema=public"
-  }
+    url: "postgresql://postgres:dilruwan@localhost:5432/Kidlink-forked-2025?schema=public",
+  },
 });

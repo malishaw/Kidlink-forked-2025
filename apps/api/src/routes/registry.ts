@@ -3,7 +3,7 @@ import { AppOpenAPI } from "@api/types";
 import { BASE_PATH } from "../lib/constants";
 
 import badges from "./badges/badges.index";
-import chat from "./chat/chat.index";
+// import chat from "./chat/chat.index";
 import chatWs from "./chat/websocket.routes";
 import children from "./children/children.index";
 import feedbacks from "./feedbacks/feedback.index";
@@ -23,30 +23,41 @@ import tasks from "./tasks/tasks.index";
 import teacher from "./teachers/teacher.index";
 import user from "./user/user.index";
 
-export function registerRoutes(app: AppOpenAPI) {
-  return app
-    .route("/", index)
-    .route("/tasks", tasks)
-    .route("/system", system)
-    .route("/media", media)
-    .route("/property-classes", propertyClasses)
-    .route("/notification", notification)
-    .route("/user", user)
-    .route("/parent", parent)
-    .route("/teacher", teacher)
-    .route("/payment", payment)
+import conversationParticipants from "./conversationParticipants/conversationParticipant.index";
+import conversations from "./conversations/conversation.index";
+import messages from "./messages/message.index";
 
-    .route("/hotels", hotels)
-    .route("/children", children)
-    .route("/nurseries", nursery)
-    .route("/feedbacks", feedbacks)
-    .route("/badges", badges)
-    .route("/organization", organization)
-    .route("/lesson-plans", lessonPlans)
-    .route("/classes", nurseryClass)
-    .route("/hotels", hotels)
-    .route("/chat", chat)
-    .route("/", chatWs); // WebSocket routes at root level
+export function registerRoutes(app: AppOpenAPI) {
+  return (
+    app
+      .route("/", index)
+      .route("/tasks", tasks)
+      .route("/system", system)
+      .route("/media", media)
+      .route("/property-classes", propertyClasses)
+      .route("/notification", notification)
+      .route("/user", user)
+      .route("/parent", parent)
+      .route("/teacher", teacher)
+      .route("/payment", payment)
+
+      .route("/hotels", hotels)
+      .route("/children", children)
+      .route("/nurseries", nursery)
+      .route("/feedbacks", feedbacks)
+      .route("/badges", badges)
+      .route("/organization", organization)
+      .route("/lesson-plans", lessonPlans)
+      .route("/classes", nurseryClass)
+      .route("/hotels", hotels)
+      // .route("/chat", chat)
+
+      .route("/messages", messages)
+      .route("/conversation-participants", conversationParticipants)
+      .route("/conversations", conversations)
+
+      .route("/", chatWs)
+  ); // WebSocket routes at root level
 }
 
 // stand alone router type used for api client

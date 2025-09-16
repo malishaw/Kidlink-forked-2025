@@ -10,11 +10,7 @@ export const feedbacks = pgTable("feedback", {
 
   organizationId: text("organization_id").references(() => organization.id),
 
-<<<<<<< HEAD:packages/database/src/schemas/feedbacks.schema.ts
-  // children.id is serial (integer)
-=======
   // childrens.id is serial (integer)
->>>>>>> main:packages/database/src/schemas/feedback.schema.ts
   childId: text("child_id").references(() => childrens.id),
 
   // user.id is text in your auth schema; use text here (change to integer if your users table uses int IDs)
