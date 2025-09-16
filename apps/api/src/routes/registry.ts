@@ -1,8 +1,10 @@
 import { createRouter } from "@api/lib/create-app";
 import { AppOpenAPI } from "@api/types";
-
 import { BASE_PATH } from "../lib/constants";
+
 import badges from "./badges/badges.index";
+// import chat from "./chat/chat.index";
+import chatWs from "./chat/websocket.routes";
 import children from "./children/children.index";
 import feedbacks from "./feedbacks/feedback.index";
 import hotels from "./hotels/hotel.index";
@@ -22,18 +24,9 @@ import teacher from "./teachers/teacher.index";
 import user from "./user/user.index";
 import event from "./event/event.index";
 
-export function registerRoutes(app: AppOpenAPI) {
-  return app
-    .route("/", index)
-    .route("/tasks", tasks)
-    .route("/system", system)
-    .route("/media", media)
-    .route("/property-classes", propertyClasses)
-    .route("/notification", notification)
-    .route("/user", user)
-    .route("/parent", parent)
-    .route("/teacher", teacher)
-    .route("/payment", payment)
+import conversationParticipants from "./conversationParticipants/conversationParticipant.index";
+import conversations from "./conversations/conversation.index";
+import messages from "./messages/message.index";
 
     .route("/hotels", hotels)
     .route("/children", children)
