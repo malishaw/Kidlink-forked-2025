@@ -125,10 +125,10 @@ export default function ClassDetailPage() {
                 <h2 className="text-3xl font-bold mb-1">
                   {data?.name || "Unnamed Class"}
                 </h2>
-                <div className="flex items-center gap-4 text-blue-100">
+                {/* <div className="flex items-center gap-4 text-blue-100">
                   <span>ID: {data?.id ?? "—"}</span>
                   <span>Nursery: {data?.nurseryId ?? "—"}</span>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

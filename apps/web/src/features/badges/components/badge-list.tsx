@@ -40,12 +40,20 @@ export function BadgeList({ onEditBadge, organizationId }: BadgeListProps) {
 
   const deleteBadge = async (badgeId: string) => {
     try {
-      // Simulate badge deletion (replace with actual API call if needed)
+      const response = await fetch(`/api/badges/${badgeId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData?.message || "Failed to delete badge");
+      }
+
       toast.success("Badge deleted successfully!");
-      queryClient.invalidateQueries(["badge"]); // Invalidate the cache to refresh the list
+      queryClient.invalidateQueries(["badge"]); // Refresh the badge list
     } catch (error) {
       console.error("Failed to delete badge:", error);
-      toast.error("Failed to delete badge");
+      toast.error((error as Error).message || "Failed to delete badge");
     }
   };
 
