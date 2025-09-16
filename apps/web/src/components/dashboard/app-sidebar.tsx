@@ -27,10 +27,41 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const activeOrg = authClient.useActiveOrganization();
   const { data: session } = authClient.useSession(); // Move hook inside component
 
+  // State for organization member data
+  const [activeMember, setActiveMember] = React.useState<{
+    id: string;
+    userId: string;
+    organizationId: string;
+    role: string;
+  } | null>(null);
+  const [isLoadingMember, setIsLoadingMember] = React.useState(true);
+
+  // Fetch active organization member
+  React.useEffect(() => {
+    const fetchActiveMember = async () => {
+      try {
+        setIsLoadingMember(true);
+        const response = await fetch(
+          "/api/auth/organization/get-active-member"
+        );
+        if (response.ok) {
+          const memberData = await response.json();
+          setActiveMember(memberData);
+        }
+      } catch (error) {
+        console.error("Failed to fetch active member:", error);
+      } finally {
+        setIsLoadingMember(false);
+      }
+    };
+
+    fetchActiveMember();
+  }, []);
+
   // Move data object inside component so it can access session
   const data = {
     user: {
-      name: session?.user?.name,
+      name: session?.user?.name || "User",
       email: session?.user?.email || "user@example.com", // Add fallback and safe access
       avatar: "/avatars/shadcn.jpg",
     },
@@ -95,6 +126,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconBuildings,
       },
       {
+        name: "Events",
+        url: "/account/manage/events",
+        icon: IconBuildings,
+      },
+      {
+        name: "Chat",
+        url: "/account/manage/chat",
+        icon: IconBuildings,
+      },
+      {
         name: "Payments",
         url: "/account/manage/payment",
         icon: IconBuildings,
@@ -102,33 +143,39 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ],
   };
 
-  // Filter documents based on user role
+  // Filter documents based on organization role
   const filteredDocuments = React.useMemo(() => {
-    const userName = session?.user?.name?.toLowerCase();
+    if (isLoadingMember || !activeMember) {
+      return []; // Show no documents while loading or if no member data
+    }
 
-    if (userName === "nursery owner") {
+    const role = activeMember.role.toLowerCase();
+
+    if (role === "owner") {
       return data.documents; // Show all documents
-    } else if (userName === "teacher") {
+    } else if (role === "teacher") {
       return data.documents.filter((doc) =>
         [
           "/account/manage/classes",
-          "/account/manage/teachers",
           "/account/manage/children",
           "/account/manage/feedback",
+          "/account/manage/badges",
+          "/account/manage/lessonplans",
+          "/account/manage/events",
         ].includes(doc.url)
       );
-    } else if (userName === "parent") {
+    } else if (role === "parent") {
       return data.documents.filter((doc) =>
         [
           "/account/manage/classes",
-          "/account/manage/parents",
           "/account/manage/children",
+          "/account/manage/events",
         ].includes(doc.url)
       );
     }
 
     return []; // Default to no documents if role is unrecognized
-  }, [session?.user?.name, data.documents]);
+  }, [activeMember, isLoadingMember, data.documents]);
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>

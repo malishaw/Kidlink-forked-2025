@@ -153,7 +153,7 @@ export default function Home() {
                         <h3 className="font-bold text-lg text-slate-800 group-hover:text-blue-600 transition-colors">
                           {cls.name || `Class ${cls.id}`}
                         </h3>
-                        <p className="text-xs text-slate-500">ID: {cls.id}</p>
+                        {/* <p className="text-xs text-slate-500">ID: {cls.id}</p> */}
                       </div>
                     </div>
 

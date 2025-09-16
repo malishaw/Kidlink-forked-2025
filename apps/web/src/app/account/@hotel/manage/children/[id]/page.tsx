@@ -89,6 +89,13 @@ export default function Page() {
   const [assignBadgeError, setAssignBadgeError] = useState("");
   const [assignBadgeSuccess, setAssignBadgeSuccess] = useState(false);
 
+  // Get current badges array, ensuring it's always an array
+  const currentBadges = Array.isArray(children?.badgeId)
+    ? children.badgeId
+    : children?.badgeId
+      ? [children.badgeId]
+      : [];
+
   // Feedback form state
   const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState(false);
 
@@ -125,10 +132,45 @@ export default function Page() {
     setAssignBadgeError("");
     setAssignBadgeSuccess(false);
     try {
-      await updateChildren(id, { ...children, badgeId: selectedBadgeId });
+      // Add the new badge to existing badges array (avoid duplicates)
+      const updatedBadges = currentBadges.includes(selectedBadgeId)
+        ? currentBadges
+        : [...currentBadges, selectedBadgeId];
+
+      await updateChildren(id, { ...children, badgeId: updatedBadges });
       setAssignBadgeSuccess(true);
+      setSelectedBadgeId(""); // Reset selection
+
+      // Reload the page to show updated data
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (err: any) {
       setAssignBadgeError(err.message || "Failed to assign badge");
+    } finally {
+      setAssignBadgeLoading(false);
+    }
+  };
+
+  const handleRemoveBadge = async (badgeIdToRemove: string) => {
+    setAssignBadgeLoading(true);
+    setAssignBadgeError("");
+    setAssignBadgeSuccess(false);
+    try {
+      // Remove the badge from existing badges array
+      const updatedBadges = currentBadges.filter(
+        (id) => id !== badgeIdToRemove
+      );
+
+      await updateChildren(id, { ...children, badgeId: updatedBadges });
+      setAssignBadgeSuccess(true);
+
+      // Reload the page to show updated data
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (err: any) {
+      setAssignBadgeError(err.message || "Failed to remove badge");
     } finally {
       setAssignBadgeLoading(false);
     }
@@ -498,7 +540,7 @@ export default function Page() {
                 <div className="p-2 bg-yellow-100 rounded-lg">
                   <span className="inline-block w-6 h-6 bg-yellow-400 rounded-full"></span>
                 </div>
-                Assign Badge
+                Manage Badges
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -512,21 +554,59 @@ export default function Page() {
                 </div>
               ) : (
                 <>
+                  {/* Currently Assigned Badges */}
+                  {currentBadges.length > 0 && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700">
+                        Currently Assigned Badges
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {currentBadges.map((badgeId: string) => {
+                          const badge = badgesQuery.data?.data?.find(
+                            (b: any) => b.id === badgeId
+                          );
+                          return (
+                            <div
+                              key={badgeId}
+                              className="flex items-center gap-2 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm"
+                            >
+                              <span className="inline-block w-3 h-3 bg-yellow-400 rounded-full"></span>
+                              <span>{badge?.title || badgeId}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveBadge(badgeId)}
+                                className="ml-1 text-yellow-600 hover:text-yellow-800 font-bold"
+                                disabled={assignBadgeLoading}
+                              >
+                                ×
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Add New Badge */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">
-                      Select Badge
+                      Add New Badge
                     </label>
                     <select
                       className="w-full border border-gray-300 rounded-xl px-4 py-2 mb-4"
                       value={selectedBadgeId}
                       onChange={(e) => setSelectedBadgeId(e.target.value)}
                     >
-                      <option value="">Select a badge</option>
-                      {badgesQuery.data?.data?.map((badge: any) => (
-                        <option key={badge.id} value={badge.id}>
-                          {badge.title}
-                        </option>
-                      ))}
+                      <option value="">Select a badge to add</option>
+                      {badgesQuery.data?.data
+                        ?.filter(
+                          (badge: any) => !currentBadges.includes(badge.id)
+                        )
+                        ?.map((badge: any) => (
+                          <option key={badge.id} value={badge.id}>
+                            {badge.title}
+                          </option>
+                        ))}
                     </select>
                   </div>
                   <button
@@ -537,10 +617,12 @@ export default function Page() {
                     {assignBadgeLoading ? (
                       <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Assigning...
+                        {currentBadges.length > 0
+                          ? "Updating..."
+                          : "Assigning..."}
                       </>
                     ) : (
-                      <>Assign Badge</>
+                      <>Add Badge</>
                     )}
                   </button>
                   {assignBadgeError && (
@@ -555,7 +637,7 @@ export default function Page() {
                     <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                       <p className="text-green-700 text-sm flex items-center gap-2">
                         <CheckCircle className="w-4 h-4" />
-                        Badge assigned successfully!
+                        Badge updated successfully!
                       </p>
                     </div>
                   )}

@@ -107,41 +107,15 @@ export function AddNewBadge({
           { id: toastId }
         );
 
+        // Use the createBadge action to save the badge to the database
         await createBadge(formData);
 
-        const existingBadges = JSON.parse(
-          localStorage.getItem("badges") || "[]"
+        toast.success(
+          editingBadge
+            ? "Badge updated successfully!"
+            : "Badge created successfully!",
+          { id: toastId }
         );
-
-        if (editingBadge) {
-          const updatedBadges = existingBadges.map((badge: any) =>
-            badge.id === editingBadge.id
-              ? {
-                  ...formData,
-                  id: editingBadge.id,
-                  createdAt: editingBadge.createdAt,
-                }
-              : badge
-          );
-          localStorage.setItem("badges", JSON.stringify(updatedBadges));
-          toast.success("Badge updated successfully!", { id: toastId });
-          onEditComplete?.();
-        } else {
-          const newBadge = {
-            ...formData,
-            id: Date.now().toString(),
-            createdAt: new Date().toISOString(),
-          };
-          localStorage.setItem(
-            "badges",
-            JSON.stringify([...existingBadges, newBadge])
-          );
-          toast.success("Badge created successfully!", { id: toastId });
-          // Automatically refresh the page after badge creation
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000); // Delay to show success message
-        }
 
         if (!editingBadge) {
           setFormData({
@@ -157,6 +131,7 @@ export function AddNewBadge({
         }
 
         window.dispatchEvent(new CustomEvent("badgeCreated"));
+        window.location.reload(); // Reload the page after badge creation
       } catch (error) {
         const err = error as Error;
         console.error("Failed to create badge:", error);

@@ -14,7 +14,7 @@ export const childrens = pgTable("childrens", {
   nurseryId: text("nursery_id"),
   parentId: text("parent_id"),
   classId: text("class_id"),
-  badgeId: text("badge_id"), // Comma-separated badge IDs
+  badgeId: text("badge_id").array(), // Comma-separated badge IDs
   dateOfBirth: date("dob"),
   /////
   gender: varchar("gender", { length: 10 }),

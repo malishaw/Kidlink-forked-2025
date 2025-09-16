@@ -14,6 +14,7 @@ export * from "./parent.schema";
 
 export * from "./teacher.schema";
 
+export * from "./feedback.schema";
 export * from "./nursery.schema";
 export * from "./payment.schema";
 
@@ -26,6 +27,11 @@ export * from "./feedback.schema";
 export * from "./lessonPlans.schema";
 
 export * from "./badges.schema";
-export * from "./chat.schema";
 export * from "./children.schema";
 export * from "./lessonPlans.schema";
+
+export * from "./event.schema";
+export * from "./message.schema";
+
+export * from "./conversation.schema";
+export * from "./conversationParticipant.schema";
