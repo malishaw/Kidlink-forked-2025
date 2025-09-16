@@ -6,17 +6,17 @@
 // // create instance to inline type in build
 // // https://hono.dev/docs/guides/rpc#compile-your-code-before-using-it-recommended
 // const client = hc<Router>("", {
-//   fetch: ((input, init) => {
+//   fetch: (input: RequestInfo | URL, init?: RequestInit) => {
 //     return fetch(input, {
 //       ...init,
-//       credentials: "include" // Required for sending cookies cross-origin
+//       credentials: "include", // Required for sending cookies cross-origin
 //     });
-//   }) satisfies typeof fetch
+//   },
 // });
 
 // export type Client = typeof client;
 
-// export default (...args: Parameters<typeof hc>): Client => hc<Router>(...args);
+// export default (...args: Parameters<typeof hc>): Client => hc(...args);
 
 // export type ErrorSchema = {
 //   error: {
@@ -30,18 +30,18 @@
 //   success: boolean;
 // };
 
-import { Router } from "@api/routes";
 import { hc } from "hono/client";
 
 // create instance to inline type in build
 // https://hono.dev/docs/guides/rpc#compile-your-code-before-using-it-recommended
-const client = hc<Router>("", {
-  fetch: (input: RequestInfo | URL, init?: RequestInit) => {
+// eslint-disable-next-line unused-imports/no-unused-vars
+const client = hc("", {
+  fetch: ((input, init) => {
     return fetch(input, {
       ...init,
       credentials: "include", // Required for sending cookies cross-origin
     });
-  },
+  }) satisfies typeof fetch,
 });
 
 export type Client = typeof client;
