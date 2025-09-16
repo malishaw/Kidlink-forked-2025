@@ -8,6 +8,7 @@ import { lessonPlans } from "@repo/database";
 
 import type {
   CreateRoute,
+  GetByClassIdRoute,
   GetByIdRoute,
   ListRoute,
   RemoveRoute,
@@ -78,6 +79,65 @@ export const getOne: AppRouteHandler<GetByIdRoute> = async (c) => {
   return c.json(lessonPlan, HttpStatusCodes.OK);
 };
 
+// 🔍 Get lesson plans by class ID
+export const getByClassId: AppRouteHandler<GetByClassIdRoute> = async (c) => {
+  const { classId } = c.req.valid("param");
+  const {
+    page = "1",
+    limit = "10",
+    sort = "desc",
+    search = "",
+  } = c.req.valid("query");
+
+  const pageNum = parseInt(page, 10);
+  const limitNum = parseInt(limit, 10);
+  const offset = (pageNum - 1) * limitNum;
+
+  // Base query to find lesson plans by classId
+  let query = db.query.lessonPlans.findMany({
+    where: eq(lessonPlans.classId, String(classId)),
+    limit: limitNum,
+    offset: offset,
+    orderBy:
+      sort === "desc" ? [lessonPlans.createdAt] : [lessonPlans.createdAt],
+  });
+
+  // If search is provided, add search functionality (you might need to adjust this based on your database setup)
+  const results = await query;
+
+  // Get total count for pagination
+  const totalResults = await db.query.lessonPlans.findMany({
+    where: eq(lessonPlans.classId, String(classId)),
+  });
+  const totalCount = totalResults.length;
+  const totalPages = Math.ceil(totalCount / limitNum);
+
+  // Filter by search if provided
+  let filteredResults = results;
+  if (search) {
+    filteredResults = results.filter(
+      (lessonPlan) =>
+        lessonPlan.title?.toLowerCase().includes(search.toLowerCase()) ||
+        lessonPlan.content?.toLowerCase().includes(search.toLowerCase())
+    );
+  }
+
+  return c.json(
+    {
+      data: filteredResults,
+      meta: {
+        totalCount: search ? filteredResults.length : totalCount,
+        limit: limitNum,
+        currentPage: pageNum,
+        totalPages: search
+          ? Math.ceil(filteredResults.length / limitNum)
+          : totalPages,
+      },
+    },
+    HttpStatusCodes.OK
+  );
+};
+
 // Update lessonPlan
 export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
   const { id } = c.req.valid("param");
@@ -134,7 +194,7 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
     );
   }
 
-  return c.body(null, HttpStatusCodes.NO_CONTENT);
+  return c.json({ message: "Deleted successfully" }, HttpStatusCodes.OK);
 };
 
 // import { eq } from "drizzle-orm";

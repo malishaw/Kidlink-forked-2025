@@ -1,9 +1,10 @@
-import { getClient } from "@/lib/rpc/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+"use server";
+
+import { getClient } from "@/lib/rpc/server";
 
 export interface Class {
   id: string;
-  nurseryId?: string | null;
+  nurseryId: string;
   name: string;
   mainTeacherId?: string | null;
   teacherIds: string[];
@@ -13,43 +14,44 @@ export interface Class {
 }
 
 export interface CreateClassInput {
-  nurseryId?: string | null;
+  nurseryId: string;
   name: string;
   mainTeacherId?: string | null;
-  teacherIds?: string[]; // optional on create
-  childIds?: string[]; // optional on create
+  teacherIds?: string[];
+  childIds?: string[];
 }
 
-export const useCreateClass = () => {
-  const queryClient = useQueryClient();
+export async function createClass(data: CreateClassInput) {
+  try {
+    const rpcClient = await getClient();
 
-  return useMutation({
-    mutationFn: async (newClass: CreateClassInput) => {
-      const rpcClient = await getClient();
+    // Ensure required fields are present
+    if (!data.nurseryId) {
+      throw new Error("Nursery ID is required");
+    }
 
-      const response = await rpcClient.api.classes.$post({
-        json: {
-          ...newClass,
-          teacherIds: newClass.teacherIds ?? [], // default to []
-        },
-      });
+    if (!data.name?.trim()) {
+      throw new Error("Class name is required");
+    }
 
-      if (!response.ok) {
-        // Bubble up API error if present
-        let msg = "Failed to create class";
-        try {
-          const err = await response.json();
-          if (err?.message) msg = err.message;
-        } catch {}
-        throw new Error(msg);
-      }
+    const response = await rpcClient.api.classes.$post({
+      json: {
+        nurseryId: data.nurseryId,
+        name: data.name.trim(),
+        mainTeacherId: data.mainTeacherId || null,
+        teacherIds: data.teacherIds ?? [],
+        childIds: data.childIds ?? [],
+      },
+    });
 
-      const json = await response.json();
-      return json as Class;
-    },
-    onSuccess: () => {
-      // Invalidate so classes list refetches
-      queryClient.invalidateQueries({ queryKey: ["classes"] });
-    },
-  });
-};
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData?.message || "Failed to create class");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error creating class:", error);
+    throw error;
+  }
+}

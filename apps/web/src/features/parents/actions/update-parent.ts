@@ -8,7 +8,10 @@ export async function updateParent(id: string, data: parentUpdateType) {
 
   const response = await rpcClient.api.parent[":id"].$patch({
     param: { id },
-    json: data,
+    json: {
+      ...data,
+      childId: data.childId, // Ensure the field is sent as an array
+    },
   });
 
   if (!response.ok) {

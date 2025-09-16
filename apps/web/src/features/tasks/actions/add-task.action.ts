@@ -14,13 +14,13 @@ export async function addTask(data: AddTaskSchema) {
   const response = await client.api.tasks.$post({
     json: {
       ...data,
-      done: false
-    }
+      done: false,
+    },
   });
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(`${errorData.message}`); 
+    throw new Error(`${errorData.message}`);
   }
 
   const taskData = await response.json();

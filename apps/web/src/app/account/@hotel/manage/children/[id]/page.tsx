@@ -3,6 +3,8 @@
 import { BadgesList } from "@/features/badges/actions/get-badge.action";
 import { ChildrensList as useChildrensList } from "@/features/children/actions/get-children";
 import { updateChildren } from "@/features/children/actions/update-children";
+import { useGetFeedbacksByChildId } from "@/features/feedback/actions/get-feedback-by-child";
+import FeedbackForm from "@/features/feedback/components/feedback-form";
 import { ChildrensList as useClassesList } from "@/features/nursery/actions/get-classes";
 import { ParentsList as useParentsList } from "@/features/parents/actions/get-parent";
 import {
@@ -19,12 +21,17 @@ import {
 import {
   AlertCircle,
   Calendar,
+  Camera,
   CheckCircle,
+  Clock,
   GraduationCap,
   Heart,
   Mail,
   MapPin,
+  MessageSquare,
   Phone,
+  Plus,
+  Star,
   Users,
 } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -35,6 +42,13 @@ export default function Page() {
   const id = (params?.id as string) || "1";
   const { data, isLoading, error } = useChildrensList({});
   const children = data?.data?.find((c: any) => c.id === id);
+
+  // Fetch feedbacks for this child
+  const {
+    data: feedbacksData,
+    isLoading: isFeedbacksLoading,
+    error: feedbacksError,
+  } = useGetFeedbacksByChildId(id, { page: 1, limit: 20 });
 
   // Classes fetch
   const {
@@ -74,6 +88,9 @@ export default function Page() {
   const [assignBadgeLoading, setAssignBadgeLoading] = useState(false);
   const [assignBadgeError, setAssignBadgeError] = useState("");
   const [assignBadgeSuccess, setAssignBadgeSuccess] = useState(false);
+
+  // Feedback form state
+  const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState(false);
 
   const handleAssignClass = async () => {
     setAssignLoading(true);
@@ -201,7 +218,7 @@ export default function Page() {
                   <span>{children.phoneNumber}</span>
                 </div>
                 {/* Display assigned badge name */}
-                {children.badgeId && badgesQuery.data?.data && (
+                {/* {children.badgeId && badgesQuery.data?.data && (
                   <div className="flex items-center gap-2 mt-2 text-yellow-200">
                     <span className="inline-block w-5 h-5 bg-yellow-400 rounded-full"></span>
                     <span className="font-semibold">Badge:</span>
@@ -211,7 +228,7 @@ export default function Page() {
                       )?.name || children.badgeId}
                     </span>
                   </div>
-                )}
+                )} */}
               </div>
             </div>
           </div>
@@ -289,10 +306,10 @@ export default function Page() {
             {/* System Information */}
             <div className="mt-8 pt-6 border-t border-slate-200">
               <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-500">
-                <div>
+                {/* <div>
                   <span className="font-medium">Organization ID:</span>{" "}
                   {children.organizationId}
-                </div>
+                </div> */}
                 <div>
                   <span className="font-medium">Created:</span>{" "}
                   {new Date(children.createdAt).toLocaleDateString()}
@@ -547,7 +564,208 @@ export default function Page() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Feedback Section */}
+        <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+                <div className="p-3 bg-purple-100 rounded-lg">
+                  <MessageSquare className="w-7 h-7 text-purple-600" />
+                </div>
+                Child Feedback History
+                {feedbacksData?.data && (
+                  <span className="text-sm font-normal text-slate-500 bg-purple-50 px-3 py-1 rounded-full">
+                    {feedbacksData.data.length} feedback
+                    {feedbacksData.data.length !== 1 ? "s" : ""}
+                  </span>
+                )}
+              </CardTitle>
+              <button
+                onClick={() => setIsFeedbackFormOpen(true)}
+                className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-4 py-2 rounded-xl font-semibold shadow-md transition-all duration-200 hover:shadow-lg"
+              >
+                <Plus className="w-4 h-4" />
+                Add Feedback
+              </button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isFeedbacksLoading ? (
+              <div className="flex items-center justify-center gap-3 p-8 bg-purple-50 rounded-lg">
+                <div className="w-6 h-6 border-2 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
+                <span className="text-purple-700 font-medium">
+                  Loading feedback history...
+                </span>
+              </div>
+            ) : feedbacksError ? (
+              <div className="p-6 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-700 flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5" />
+                  Error loading feedback: {feedbacksError.message}
+                </p>
+              </div>
+            ) : !feedbacksData?.data || feedbacksData.data.length === 0 ? (
+              <div className="text-center p-12 bg-slate-50 rounded-lg">
+                <MessageSquare className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-slate-600 mb-2">
+                  No Feedback Yet
+                </h3>
+                <p className="text-slate-500">
+                  This child hasn't received any feedback yet.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {feedbacksData.data.map((feedback: any) => (
+                  <div
+                    key={feedback.id}
+                    className="p-6 bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl border border-slate-200 hover:shadow-md transition-all duration-200"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-purple-100 rounded-full">
+                          <MessageSquare className="w-5 h-5 text-purple-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-slate-800">
+                            Teacher Feedback
+                          </h4>
+                          <p className="text-sm text-slate-500 flex items-center gap-2">
+                            <Clock className="w-4 h-4" />
+                            {new Date(feedback.createdAt).toLocaleDateString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      {feedback.rating && (
+                        <div className="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                          <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                          <span className="text-sm font-medium text-yellow-700">
+                            {feedback.rating}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Feedback Content */}
+                    {feedback.teacherFeedback && (
+                      <div className="mb-4 p-4 bg-white rounded-lg border border-slate-200">
+                        <h5 className="font-medium text-slate-700 mb-2 flex items-center gap-2">
+                          <Users className="w-4 h-4" />
+                          Teacher's Feedback:
+                        </h5>
+                        <p className="text-slate-600 leading-relaxed">
+                          {feedback.teacherFeedback}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Reply Section */}
+                    {feedback.reply && (
+                      <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <h5 className="font-medium text-blue-700 mb-2 flex items-center gap-2">
+                          <Mail className="w-4 h-4" />
+                          Reply:
+                        </h5>
+                        <p className="text-blue-600 leading-relaxed">
+                          {feedback.reply}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Additional Content */}
+                    {feedback.content && (
+                      <div className="mb-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                        <h5 className="font-medium text-green-700 mb-2">
+                          Additional Notes:
+                        </h5>
+                        <p className="text-green-600 leading-relaxed">
+                          {feedback.content}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Images Section */}
+                    {feedback.images && feedback.images.length > 0 && (
+                      <div className="mt-4">
+                        <h5 className="font-medium text-slate-700 mb-3 flex items-center gap-2">
+                          <Camera className="w-4 h-4" />
+                          Attached Images:
+                        </h5>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          {feedback.images.map(
+                            (image: string, index: number) => (
+                              <div
+                                key={index}
+                                className="relative aspect-square rounded-lg overflow-hidden bg-slate-100 hover:scale-105 transition-transform duration-200 cursor-pointer"
+                              >
+                                <img
+                                  src={image}
+                                  alt={`Feedback image ${index + 1}`}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.currentTarget.src = "/placeholder.svg";
+                                  }}
+                                />
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Footer with metadata */}
+                    <div className="mt-4 pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+                      <div className="flex items-center gap-4">
+                        {feedback.teacherId && (
+                          <span>Teacher ID: {feedback.teacherId}</span>
+                        )}
+                        {/* {feedback.organizationId && (
+                          <span>Org: {feedback.organizationId}</span>
+                        )} */}
+                      </div>
+                      {feedback.updatedAt &&
+                        feedback.updatedAt !== feedback.createdAt && (
+                          <span>
+                            Updated:{" "}
+                            {new Date(feedback.updatedAt).toLocaleDateString()}
+                          </span>
+                        )}
+                    </div>
+                  </div>
+                ))}
+
+                {/* Show pagination info if there are more feedbacks */}
+                {feedbacksData.meta &&
+                  feedbacksData.meta.totalCount > feedbacksData.data.length && (
+                    <div className="text-center py-4 text-slate-500">
+                      Showing {feedbacksData.data.length} of{" "}
+                      {feedbacksData.meta.totalCount} feedback entries
+                    </div>
+                  )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Feedback Form Modal */}
+      {isFeedbackFormOpen && (
+        <FeedbackForm
+          isOpen={isFeedbackFormOpen}
+          onClose={() => setIsFeedbackFormOpen(false)}
+          childId={params.id}
+        />
+      )}
     </div>
   );
 }

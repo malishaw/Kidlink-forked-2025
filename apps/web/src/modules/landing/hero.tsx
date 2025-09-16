@@ -1,4 +1,3 @@
-import HotelSearchComponent from "@/features/hotels/components/advanced-search";
 import { Navbar } from "./navbar";
 
 export function Hero() {
@@ -14,9 +13,9 @@ export function Hero() {
           and enjoy your perfect getaway.
         </p> */}
       </div>
-      <div className="absolute z-10 bottom-5 flex items-center justify-center w-full">
+      {/* <div className="absolute z-10 bottom-5 flex items-center justify-center w-full">
         <HotelSearchComponent />
-      </div>
+      </div> */}
       {/* Background video */}
       <video
         className="absolute top-0 left-0 object-cover w-full h-full -z-10"

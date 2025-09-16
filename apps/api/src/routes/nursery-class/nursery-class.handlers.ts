@@ -22,45 +22,42 @@ type Session = {
 
 // 🔍 List ONLY classes whose parent nursery belongs to the logged-in user
 export const list: AppRouteHandler<ListRoute> = async (c) => {
-  const session = c.get("session") as Session | undefined;
-  if (!session?.userId) {
+  const session = c.get("session");
+
+  console.log("Session:", session); // Debug log
+
+  if (!session?.activeOrganizationId) {
     return c.json(
       { message: HttpStatusPhrases.UNAUTHORIZED },
       HttpStatusCodes.UNAUTHORIZED
     );
   }
 
-  const where = session.activeOrganizationId
-    ? and(
-        eq(nurseries.createdBy, session.userId),
-        eq(nurseries.organizationId, session.activeOrganizationId)
-      )
-    : eq(nurseries.createdBy, session.userId);
+  const organizationId = session.activeOrganizationId;
 
-  const rows = await db
-    .select({
-      id: classes.id,
-      nurseryId: classes.nurseryId,
-      name: classes.name,
-      mainTeacherId: classes.mainTeacherId,
-      teacherIds: classes.teacherIds,
-      childIds: classes.childIds,
-      createdAt: classes.createdAt,
-      updatedAt: classes.updatedAt,
-    })
-    .from(classes)
-    .innerJoin(nurseries, eq(nurseries.id, classes.nurseryId))
-    .where(where);
+  console.log("Active Organization ID:", organizationId); // Debug log
 
-  const page = 1;
-  const limit = rows.length;
-  const totalCount = rows.length;
+  // Fetch nursery classes filtered by the active organization ID
+  const results = await db.query.classes.findMany({
+    where: eq(classes.organizationId, organizationId),
+  });
+
+  console.log("Query Results:", results); // Debug log
+
+  const page = 1; // or from query params
+  const limit = results.length; // or from query params
+  const totalCount = results.length;
   const totalPages = Math.ceil(totalCount / Math.max(limit, 1));
 
   return c.json(
     {
-      data: rows,
-      meta: { totalCount, limit, currentPage: page, totalPages },
+      data: results,
+      meta: {
+        totalCount,
+        limit,
+        currentPage: page,
+        totalPages,
+      },
     },
     HttpStatusCodes.OK
   );
@@ -69,83 +66,42 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 // ➕ Create new class
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const body = c.req.valid("json");
-  const session = c.get("session") as Session | undefined;
+  const session = c.get("session");
 
-  if (!session?.userId) {
+  if (!session) {
     return c.json(
       { message: HttpStatusPhrases.UNAUTHORIZED },
       HttpStatusCodes.UNAUTHORIZED
     );
   }
 
-  let resolvedNurseryId: string | undefined = body.nurseryId ?? undefined;
-
-  if (!resolvedNurseryId) {
-    const ownershipWhere = session.activeOrganizationId
-      ? and(
-          eq(nurseries.createdBy, session.userId),
-          eq(nurseries.organizationId, session.activeOrganizationId)
-        )
-      : eq(nurseries.createdBy, session.userId);
-
-    const ownedNurseries = await db
-      .select({ id: nurseries.id })
-      .from(nurseries)
-      .where(ownershipWhere);
-
-    if (ownedNurseries.length === 0) {
-      return c.json(
-        { message: "Parent nursery not found" },
-        HttpStatusCodes.NOT_FOUND
-      );
-    }
-    if (ownedNurseries.length > 1) {
-      return c.json(
-        {
-          message:
-            "Multiple nurseries found for your account. Please specify nurseryId.",
-        },
-        HttpStatusCodes.BAD_REQUEST
-      );
-    }
-
-    resolvedNurseryId = ownedNurseries[0]?.id as string;
-  } else {
-    const nurseryWhere = session.activeOrganizationId
-      ? and(
-          eq(nurseries.id, resolvedNurseryId),
-          eq(nurseries.createdBy, session.userId),
-          eq(nurseries.organizationId, session.activeOrganizationId)
-        )
-      : and(
-          eq(nurseries.id, resolvedNurseryId),
-          eq(nurseries.createdBy, session.userId)
-        );
-
-    const parent = await db.query.nurseries.findFirst({ where: nurseryWhere });
-    if (!parent) {
-      return c.json(
-        { message: HttpStatusPhrases.NOT_FOUND },
-        HttpStatusCodes.NOT_FOUND
-      );
-    }
+  if (!session.activeOrganizationId) {
+    return c.json(
+      { message: "No active organization selected" },
+      HttpStatusCodes.BAD_REQUEST
+    );
   }
 
-  const now = new Date();
-
-  // Normalize arrays if provided (dedupe)
+  // Normalize arrays if provided (dedupe and filter out null/undefined values)
   const teacherIds = Array.isArray(body.teacherIds)
-    ? Array.from(new Set(body.teacherIds))
-    : undefined;
+    ? Array.from(
+        new Set(body.teacherIds.filter((id) => id != null && id !== ""))
+      )
+    : [];
+
   const childIds = Array.isArray(body.childIds)
-    ? Array.from(new Set(body.childIds))
-    : undefined;
+    ? Array.from(new Set(body.childIds.filter((id) => id != null && id !== "")))
+    : [];
+
+  const now = new Date();
 
   const [inserted] = await db
     .insert(classes)
     .values({
-      ...body,
-      nurseryId: resolvedNurseryId!,
+      nurseryId: body.nurseryId,
+      organizationId: session.activeOrganizationId, // Add organizationId from session
+      name: body.name,
+      mainTeacherId: body.mainTeacherId || null,
       teacherIds,
       childIds,
       createdAt: now,

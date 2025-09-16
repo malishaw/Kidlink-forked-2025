@@ -6,30 +6,102 @@ import {
   AvatarImage,
 } from "@repo/ui/components/avatar";
 import { Button } from "@repo/ui/components/button";
-import { CardContent, CardHeader, CardTitle } from "@repo/ui/components/card";
+import { CardHeader, CardTitle } from "@repo/ui/components/card";
+import { useQuery } from "@tanstack/react-query";
 import {
   Award,
   ChevronDown,
   Eye,
   GraduationCap,
   Grid3X3,
-  List,
+  Table,
   Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { createChildren } from "@/features/children/actions/create-children";
 import { ChildrensList as useChildrensList } from "@/features/children/actions/get-children";
+import { getClient } from "@/lib/rpc/client";
+
+const useGetClassById = async (classId: string) => {
+  // Placeholder implementation for fetching class by ID
+  return { data: { name: "Sample Class" } };
+};
+
+const useGetParentById = (parentId: string) => {
+  // Placeholder implementation for fetching parent by ID
+  return {
+    data: { name: "Sample Parent" },
+    isLoading: false,
+    error: null,
+  };
+};
 
 export function ChildrensList() {
   const [selectedChild, setSelectedChild] = useState<any>(null);
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list" | "table">("grid");
   const [sortBy, setSortBy] = useState<"name" | "children" | "recent">("name");
 
   const { data, isLoading, error } = useChildrensList({});
+
+  const childrensData = data?.data || [];
+
+  // Fetch all classes
+  const {
+    data: classesResponse,
+    isLoading: classesLoading,
+    error: classesError,
+  } = useQuery({
+    queryKey: ["all-classes"],
+    queryFn: async () => {
+      const rpcClient = await getClient();
+      const classesRes = await rpcClient.api["classes"].$get();
+
+      if (!classesRes.ok) {
+        const errorData = await classesRes.json();
+        throw new Error(errorData.message || "Failed to fetch classes");
+      }
+
+      const classes = await classesRes.json();
+      return classes;
+    },
+  });
+
+  const classesData = classesResponse?.data || [];
+
+  const getClassName = (classId: string): string => {
+    if (classesLoading) return "Loading...";
+    const classData = classesData.find(
+      (cls: { id: string }) => cls.id === classId
+    );
+    return classData?.name || "No assigned class";
+  };
+
+  // Fetch all badges
+  const {
+    data: badgesResponse,
+    isLoading: badgesLoading,
+    error: badgesError,
+  } = useQuery({
+    queryKey: ["all-badges"],
+    queryFn: async () => {
+      const rpcClient = await getClient();
+      const badgesRes = await rpcClient.api["badges"].$get();
+
+      if (!badgesRes.ok) {
+        const errorData = await badgesRes.json();
+        throw new Error(errorData.message || "Failed to fetch badges");
+      }
+
+      const badges = await badgesRes.json();
+      return badges;
+    },
+  });
+
+  const badgesData = badgesResponse?.data || [];
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -64,10 +136,17 @@ export function ChildrensList() {
       setIsModalOpen(false);
       setFormData({
         name: "",
-        email: "",
-        phoneNumber: "",
-        address: "",
-        avatar: "",
+        organizationId: "",
+        nurseryId: "",
+        parentId: "",
+        classId: "",
+        dateOfBirth: "",
+        gender: "",
+        emergencyContact: "",
+        medicalNotes: "",
+        profileImageUrl: "",
+        imagesUrl: "",
+        activities: "",
       });
       window.location.reload();
     } catch (err) {
@@ -78,7 +157,56 @@ export function ChildrensList() {
     }
   };
 
-  if (isLoading) {
+  const [classNames, setClassNames] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const fetchClassNames = async () => {
+      const classIdMap: Record<string, string> = { ...classNames };
+      const classIdsToFetch = childrensData
+        .map((child) => child.classId)
+        .filter((classId) => classId && !classIdMap[classId]);
+
+      if (classIdsToFetch.length === 0) return;
+
+      for (const classId of classIdsToFetch) {
+        try {
+          const { data } = await useGetClassById(classId);
+          classIdMap[classId] = data?.name || "Unknown class";
+        } catch {
+          classIdMap[classId] = "Error fetching class";
+        }
+      }
+
+      setClassNames(classIdMap);
+    };
+
+    fetchClassNames();
+  }, [childrensData, classNames]);
+
+  // Add a function to fetch parent names based on parent ID
+  const getParentName = (parentId: string): string => {
+    if (!parentId) return "No assigned parent";
+    const {
+      data: parentData,
+      isLoading: parentLoading,
+      error: parentError,
+    } = useGetParentById(parentId);
+
+    if (parentLoading) return "Loading...";
+    if (parentError) return "Error fetching parent";
+
+    return parentData?.name || "Unknown parent";
+  };
+
+  const getBadgeName = (badgeId: string): string => {
+    if (badgesLoading) return "Loading...";
+    const badgeData = badgesData.find(
+      (badge: { id: string }) => badge.id === badgeId
+    );
+    return badgeData?.title || "No badge assigned";
+  };
+
+  if (isLoading || classesLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex flex-col justify-center items-center py-20 space-y-8">
         <div className="relative">
@@ -105,7 +233,7 @@ export function ChildrensList() {
     );
   }
 
-  if (error) {
+  if (error || classesError) {
     return (
       <div className="bg-gradient-to-br from-red-50 via-pink-50 to-red-100 border border-red-200 rounded-2xl p-8 text-center shadow-lg">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-red-100 to-red-200 rounded-full mb-6 shadow-inner">
@@ -115,13 +243,11 @@ export function ChildrensList() {
           Failed to load childrens
         </h3>
         <p className="text-red-600 mb-6 max-w-md mx-auto">
-          Error: {error.message}
+          Error: {error?.message || classesError?.message}
         </p>
       </div>
     );
   }
-
-  const childrensData = data?.data || [];
 
   const filteredChildrens = childrensData.filter(
     (children: any) =>
@@ -181,7 +307,7 @@ export function ChildrensList() {
                   {sortedChildrens.length !== 1 ? "s" : ""}
                 </span>
               </div>
-              <div className="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full">
+              {/* <div className="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full">
                 <Award className="h-4 w-4 text-purple-600" />
                 <span className="text-sm font-semibold text-purple-700">
                   {sortedChildrens.reduce(
@@ -190,7 +316,7 @@ export function ChildrensList() {
                   )}{" "}
                   Students
                 </span>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -212,7 +338,7 @@ export function ChildrensList() {
               >
                 <Grid3X3 className="h-4 w-4" />
               </button>
-              <button
+              {/* <button
                 onClick={() => setViewMode("list")}
                 className={`p-2 rounded-lg transition-all ${
                   viewMode === "list"
@@ -221,6 +347,16 @@ export function ChildrensList() {
                 }`}
               >
                 <List className="h-4 w-4" />
+              </button> */}
+              <button
+                onClick={() => setViewMode("table")}
+                className={`p-2 rounded-lg transition-all ${
+                  viewMode === "table"
+                    ? "bg-white shadow-md text-blue-600"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                <Table className="h-4 w-4" />
               </button>
             </div>
 
@@ -242,7 +378,7 @@ export function ChildrensList() {
         {/* Create Children Modal */}
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-lg relative">
+            <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-lg relative max-h-[90vh] overflow-y-auto">
               <h2 className="text-2xl font-bold mb-4">Create New Children</h2>
               <form onSubmit={handleFormSubmit} className="space-y-4">
                 <input
@@ -287,22 +423,204 @@ export function ChildrensList() {
                   onChange={handleFormChange}
                   className="w-full border border-gray-200 rounded-xl px-4 py-2"
                 />
-                <input
-                  type="text"
-                  name="profileImageUrl"
-                  placeholder="Profile Image URL"
-                  value={formData.profileImageUrl}
-                  onChange={handleFormChange}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2"
-                />
-                <input
-                  type="text"
-                  name="imagesUrl"
-                  placeholder="Images URL"
-                  value={formData.imagesUrl}
-                  onChange={handleFormChange}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2"
-                />
+                {/* Profile Image Section */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Profile Picture
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <div className="relative h-24 w-24 rounded-xl overflow-hidden border-2 border-gray-200">
+                      {formData.profileImageUrl ? (
+                        <img
+                          src={formData.profileImageUrl}
+                          alt="Profile preview"
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = "/placeholder.svg";
+                          }}
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-gray-50 flex items-center justify-center">
+                          <Users className="h-8 w-8 text-gray-400" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            try {
+                              // Create a temporary URL for preview
+                              const previewUrl = URL.createObjectURL(file);
+                              setFormData({
+                                ...formData,
+                                profileImageUrl: previewUrl,
+                              });
+
+                              // Here you would typically upload the file to your server
+                              // const uploadedUrl = await uploadImage(file);
+                              // setFormData({ ...formData, profileImageUrl: uploadedUrl });
+                            } catch (error) {
+                              console.error("Error uploading image:", error);
+                              alert("Failed to upload profile image");
+                            }
+                          }
+                        }}
+                        className="hidden"
+                        id="profile-image-upload"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() =>
+                          document
+                            .getElementById("profile-image-upload")
+                            ?.click()
+                        }
+                        className="w-full"
+                      >
+                        Upload Profile Image
+                      </Button>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          name="profileImageUrl"
+                          placeholder="or paste profile image URL"
+                          value={formData.profileImageUrl}
+                          onChange={handleFormChange}
+                          className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm"
+                        />
+                        {formData.profileImageUrl && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-6 p-1 text-gray-400 hover:text-gray-600"
+                            onClick={() =>
+                              setFormData({ ...formData, profileImageUrl: "" })
+                            }
+                          >
+                            ✕
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Additional Images Section */}
+                {/* <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Additional Images
+                  </label>
+                  <div className="flex flex-wrap gap-4">
+                    {formData.imagesUrl &&
+                      formData.imagesUrl.split(",").map((url, index) => (
+                        <div
+                          key={index}
+                          className="relative h-20 w-20 rounded-lg overflow-hidden border-2 border-gray-200"
+                        >
+                          <img
+                            src={url.trim()}
+                            alt={`Additional image ${index + 1}`}
+                            className="h-full w-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = "/placeholder.svg";
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const urls = formData.imagesUrl
+                                .split(",")
+                                .filter((_, i) => i !== index);
+                              setFormData({
+                                ...formData,
+                                imagesUrl: urls.join(","),
+                              });
+                            }}
+                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    <div className="h-20 w-20">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={async (e) => {
+                          const files = Array.from(e.target.files || []);
+                          if (files.length > 0) {
+                            try {
+                              // Create temporary URLs for preview
+                              const previewUrls = files.map((file) =>
+                                URL.createObjectURL(file)
+                              );
+                              const currentUrls = formData.imagesUrl
+                                ? formData.imagesUrl.split(",")
+                                : [];
+                              setFormData({
+                                ...formData,
+                                imagesUrl: [
+                                  ...currentUrls,
+                                  ...previewUrls,
+                                ].join(","),
+                              });
+
+                              // Here you would typically upload the files to your server
+                              // const uploadedUrls = await Promise.all(files.map(file => uploadImage(file)));
+                              // setFormData({ ...formData, imagesUrl: uploadedUrls.join(',') });
+                            } catch (error) {
+                              console.error("Error uploading images:", error);
+                              alert("Failed to upload images");
+                            }
+                          }
+                        }}
+                        className="hidden"
+                        id="additional-images-upload"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() =>
+                          document
+                            .getElementById("additional-images-upload")
+                            ?.click()
+                        }
+                        className="w-full h-full flex flex-col items-center justify-center text-gray-500 border-2 border-dashed rounded-lg hover:bg-gray-50"
+                      >
+                        <span className="text-2xl mb-1">+</span>
+                        <span className="text-xs">Add Images</span>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="imagesUrl"
+                      placeholder="or paste comma-separated image URLs"
+                      value={formData.imagesUrl}
+                      onChange={handleFormChange}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm"
+                    />
+                    {formData.imagesUrl && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-6 p-1 text-gray-400 hover:text-gray-600"
+                        onClick={() =>
+                          setFormData({ ...formData, imagesUrl: "" })
+                        }
+                      >
+                        ✕
+                      </Button>
+                    )}
+                  </div>
+                </div> */}
                 <input
                   type="text"
                   name="activities"
@@ -332,85 +650,318 @@ export function ChildrensList() {
           </div>
         )}
 
-        {/* Childrens Cards */}
-        <div
-          className={
-            viewMode === "grid"
-              ? "grid gap-8 md:grid-cols-2 xl:grid-cols-3"
-              : "space-y-6"
-          }
-        >
-          {sortedChildrens.map((children: any) => (
-            <div
-              key={children.id}
-              className={`group relative overflow-hidden border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 rounded-3xl cursor-pointer ${viewMode === "list" ? "flex flex-row gap-4 p-4" : ""}`}
-              onClick={() =>
-                router.push(`/account/manage/children/${children.id}`)
-              }
-            >
-              <CardHeader className="flex items-center gap-4">
-                <Avatar className="h-16 w-16 shadow-lg ring-4 ring-white group-hover:ring-blue-100 transition-all duration-300">
-                  <AvatarImage src={children.avatar || "/placeholder.svg"} />
-                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white font-bold text-lg">
-                    {children.name
-                      .split(" ")
-                      .map((n: string) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-blue-700 transition-colors duration-200">
-                    {children.name}
-                  </CardTitle>
-                  <p className="text-sm text-gray-600">{children.email}</p>
-                  <p className="text-sm text-gray-600">
-                    {children.phoneNumber}
-                  </p>
-                  <p className="text-sm text-gray-600">{children.address}</p>
-                  <p className="text-xs text-gray-400">
-                    Organization: {children.organizationId}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    Created: {new Date(children.createdAt).toLocaleString()}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    Updated: {new Date(children.updatedAt).toLocaleString()}
-                  </p>
-                </div>
-              </CardHeader>
-
-              {children.children && children.children.length > 0 && (
-                <CardContent className="mt-4">
-                  <h4 className="font-semibold mb-2">
-                    Students ({children.children.length})
-                  </h4>
-                  <div className="space-y-2">
-                    {children.children.map((child: any) => (
-                      <div
-                        key={child.id}
-                        className="flex items-center justify-between p-2 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          router.push(`/account/manage/children/${child.id}`);
-                        }}
-                      >
-                        <div className="text-sm font-medium">
-                          {child.name} ({child.class})
+        {/* Childrens Display */}
+        {viewMode === "table" ? (
+          /* Table View */
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Child
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Class
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Badge
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Contact
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Created
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {sortedChildrens.map((children: any, index: number) => (
+                    <tr
+                      key={children.id}
+                      className={`hover:bg-blue-50/50 transition-all duration-200 cursor-pointer ${index % 2 === 0 ? "bg-white/50" : "bg-gray-50/30"}`}
+                      onClick={() =>
+                        router.push(`/account/manage/children/${children.id}`)
+                      }
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-10 w-10 shadow-md ring-2 ring-white">
+                            <AvatarImage
+                              src={children.avatar || "/placeholder.svg"}
+                            />
+                            <AvatarFallback className="bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 text-white font-bold text-sm">
+                              {children.name
+                                .split(" ")
+                                .map((n: string) => n[0])
+                                .join("")}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="text-sm font-semibold text-gray-900">
+                              {children.name}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {children.gender && `${children.gender}`}
+                              {children.dateOfBirth &&
+                                ` • ${new Date(children.dateOfBirth).toLocaleDateString()}`}
+                            </div>
+                          </div>
                         </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex px-3 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                          {getClassName(children.classId)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {children.badgeId ? (
+                          <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-amber-100 text-amber-800 rounded-full gap-1">
+                            🏆 {getBadgeName(children.badgeId)}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-400">
+                            No badge
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-900">
+                          {children.email && (
+                            <div className="truncate max-w-48">
+                              {children.email}
+                            </div>
+                          )}
+                          {children.phoneNumber && (
+                            <div className="text-xs text-gray-500">
+                              {children.phoneNumber}
+                            </div>
+                          )}
+                          {children.emergencyContact && (
+                            <div className="text-xs text-orange-600">
+                              Emergency: {children.emergencyContact}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(children.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <Button
                           size="sm"
-                          className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 shadow-sm hover:shadow-md text-xs px-3"
+                          className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-sm hover:shadow-md"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(
+                              `/account/manage/children/${children.id}`
+                            );
+                          }}
                         >
-                          <Eye className="h-3 w-3 mr-2" /> View
+                          <Eye className="h-3 w-3 mr-1" />
+                          View
                         </Button>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
-        </div>
+            {sortedChildrens.length === 0 && (
+              <div className="text-center py-12">
+                <div className="text-gray-400 text-lg mb-2">
+                  No children found
+                </div>
+                <div className="text-gray-500 text-sm">
+                  Try adjusting your search or add a new child
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Card/List Views */
+          <div
+            className={
+              viewMode === "grid"
+                ? "grid gap-8 md:grid-cols-2 xl:grid-cols-3"
+                : "space-y-6"
+            }
+          >
+            {sortedChildrens.map((children: any) => (
+              <div
+                key={children.id}
+                className={`group relative overflow-hidden bg-white/90 backdrop-blur-md shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 rounded-3xl cursor-pointer border border-white/50 ${viewMode === "list" ? "flex flex-row gap-6 p-6" : "p-6"}`}
+                onClick={() =>
+                  router.push(`/account/manage/children/${children.id}`)
+                }
+              >
+                {/* Background Gradient Effects */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/60 via-purple-50/40 to-pink-50/60"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full blur-2xl"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-200/20 to-transparent rounded-full blur-2xl"></div>
+
+                <div className="relative z-10 space-y-6">
+                  {/* Header Section */}
+                  <CardHeader className="flex items-center gap-4 p-0">
+                    <div className="relative">
+                      <Avatar className="h-16 w-16 shadow-lg ring-4 ring-white/80 group-hover:ring-blue-200/80 transition-all duration-300">
+                        <AvatarImage
+                          src={children.avatar || "/placeholder.svg"}
+                        />
+                        <AvatarFallback className="bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 text-white font-bold text-lg">
+                          {children.name
+                            .split(" ")
+                            .map((n: string) => n[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                      {/* Active Status Indicator */}
+                      <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow-md"></div>
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-blue-700 transition-colors duration-200 mb-2">
+                        {children.name}
+                      </CardTitle>
+                      <div className="flex flex-wrap gap-2">
+                        <div className="px-3 py-1 bg-blue-100/80 text-blue-700 rounded-full text-xs font-medium">
+                          {getClassName(children.classId)}
+                        </div>
+                        {children.badgeId && (
+                          <div className="px-3 py-1 bg-amber-100/80 text-amber-700 rounded-full text-xs font-medium flex items-center gap-1">
+                            🏆 {getBadgeName(children.badgeId)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardHeader>
+
+                  {/* Contact Information */}
+                  {(children.email ||
+                    children.phoneNumber ||
+                    children.address) && (
+                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 space-y-3">
+                      <h4 className="font-semibold text-gray-700 text-sm flex items-center gap-2">
+                        📞 Contact Information
+                      </h4>
+                      <div className="space-y-2">
+                        {children.email && (
+                          <div className="flex items-center gap-3 text-sm">
+                            <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
+                            <span className="text-gray-600 truncate">
+                              {children.email}
+                            </span>
+                          </div>
+                        )}
+                        {children.phoneNumber && (
+                          <div className="flex items-center gap-3 text-sm">
+                            <div className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
+                            <span className="text-gray-600">
+                              {children.phoneNumber}
+                            </span>
+                          </div>
+                        )}
+                        {children.address && (
+                          <div className="flex items-center gap-3 text-sm">
+                            <div className="w-2 h-2 bg-purple-400 rounded-full flex-shrink-0"></div>
+                            <span className="text-gray-600 truncate">
+                              {children.address}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Timeline Information */}
+                  <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4">
+                    <h4 className="font-semibold text-gray-700 text-sm flex items-center gap-2 mb-3">
+                      📅 Timeline
+                    </h4>
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div className="space-y-1">
+                        <span className="font-medium text-gray-600">
+                          Created
+                        </span>
+                        <div className="text-gray-500">
+                          {new Date(children.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="font-medium text-gray-600">
+                          Updated
+                        </span>
+                        <div className="text-gray-500">
+                          {new Date(children.updatedAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Students Section */}
+                  {children.children && children.children.length > 0 && (
+                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4">
+                      <h4 className="font-semibold text-gray-700 text-sm flex items-center gap-2 mb-3">
+                        👥 Students ({children.children.length})
+                      </h4>
+                      <div className="space-y-2">
+                        {children.children.map((child: any) => (
+                          <div
+                            key={child.id}
+                            className="flex items-center justify-between p-3 bg-white/80 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer border border-white/60"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(
+                                `/account/manage/children/${child.id}`
+                              );
+                            }}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                {child.name.charAt(0)}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="text-sm font-medium text-gray-700 truncate">
+                                  {child.name}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  {child.class}
+                                </div>
+                              </div>
+                            </div>
+                            <Button
+                              size="sm"
+                              className="bg-gradient-to-r from-blue-400 to-purple-500 hover:from-blue-500 hover:to-purple-600 text-white shadow-sm hover:shadow-md text-xs px-3 py-1 rounded-lg flex-shrink-0"
+                            >
+                              <Eye className="h-3 w-3 mr-1" />
+                              View
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Action Button */}
+                  <div className="pt-2">
+                    <Button
+                      className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/account/manage/children/${children.id}`);
+                      }}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      View Profile
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
