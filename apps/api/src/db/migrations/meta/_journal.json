@@ -15,6 +15,13 @@
       "when": 1758007621023,
       "tag": "0001_solid_excalibur",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1758010804972,
+      "tag": "0002_thankful_rumiko_fujikawa",
+      "breakpoints": true
     }
   ]
 }

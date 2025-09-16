@@ -20,6 +20,7 @@ import system from "./system/system.index";
 import tasks from "./tasks/tasks.index";
 import teacher from "./teachers/teacher.index";
 import user from "./user/user.index";
+import event from "./event/event.index";
 
 export function registerRoutes(app: AppOpenAPI) {
   return app
@@ -41,6 +42,7 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/badges", badges)
     .route("/organization", organization)
     .route("/lesson-plans", lessonPlans)
+    .route("/events", event)
     .route("/classes", nurseryClass);
 }
 

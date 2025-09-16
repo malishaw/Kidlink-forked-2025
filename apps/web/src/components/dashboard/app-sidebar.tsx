@@ -126,6 +126,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconBuildings,
       },
       {
+        name: "Events",
+        url: "/account/manage/events",
+        icon: IconBuildings,
+      },
+      {
         name: "Payments",
         url: "/account/manage/payment",
         icon: IconBuildings,
@@ -151,13 +156,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           "/account/manage/feedback",
           "/account/manage/badges",
           "/account/manage/lessonplans",
+          "/account/manage/events",
         ].includes(doc.url)
       );
     } else if (role === "parent") {
       return data.documents.filter((doc) =>
-        ["/account/manage/classes", "/account/manage/children"].includes(
-          doc.url
-        )
+        [
+          "/account/manage/classes",
+          "/account/manage/children",
+          "/account/manage/events",
+        ].includes(doc.url)
       );
     }
 

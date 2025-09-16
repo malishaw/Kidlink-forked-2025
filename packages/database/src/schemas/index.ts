@@ -28,3 +28,5 @@ export * from "./lessonPlans.schema";
 export * from "./badges.schema";
 export * from "./children.schema";
 export * from "./lessonPlans.schema";
+
+export * from "./event.schema";
