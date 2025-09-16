@@ -1,6 +1,4 @@
-// /* eslint-disable @typescript-eslint/no-unused-vars */
-// import type { Router } from "@nextplate/api/routes";
-
+// import { Router } from "@nextplate/api/routes";
 // import { hc } from "hono/client";
 
 // // create instance to inline type in build
