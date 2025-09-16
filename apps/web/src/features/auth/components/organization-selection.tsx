@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 import { Building2, CheckCircle, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -30,12 +30,25 @@ interface Organization {
   metadata: string;
 }
 
-export function OrganizationSelection() {
+interface OrganizationSelectionProps {
+  userType?: "teacher" | "parent";
+}
+
+export function OrganizationSelection({
+  userType,
+}: OrganizationSelectionProps) {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrgId, setSelectedOrgId] = useState<string>("");
   const [settingActive, setSettingActive] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Get userType from props or URL params
+  const currentUserType =
+    userType ||
+    (searchParams.get("userType") as "teacher" | "parent") ||
+    "teacher";
 
   useEffect(() => {
     fetchOrganizations();
@@ -102,6 +115,11 @@ export function OrganizationSelection() {
     return organizations.find((org) => org.id === selectedOrgId);
   };
 
+  const handleJoinOrganization = () => {
+    const url = `/join-organization?userType=${currentUserType}`;
+    router.push(url);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -132,10 +150,7 @@ export function OrganizationSelection() {
           {organizations.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-500 mb-4">No organizations available</p>
-              <Button
-                variant="outline"
-                onClick={() => router.push("/join-organization")}
-              >
+              <Button variant="outline" onClick={handleJoinOrganization}>
                 Join Organization
               </Button>
             </div>
@@ -223,7 +238,7 @@ export function OrganizationSelection() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => router.push("/join-organization")}
+                  onClick={handleJoinOrganization}
                   disabled={settingActive}
                 >
                   Join Different Organization

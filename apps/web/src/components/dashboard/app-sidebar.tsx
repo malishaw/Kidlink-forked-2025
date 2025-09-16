@@ -112,18 +112,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       return data.documents.filter((doc) =>
         [
           "/account/manage/classes",
-          "/account/manage/teachers",
           "/account/manage/children",
           "/account/manage/feedback",
+          "/account/manage/badges",
+          "/account/manage/lessonplans",
         ].includes(doc.url)
       );
     } else if (userName === "parent") {
       return data.documents.filter((doc) =>
-        [
-          "/account/manage/classes",
-          "/account/manage/parents",
-          "/account/manage/children",
-        ].includes(doc.url)
+        ["/account/manage/classes", "/account/manage/children"].includes(
+          doc.url
+        )
       );
     }
 
