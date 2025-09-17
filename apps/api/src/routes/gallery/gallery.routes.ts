@@ -10,17 +10,17 @@ import {
   stringIdParamSchema,
 } from "@api/lib/helpers";
 import {
-  message,
-  messageInsertSchema,
-  messageUpdateSchema,
-} from "./message.schema";
+  galleryInsertSchema,
+  gallerySelectSchema,
+  galleryUpdateSchema,
+} from "./gallery.schema";
 
-const tags: string[] = ["Message"];
+const tags: string[] = ["gallery"];
 
 // List route definition
 export const list = createRoute({
   tags,
-  summary: "List all message",
+  summary: "List all gallery",
   path: "/",
   method: "get",
   request: {
@@ -28,8 +28,8 @@ export const list = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      getPaginatedSchema(z.array(message)),
-      "The list of message"
+      getPaginatedSchema(z.array(gallerySelectSchema)),
+      "The list of gallery"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -41,62 +41,62 @@ export const list = createRoute({
 // Get by ID route definition
 export const getById = createRoute({
   tags,
-  summary: "Get message by ID",
+  summary: "Get gallery by ID",
   method: "get",
   path: "/:id",
   request: {
     params: stringIdParamSchema,
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(message, "The message item"),
+    [HttpStatusCodes.OK]: jsonContent(gallerySelectSchema, "The gallery item"),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
       "Unauthorized access"
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       errorMessageSchema,
-      "Message not found"
+      "gallery not found"
     ),
   },
 });
 
-// Create Message route definition
+// Create gallery route definition
 export const create = createRoute({
   tags,
-  summary: "Create message",
+  summary: "Create gallery",
   method: "post",
   path: "/",
   request: {
-    body: jsonContentRequired(messageInsertSchema, "Create uploaded message"),
+    body: jsonContentRequired(galleryInsertSchema, "Create uploaded gallery"),
   },
   responses: {
-    [HttpStatusCodes.CREATED]: jsonContent(message, "The message created"),
+    [HttpStatusCodes.CREATED]: jsonContent(
+      gallerySelectSchema,
+      "The gallery created"
+    ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
       "Unauthorized access"
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       errorMessageSchema,
-      "Message not created"
+      "gallery not created"
     ),
   },
 });
 
-// Update message route definition
+// Update gallery route definition
 export const update = createRoute({
   tags,
-  summary: "Update Message",
+  summary: "Update gallery",
   method: "patch",
   path: "/:id",
   request: {
     params: stringIdParamSchema,
-    body: jsonContentRequired(
-      messageUpdateSchema,
-      "Update message details schema"
-    ),
+    body: jsonContentRequired(galleryUpdateSchema, "Update gallery details schema"),
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(messageUpdateSchema, "The message item"),
+    [HttpStatusCodes.OK]: jsonContent(galleryUpdateSchema, "The gallery item"),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(errorMessageSchema, "Not found"),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -108,8 +108,8 @@ export const update = createRoute({
 export const remove = createRoute({
   method: "delete",
   path: "/:id",
-  tags: ["Message"],
-  summary: "Delete a user profile",
+  tags: ["gallery"],
+  summary: "Delete an gallery",
   request: {
     params: z.object({ id: z.string() }),
   },
@@ -127,33 +127,9 @@ export const remove = createRoute({
   },
 });
 
-// Get messages by conversationId route definition
-export const getByConversationId = createRoute({
-  tags,
-  summary: "Get messages by conversationId",
-  method: "get",
-  path: "/by-conversation",
-  request: {
-    query: z.object({
-      conversationId: z.string(),
-    }),
-  },
-  responses: {
-    [HttpStatusCodes.OK]: jsonContent(
-      getPaginatedSchema(z.array(message)),
-      "The list of messages for the conversation"
-    ),
-    [HttpStatusCodes.BAD_REQUEST]: jsonContent(
-      errorMessageSchema,
-      "Invalid or missing conversationId"
-    ),
-  },
-});
-
 // Export types
 export type ListRoute = typeof list;
 export type GetByIdRoute = typeof getById;
 export type CreateRoute = typeof create;
 export type UpdateRoute = typeof update;
 export type RemoveRoute = typeof remove;
-export type GetByConversationIdRoute = typeof getByConversationId;
