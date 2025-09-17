@@ -35,3 +35,5 @@ export * from "./message.schema";
 
 export * from "./conversation.schema";
 export * from "./conversationParticipant.schema";
+
+export * from "./gallery.schema";

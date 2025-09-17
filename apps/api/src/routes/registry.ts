@@ -8,6 +8,7 @@ import conversationParticipant from "./conversationParticipants/conversationPart
 import conversation from "./conversations/conversation.index";
 import event from "./event/event.index";
 import feedbacks from "./feedbacks/feedback.index";
+import gallery from "./gallery/gallery.index";
 import hotels from "./hotels/hotel.index";
 import index from "./index.route";
 import lessonPlans from "./lessonPlans/lessonPlans.index";
@@ -49,6 +50,7 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/messages", messages)
     .route("/conversation", conversation)
     .route("/conversation-participant", conversationParticipant)
+    .route("/gallery", gallery)
     .route("/classes", nurseryClass);
 }
 
