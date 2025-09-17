@@ -127,9 +127,33 @@ export const remove = createRoute({
   },
 });
 
+// Get messages by conversationId route definition
+export const getByConversationId = createRoute({
+  tags,
+  summary: "Get messages by conversationId",
+  method: "get",
+  path: "/by-conversation",
+  request: {
+    query: z.object({
+      conversationId: z.string(),
+    }),
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      getPaginatedSchema(z.array(message)),
+      "The list of messages for the conversation"
+    ),
+    [HttpStatusCodes.BAD_REQUEST]: jsonContent(
+      errorMessageSchema,
+      "Invalid or missing conversationId"
+    ),
+  },
+});
+
 // Export types
 export type ListRoute = typeof list;
 export type GetByIdRoute = typeof getById;
 export type CreateRoute = typeof create;
 export type UpdateRoute = typeof update;
 export type RemoveRoute = typeof remove;
+export type GetByConversationIdRoute = typeof getByConversationId;

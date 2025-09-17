@@ -8,6 +8,7 @@ import { messages } from "@repo/database";
 
 import type {
   CreateRoute,
+  GetByConversationIdRoute,
   GetByIdRoute,
   ListRoute,
   RemoveRoute,
@@ -134,6 +135,33 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   }
 
   return c.body(null, HttpStatusCodes.NO_CONTENT);
+};
+
+// Get messages by conversationId
+export const getByConversationId: AppRouteHandler<
+  GetByConversationIdRoute
+> = async (c) => {
+  const { conversationId } = c.req.valid("query");
+
+  if (!conversationId) {
+    return c.json(
+      { message: "conversationId is required" },
+      HttpStatusCodes.BAD_REQUEST
+    );
+  }
+
+  const results = await db.query.messages.findMany({
+    where: eq(messages.conversationId, conversationId),
+    orderBy: (messages, { asc }) => [asc(messages.createdAt)],
+  });
+
+  return c.json(
+    {
+      data: results,
+      totalCount: results.length,
+    },
+    HttpStatusCodes.OK
+  );
 };
 
 // import { eq } from "drizzle-orm";
