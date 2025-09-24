@@ -484,7 +484,7 @@ export function ChildrensList() {
                       >
                         Upload Profile Image
                       </Button>
-                      <div className="relative">
+                      {/* <div className="relative">
                         <input
                           type="text"
                           name="profileImageUrl"
@@ -505,7 +505,7 @@ export function ChildrensList() {
                             ✕
                           </Button>
                         )}
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>
