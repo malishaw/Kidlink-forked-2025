@@ -186,6 +186,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           "/account/manage/classes",
           "/account/manage/children",
           "/account/manage/events",
+          "/account/manage/payment",
         ].includes(doc.url)
       );
     }
