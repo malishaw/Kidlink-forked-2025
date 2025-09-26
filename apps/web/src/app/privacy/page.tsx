@@ -1,5 +1,6 @@
 "use client";
 
+import { Footer } from "@/modules/landing/footer";
 import { Navbar } from "@/modules/landing/navbar";
 import {
   Card,
@@ -308,6 +309,7 @@ export default function PrivacyPolicyPage() {
           </CardContent>
         </Card>
       </div>
+      <Footer />
     </div>
   );
 }

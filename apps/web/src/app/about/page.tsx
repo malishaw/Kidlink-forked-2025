@@ -1,5 +1,6 @@
 "use client";
 
+import { Footer } from "@/modules/landing/footer";
 import { Navbar } from "@/modules/landing/navbar";
 import { Button } from "@repo/ui/components/button";
 import {
@@ -317,6 +318,7 @@ export default function AboutPage() {
           </CardContent>
         </Card>
       </div>
+      <Footer />
     </div>
   );
 }

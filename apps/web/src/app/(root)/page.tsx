@@ -1,5 +1,6 @@
 "use client";
 
+import { Footer } from "@/modules/landing/footer";
 import { Hero } from "@/modules/landing/hero";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
@@ -448,7 +449,7 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className="bg-gray-800 text-white py-12 px-4">
+        {/* <footer className="bg-gray-800 text-white py-12 px-4">
           <div className="container mx-auto max-w-6xl">
             <div className="grid md:grid-cols-4 gap-8">
               <div>
@@ -569,7 +570,8 @@ export default function Home() {
               </p>
             </div>
           </div>
-        </footer>
+        </footer> */}
+        <Footer />
       </div>
     </div>
   );
