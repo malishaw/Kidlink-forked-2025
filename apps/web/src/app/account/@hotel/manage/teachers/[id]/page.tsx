@@ -1,213 +1,3 @@
-// "use client";
-// import { ClassesList } from "@/features/teachers/actions/get-class";
-// import { TeachersList as useTeachersList } from "@/features/teachers/actions/get-teacher";
-// import { updateTeacher } from "@/features/teachers/actions/update-teacher";
-// import {
-//   Avatar,
-//   AvatarFallback,
-//   AvatarImage,
-// } from "@repo/ui/components/avatar";
-// import {
-//   Card,
-//   CardContent,
-//   CardHeader,
-//   CardTitle,
-// } from "@repo/ui/components/card";
-// import { useMutation, useQueryClient } from "@tanstack/react-query";
-// import { Award, Users } from "lucide-react";
-// import { useParams } from "next/navigation";
-// import { useState } from "react";
-
-// // All hooks must be inside the Page component
-// export default function Page() {
-//   const params = useParams();
-//   const id = params?.id as string;
-//   const queryClient = useQueryClient();
-//   const { data, isLoading, error } = useTeachersList({});
-//   const teacher = data?.data?.find((t: any) => t.id === id);
-
-//   // Get all classes
-//   const {
-//     data: classesData,
-//     isLoading: isClassesLoading,
-//     error: classesError,
-//   } = ClassesList({});
-//   const classes = classesData?.data || [];
-
-//   // State for selected class
-//   const [selectedClassId, setSelectedClassId] = useState("");
-
-//   // Mutation for updating teacher
-//   const mutation = useMutation({
-//     mutationFn: async (classId: string) => {
-//       // Only send classId, matching your API usage
-//       return await updateTeacher(id, { classId });
-//     },
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: ["teacher"] });
-//       queryClient.invalidateQueries({ queryKey: ["classes"] });
-//       setSelectedClassId("");
-//     },
-//   });
-
-//   // Handler for assigning class
-//   const handleAssignClass = (e: React.FormEvent) => {
-//     e.preventDefault();
-//     if (selectedClassId) {
-//       mutation.mutate(selectedClassId);
-//     }
-//   };
-
-//   let content;
-//   if (isLoading || isClassesLoading) {
-//     content = (
-//       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-//         <div className="flex flex-col items-center gap-4">
-//           <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-//           <p className="text-slate-600 font-medium">
-//             Loading teacher details...
-//           </p>
-//         </div>
-//       </div>
-//     );
-//   } else if (error || classesError) {
-//     content = (
-//       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 p-6">
-//         <Card className="max-w-md w-full border-red-200 bg-white shadow-lg">
-//           <CardContent className="flex flex-col items-center gap-4 p-8">
-//             <Award className="w-12 h-12 text-red-500" />
-//             <div className="text-center">
-//               <h3 className="text-lg font-semibold text-red-800 mb-2">
-//                 Error Loading Data
-//               </h3>
-//               <p className="text-red-600">
-//                 {error?.message || classesError?.message}
-//               </p>
-//             </div>
-//           </CardContent>
-//         </Card>
-//       </div>
-//     );
-//   } else if (!teacher) {
-//     content = (
-//       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50 p-6">
-//         <Card className="max-w-md w-full bg-white shadow-lg">
-//           <CardContent className="flex flex-col items-center gap-4 p-8">
-//             <Users className="w-12 h-12 text-slate-400" />
-//             <div className="text-center">
-//               <h3 className="text-lg font-semibold text-slate-800 mb-2">
-//                 Teacher Not Found
-//               </h3>
-//               <p className="text-slate-600">
-//                 No details found for this teacher.
-//               </p>
-//             </div>
-//           </CardContent>
-//         </Card>
-//       </div>
-//     );
-//   } else {
-//     content = (
-//       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
-//         <Card className="max-w-lg w-full bg-white/80 rounded-3xl shadow-xl p-8">
-//           <CardHeader className="flex items-center gap-4">
-//             <Avatar className="h-20 w-20 shadow-lg ring-4 ring-white">
-//               <AvatarImage src={teacher.avatar || "/placeholder.svg"} />
-//               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white font-bold text-lg">
-//                 {teacher.name
-//                   .split(" ")
-//                   .map((n: string) => n[0])
-//                   .join("")}
-//               </AvatarFallback>
-//             </Avatar>
-//             <div>
-//               <CardTitle className="text-2xl font-bold text-gray-800">
-//                 {teacher.name}
-//               </CardTitle>
-//               <p className="text-sm text-gray-600">{teacher.email}</p>
-//               <p className="text-sm text-gray-600">{teacher.phoneNumber}</p>
-//               <p className="text-sm text-gray-600">{teacher.address}</p>
-//               <p className="text-xs text-gray-400">
-//                 Organization: {teacher.organizationId}
-//               </p>
-//               <p className="text-xs text-gray-400">
-//                 Created: {new Date(teacher.createdAt).toLocaleString()}
-//               </p>
-//               <p className="text-xs text-gray-400">
-//                 Updated: {new Date(teacher.updatedAt).toLocaleString()}
-//               </p>
-//             </div>
-//           </CardHeader>
-//           <CardContent className="mt-4">
-//             {/* Assign Class Section */}
-//             <form onSubmit={handleAssignClass} className="mb-8">
-//               <h4 className="font-semibold mb-2">Assign Class</h4>
-//               <div className="mb-4">
-//                 <select
-//                   value={selectedClassId}
-//                   onChange={(e) => setSelectedClassId(e.target.value)}
-//                   className="w-full border rounded p-2"
-//                 >
-//                   <option value="">Select a class</option>
-//                   {classes.map((cls: any) => (
-//                     <option key={cls.id} value={cls.id}>
-//                       {cls.name}
-//                     </option>
-//                   ))}
-//                 </select>
-//               </div>
-//               <button
-//                 type="submit"
-//                 className="bg-blue-600 text-white px-4 py-2 rounded shadow"
-//                 disabled={mutation.isPending || !selectedClassId}
-//               >
-//                 {mutation.isPending ? "Assigning..." : "Assign Class"}
-//               </button>
-//               {mutation.isError && (
-//                 <div className="text-red-600 mt-2">
-//                   {mutation.error?.message}
-//                 </div>
-//               )}
-//               {mutation.isSuccess && (
-//                 <div className="text-green-600 mt-2">
-//                   Class assigned successfully!
-//                 </div>
-//               )}
-//             </form>
-
-//             <h4 className="font-semibold mb-2">Students</h4>
-//             <ul className="space-y-2">
-//               {teacher.children?.length ? (
-//                 teacher.children.map((child: any) => (
-//                   <li key={child.id} className="flex items-center gap-3">
-//                     <Avatar className="h-8 w-8">
-//                       <AvatarImage src={child.avatar || "/placeholder.svg"} />
-//                       <AvatarFallback>
-//                         {child.name
-//                           .split(" ")
-//                           .map((n: string) => n[0])
-//                           .join("")}
-//                       </AvatarFallback>
-//                     </Avatar>
-//                     <span className="font-medium text-gray-800">
-//                       {child.name}
-//                     </span>
-//                     <span className="text-xs text-gray-500">{child.class}</span>
-//                   </li>
-//                 ))
-//               ) : (
-//                 <li className="text-gray-500">No students assigned</li>
-//               )}
-//             </ul>
-//           </CardContent>
-//         </Card>
-//       </div>
-//     );
-//   }
-
-//   return content;
-// }
-
 "use client";
 import { ClassesList } from "@/features/teachers/actions/get-class";
 import type React from "react";
@@ -228,7 +18,6 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Award,
-  Building,
   Calendar,
   GraduationCap,
   Loader2,
@@ -403,7 +192,7 @@ export default function Page() {
                     <p className="text-slate-600">{teacher.address}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                {/* <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
                   <Building className="w-5 h-5 text-slate-500" />
                   <div>
                     <p className="text-sm font-medium text-slate-700">
@@ -411,7 +200,7 @@ export default function Page() {
                     </p>
                     <p className="text-slate-600">{teacher.organizationId}</p>
                   </div>
-                </div>
+                </div> */}
               </CardContent>
             </Card>
 

@@ -197,7 +197,7 @@ export function TeachersList() {
                   {sortedTeachers.length !== 1 ? "s" : ""}
                 </span>
               </div>
-              <div className="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full">
+              {/* <div className="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full">
                 <Award className="h-4 w-4 text-purple-600" />
                 <span className="text-sm font-semibold text-purple-700">
                   {sortedTeachers.reduce(
@@ -206,7 +206,7 @@ export function TeachersList() {
                   )}{" "}
                   Students
                 </span>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -440,9 +440,9 @@ export function TeachersList() {
                       ? getClassName(teacher.classId)
                       : "No assigned class"}
                   </p>
-                  <p className="text-xs text-gray-400">
+                  {/* <p className="text-xs text-gray-400">
                     Organization: {teacher.organizationId}
-                  </p>
+                  </p> */}
                   <p className="text-xs text-gray-400">
                     Created: {new Date(teacher.createdAt).toLocaleString()}
                   </p>
