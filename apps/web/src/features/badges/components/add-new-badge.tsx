@@ -273,7 +273,7 @@ export function AddNewBadge({
             </div>
 
             {/* Icon URL */}
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label htmlFor="iconUrl">
                 Icon URL (Optional if image uploaded)
               </Label>
@@ -283,7 +283,7 @@ export function AddNewBadge({
                 value={formData.iconUrl}
                 onChange={(e) => handleInputChange("iconUrl", e.target.value)}
               />
-            </div>
+            </div> */}
           </div>
 
           <DialogFooter>
