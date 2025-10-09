@@ -127,9 +127,37 @@ export const remove = createRoute({
   },
 });
 
+// Filter parents by userId route definition
+export const getByUserId = createRoute({
+  tags,
+  summary: "Get parents by userId",
+  method: "get",
+  path: "/user/:userId",
+  request: {
+    params: z.object({
+      userId: z.string().min(1, "User ID is required"), // Changed from .uuid() to .min(1)
+    }),
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      getPaginatedSchema(z.array(parent)),
+      "The list of parents filtered by userId"
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthorized access"
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      errorMessageSchema,
+      "No parents found for the given userId"
+    ),
+  },
+});
+
 // Export types
 export type ListRoute = typeof list;
 export type GetByIdRoute = typeof getById;
+export type GetByUserIdRoute = typeof getByUserId;
 export type CreateRoute = typeof create;
 export type UpdateRoute = typeof update;
 export type RemoveRoute = typeof remove;
