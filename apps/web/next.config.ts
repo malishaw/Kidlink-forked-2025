@@ -7,14 +7,14 @@ const nextConfig: NextConfig = {
     "@nextplate/rpc",
     "@repo/eslint-config",
     "@repo/typescript-config",
-    "@repo/database"
+    "@repo/database",
   ],
   async rewrites() {
     return [
       {
         source: "/api/:path*",
-        destination: "http://localhost:8000/api/:path*"
-      }
+        destination: "http://localhost:8000/api/:path*",
+      },
     ];
   },
   images: {
@@ -23,9 +23,15 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "donext.s3.ap-south-1.amazonaws.com",
         port: "",
-        pathname: "/**"
-      }
-    ]
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "donext-org.s3.eu-west-2.amazonaws.com",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
 
   typescript: {

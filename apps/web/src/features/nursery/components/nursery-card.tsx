@@ -1,6 +1,18 @@
 "use client";
 
-import Link from "next/link";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  Building2,
+  Calendar,
+  Edit3,
+  Loader2,
+  MapPin,
+  Phone,
+  Save,
+  Star,
+  Users,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { useGetNurseries, type Nursery } from "../actions/get-nursery-action";
 import { useUpdateNursery } from "../actions/update-nursery-action";
@@ -17,17 +29,22 @@ type UpdateNurseryInput = {
   logo?: string;
 };
 
-export default function NurseriesPage() {
+export default function NurseriesPage({ nursery }: { nursery?: Nursery }) {
   const { data, isLoading, isError, error, refetch } = useGetNurseries();
+
+  // If nursery prop is provided, use it; otherwise use data from query
+  const nurseries = nursery ? [nursery] : (data ?? []);
 
   if (isLoading) {
     return (
-      <div className="w-full max-w-5xl p-6">
-        <h1 className="text-2xl font-bold mb-4">Nurseries</h1>
-        <div className="animate-pulse space-y-3">
-          <div className="h-20 bg-gray-100 rounded" />
-          <div className="h-20 bg-gray-100 rounded" />
-          <div className="h-20 bg-gray-100 rounded" />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6">
+        <div className="w-full max-w-4xl mx-auto">
+          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-white/20">
+            <div className="animate-pulse space-y-6">
+              <div className="h-8 bg-gradient-to-r from-gray-200 to-gray-300 rounded-xl w-1/3" />
+              <div className="h-64 bg-gradient-to-r from-gray-200 to-gray-300 rounded-2xl" />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -35,108 +52,196 @@ export default function NurseriesPage() {
 
   if (isError) {
     return (
-      <div className="w-full max-w-5xl p-6">
-        <h1 className="text-2xl font-bold mb-4">Nurseries</h1>
-        <div className="bg-red-50 text-red-700 p-4 rounded">
-          {(error as Error)?.message || "Failed to load nurseries"}
+      <div className="min-h-screen bg-gradient-to-br from-red-50 via-pink-50 to-rose-50 p-6">
+        <div className="w-full max-w-4xl mx-auto">
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-red-100">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <X className="w-8 h-8 text-red-600" />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                Failed to load nursery
+              </h2>
+              <p className="text-red-600 mb-6">
+                {(error as Error)?.message || "Something went wrong"}
+              </p>
+              <button
+                onClick={() => refetch()}
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
         </div>
-        <button
-          onClick={() => refetch()}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          Retry
-        </button>
       </div>
     );
   }
 
-  const nurseries = data ?? [];
-
   return (
-    <div className="w-full max-w-5xl p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Nurseries</h1>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6">
+      <div className="w-full max-w-4xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            My Nursery
+          </h1>
+          <p className="text-gray-600">
+            Manage your nursery information and settings
+          </p>
+        </div>
 
-      {nurseries.length === 0 ? (
-        <div className="text-gray-600">No nurseries found.</div>
-      ) : (
-        <ul className="grid md:grid-cols-2 gap-4">
-          {nurseries.map((n: Nursery) => (
-            <NurseryListItem key={n.id} n={n} />
-          ))}
-        </ul>
-      )}
+        {nurseries.length === 0 ? (
+          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-12 shadow-lg border border-white/20 text-center">
+            <div className="w-24 h-24 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Building2 className="w-12 h-12 text-indigo-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              No nursery found
+            </h3>
+            <p className="text-gray-600">You haven't created a nursery yet.</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {nurseries.map((n: Nursery) => (
+              <NurseryCard key={n.id} nursery={n} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-function NurseryListItem({ n }: { n: Nursery }) {
+function NurseryCard({ nursery }: { nursery: Nursery }) {
   const [isEditing, setIsEditing] = useState(false);
+  const queryClient = useQueryClient(); // React Query client for invalidating queries
+
+  const handleEditClose = () => {
+    setIsEditing(false);
+    queryClient.invalidateQueries(["my-nursery"]); // Refetch the nursery data
+  };
 
   return (
-    <li className="border rounded-lg p-4 shadow-sm">
-      <div className="flex items-start gap-3">
-        {n.logo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={n.logo}
-            alt={n.title ?? "Nursery logo"}
-            className="w-14 h-14 rounded object-cover border"
-          />
-        ) : (
-          <div className="w-14 h-14 rounded bg-gray-100 border" />
-        )}
-        <div className="flex-1">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <h2 className="text-lg font-semibold">{n.title}</h2>
-              {n.address && (
-                <p className="text-sm text-gray-600">{n.address}</p>
+    <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.01]">
+      {/* Header with gradient background */}
+      <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-8 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative z-10">
+          <div className="flex items-start justify-between mb-6">
+            <div className="flex items-center gap-4">
+              {nursery.logo ? (
+                <div className="relative">
+                  <img
+                    src={nursery.logo}
+                    alt={nursery.title ?? "Nursery logo"}
+                    className="w-20 h-20 rounded-2xl object-cover border-4 border-white/30 shadow-lg"
+                  />
+                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
+                    <Star className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+              ) : (
+                <div className="w-20 h-20 rounded-2xl bg-white/20 border-4 border-white/30 flex items-center justify-center">
+                  <Building2 className="w-10 h-10 text-white/80" />
+                </div>
               )}
-              <div className="mt-2 text-xs text-gray-500">
-                <span>
-                  Created:{" "}
-                  {typeof n.createdAt === "string"
-                    ? n.createdAt
-                    : n.createdAt
-                      ? new Date(n.createdAt as any).toLocaleString()
-                      : "—"}
-                </span>
+              <div>
+                <h2 className="text-3xl font-bold mb-2">{nursery.title}</h2>
+                <div className="flex items-center gap-2 text-white/90">
+                  <Calendar className="w-4 h-4" />
+                  <span className="text-sm">
+                    Created{" "}
+                    {typeof nursery.createdAt === "string"
+                      ? new Date(nursery.createdAt).toLocaleDateString()
+                      : nursery.createdAt
+                        ? new Date(
+                            nursery.createdAt as any
+                          ).toLocaleDateString()
+                        : "—"}
+                  </span>
+                </div>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <button
                 onClick={() => setIsEditing(true)}
-                className="text-sm bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded"
+                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 border border-white/30"
               >
-                Update
+                <Edit3 className="w-4 h-4" />
+                Edit
               </button>
-              <Link
-                href={`/account/nurseries/${n.id}`}
-                className="text-blue-600 text-sm self-start"
-              >
-                View details →
-              </Link>
             </div>
           </div>
-
-          {n.description && (
-            <p className="mt-3 text-sm text-gray-700 line-clamp-3">
-              {n.description}
-            </p>
-          )}
         </div>
       </div>
 
+      {/* Content */}
+      <div className="p-8">
+        {nursery.description && (
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Users className="w-5 h-5 text-indigo-600" />
+              About
+            </h3>
+            <p className="text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-xl">
+              {nursery.description}
+            </p>
+          </div>
+        )}
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Location */}
+          {nursery.address && (
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-100">
+              <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-blue-600" />
+                Location
+              </h4>
+              <p className="text-gray-700">{nursery.address}</p>
+              {(nursery.latitude || nursery.longitude) && (
+                <p className="text-sm text-gray-500 mt-1">
+                  {nursery.latitude}, {nursery.longitude}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Contact */}
+          {nursery.phoneNumbers &&
+            nursery.phoneNumbers.length > 0 &&
+            nursery.phoneNumbers.some((phone) => phone) && (
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl border border-green-100">
+                <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-green-600" />
+                  Contact
+                </h4>
+                <div className="space-y-1">
+                  {nursery.phoneNumbers
+                    .filter((phone) => phone)
+                    .map((phone, idx) => (
+                      <a
+                        key={idx}
+                        href={`tel:${phone}`}
+                        className="block text-gray-700 hover:text-green-600 transition-colors"
+                      >
+                        {phone}
+                      </a>
+                    ))}
+                </div>
+              </div>
+            )}
+        </div>
+      </div>
+
+      {/* Edit Form */}
       {isEditing && (
         <EditNurseryForm
-          key={`edit-${n.id}`}
-          initial={n}
-          onClose={() => setIsEditing(false)}
+          key={`edit-${nursery.id}`}
+          initial={nursery}
+          onClose={handleEditClose} // Close and refetch data
         />
       )}
-    </li>
+    </div>
   );
 }
 
@@ -163,50 +268,27 @@ function EditNurseryForm({
 
   const { mutateAsync, isPending } = useUpdateNursery();
 
-  // ---------- helpers for patch/diff ----------
-  function toNullIfEmpty(v: string | null | undefined) {
-    const t = (v ?? "").trim();
-    return t === "" ? null : t;
-  }
-
-  function cleanPhones(arr: string[] | undefined) {
-    return (arr ?? []).map((s) => s.trim()).filter(Boolean);
-  }
-
-  function buildPatch(initialN: Nursery, current: UpdateNurseryInput) {
+  // Define the buildPatch function
+  const buildPatch = (initial: Nursery, current: UpdateNurseryInput) => {
     const patch: Record<string, unknown> = {};
 
-    const title = toNullIfEmpty(current.title) ?? undefined;
-    if (title !== (initialN.title ?? undefined)) patch.title = title;
-
-    const description = toNullIfEmpty(current.description);
-    if (description !== (initialN.description ?? null))
-      patch.description = description;
-
-    const address = toNullIfEmpty(current.address);
-    if (address !== (initialN.address ?? null)) patch.address = address;
-
-    const longitude = current.longitude ?? null;
-    if (longitude !== (initialN.longitude ?? null)) patch.longitude = longitude;
-
-    const latitude = current.latitude ?? null;
-    if (latitude !== (initialN.latitude ?? null)) patch.latitude = latitude;
-
-    const logo = toNullIfEmpty(current.logo);
-    if (logo !== (initialN.logo ?? null)) patch.logo = logo;
-
-    const phoneNumbers = cleanPhones(current.phoneNumbers);
+    if (current.title !== initial.title) patch.title = current.title;
+    if (current.description !== initial.description)
+      patch.description = current.description;
+    if (current.address !== initial.address) patch.address = current.address;
+    if (current.longitude !== initial.longitude)
+      patch.longitude = current.longitude;
+    if (current.latitude !== initial.latitude)
+      patch.latitude = current.latitude;
     if (
-      JSON.stringify(phoneNumbers) !==
-      JSON.stringify(initialN.phoneNumbers ?? [])
-    ) {
-      patch.phoneNumbers = phoneNumbers;
-    }
+      JSON.stringify(current.phoneNumbers) !==
+      JSON.stringify(initial.phoneNumbers)
+    )
+      patch.phoneNumbers = current.phoneNumbers;
+    if (current.logo !== initial.logo) patch.logo = current.logo;
 
-    // add photos/attachments here if you expose them in the form
     return patch;
-  }
-  // -------------------------------------------
+  };
 
   const onChange = (
     e: React.ChangeEvent<
@@ -215,7 +297,7 @@ function EditNurseryForm({
   ) => {
     const { name, value } = e.target;
     if (name === "longitude" || name === "latitude") {
-      setForm((f: any) => ({
+      setForm((f) => ({
         ...f,
         [name]: value === "" ? undefined : Number(value),
       }));
@@ -224,15 +306,11 @@ function EditNurseryForm({
         .split(",")
         .map((v) => v.trim())
         .filter(Boolean);
-      setForm((f: any) => ({ ...f, phoneNumbers: arr }));
+      setForm((f) => ({ ...f, phoneNumbers: arr }));
     } else if (name === "logo") {
-      setForm((f: any) => ({ ...f, logo: value || "" }));
-    } else if (
-      name === "description" ||
-      name === "address" ||
-      name === "title"
-    ) {
-      setForm((f: any) => ({ ...f, [name]: value }));
+      setForm((f) => ({ ...f, logo: value || "" }));
+    } else {
+      setForm((f) => ({ ...f, [name]: value }));
     }
   };
 
@@ -241,21 +319,13 @@ function EditNurseryForm({
     setLocalError(null);
 
     try {
-      const patch = buildPatch(initial, {
-        ...form,
-        title: form.title,
-        description: form.description,
-        address: form.address,
-        logo: form.logo,
-        phoneNumbers: form.phoneNumbers,
-      });
+      const patch = buildPatch(initial, form);
 
       if (Object.keys(patch).length === 0) {
         setLocalError("No changes to save");
         return;
       }
 
-      // KEY FIX: send { id, patch }
       await mutateAsync({ id: form.id, patch });
       onClose();
     } catch (err) {
@@ -264,116 +334,180 @@ function EditNurseryForm({
   };
 
   return (
-    <div className="mt-4 border-t pt-4">
-      <h3 className="text-base font-semibold mb-3">Edit nursery</h3>
-      {localError && (
-        <div className="mb-3 bg-red-50 text-red-700 p-2 rounded">
-          {localError}
-        </div>
-      )}
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-3"
-      >
-        <label className="flex flex-col gap-1">
-          <span className="text-sm text-gray-700">Title</span>
-          <input
-            name="title"
-            className="border rounded px-3 py-2"
-            value={form.title ?? ""}
-            onChange={onChange}
-            placeholder="e.g. Hilltop Nursery"
-            required
-          />
-        </label>
-
-        <label className="flex flex-col gap-1">
-          <span className="text-sm text-gray-700">Address</span>
-          <input
-            name="address"
-            className="border rounded px-3 py-2"
-            value={form.address ?? ""}
-            onChange={onChange}
-            placeholder="123 Main Rd, Kandy"
-          />
-        </label>
-
-        <label className="md:col-span-2 flex flex-col gap-1">
-          <span className="text-sm text-gray-700">Description</span>
-          <textarea
-            name="description"
-            className="border rounded px-3 py-2"
-            rows={3}
-            value={form.description ?? ""}
-            onChange={onChange}
-            placeholder="Short description..."
-          />
-        </label>
-
-        <label className="flex flex-col gap-1">
-          <span className="text-sm text-gray-700">Longitude</span>
-          <input
-            name="longitude"
-            type="number"
-            step="any"
-            className="border rounded px-3 py-2"
-            value={form.longitude ?? ""}
-            onChange={onChange}
-          />
-        </label>
-
-        <label className="flex flex-col gap-1">
-          <span className="text-sm text-gray-700">Latitude</span>
-          <input
-            name="latitude"
-            type="number"
-            step="any"
-            className="border rounded px-3 py-2"
-            value={form.latitude ?? ""}
-            onChange={onChange}
-          />
-        </label>
-
-        <label className="flex flex-col gap-1">
-          <span className="text-sm text-gray-700">Phone numbers</span>
-          <input
-            name="phoneNumbers"
-            className="border rounded px-3 py-2"
-            value={(form.phoneNumbers ?? []).join(", ")}
-            onChange={onChange}
-            placeholder="0771234567, 0712345678"
-          />
-        </label>
-
-        <label className="flex flex-col gap-1">
-          <span className="text-sm text-gray-700">Logo URL</span>
-          <input
-            name="logo"
-            className="border rounded px-3 py-2"
-            value={form.logo ?? ""}
-            onChange={onChange}
-            placeholder="https://..."
-          />
-        </label>
-
-        <div className="md:col-span-2 flex items-center justify-end gap-2 mt-2">
+    <div className="border-t border-gray-200 bg-gray-50/50 backdrop-blur-sm">
+      <div className="p-8">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+            <Edit3 className="w-5 h-5 text-indigo-600" />
+            Edit Nursery Details
+          </h3>
           <button
-            type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded border"
-            disabled={isPending}
+            className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
           >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-60"
-            disabled={isPending}
-          >
-            {isPending ? "Saving..." : "Save changes"}
+            <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
-      </form>
+
+        {localError && (
+          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center gap-2">
+            <X className="w-4 h-4" />
+            {localError}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Nursery Name *
+              </label>
+              <input
+                name="title"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                value={form.title ?? ""}
+                onChange={onChange}
+                placeholder="e.g. Sunshine Nursery"
+                required
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description
+              </label>
+              <textarea
+                name="description"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                rows={4}
+                value={form.description ?? ""}
+                onChange={onChange}
+                placeholder="Tell us about your nursery..."
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Address
+              </label>
+              <input
+                name="address"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                value={form.address ?? ""}
+                onChange={onChange}
+                placeholder="123 Main Street, City"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Longitude
+              </label>
+              <input
+                name="longitude"
+                type="number"
+                step="any"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                value={form.longitude ?? ""}
+                onChange={onChange}
+                placeholder="e.g. 80.7718"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Latitude
+              </label>
+              <input
+                name="latitude"
+                type="number"
+                step="any"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                value={form.latitude ?? ""}
+                onChange={onChange}
+                placeholder="e.g. 7.2906"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Phone Numbers
+              </label>
+              <input
+                name="phoneNumbers"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                value={(form.phoneNumbers ?? []).join(", ")}
+                onChange={onChange}
+                placeholder="0771234567, 0712345678"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Logo URL
+              </label>
+              <div className="flex items-center gap-4">
+                {/* Image Preview */}
+                {form.logo && (
+                  <img
+                    src={form.logo}
+                    alt="Logo Preview"
+                    className="w-16 h-16 rounded-lg object-cover border border-gray-300"
+                  />
+                )}
+
+                {/* File Picker */}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        setForm((f) => ({
+                          ...f,
+                          logo: reader.result as string,
+                        }));
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-4 pt-6 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+              disabled={isPending}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium transition-all duration-200 transform hover:scale-105 disabled:opacity-60 disabled:hover:scale-100 flex items-center gap-2"
+              disabled={isPending}
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  Save Changes
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

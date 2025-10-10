@@ -48,20 +48,65 @@ export function Navbar() {
           </Link>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2">
-          <Button
-            asChild
-            variant={isHomePage ? "ghost" : "outline"}
+        {/* Center Navigation Links */}
+        <div className="hidden md:flex items-center gap-6">
+          <Link
+            href="/about"
             className={cn(
-              "transition-all",
+              "font-medium text-sm hover:underline transition-colors opacity-70 hover:opacity-100",
               isHomePage
-                ? "border border-secondary/20"
-                : "text-[#003580] border-[#003580]/20 hover:bg-[#003580]/5"
+                ? "text-white/90 hover:text-white"
+                : "text-gray-700 hover:text-[#003580]",
+              pathname === "/about" &&
+                "text-[#003580] font-semibold opacity-100"
             )}
           >
-            <Link href="/account">+ Post Jobs</Link>
-          </Button>
+            About
+          </Link>
+          <Link
+            href="/privacy"
+            className={cn(
+              "font-medium text-sm hover:underline transition-colors opacity-70 hover:opacity-100",
+              isHomePage
+                ? "text-white/90 hover:text-white"
+                : "text-gray-700 hover:text-[#003580]",
+              pathname === "/privacy" &&
+                "text-[#003580] font-semibold opacity-100"
+            )}
+          >
+            Privacy Policy
+          </Link>
+          <Link
+            href="/contact"
+            className={cn(
+              "font-medium text-sm hover:underline transition-colors opacity-70 hover:opacity-100",
+              isHomePage
+                ? "text-white/90 hover:text-white"
+                : "text-gray-700 hover:text-[#003580]",
+              pathname === "/contact" &&
+                "text-[#003580] font-semibold opacity-100"
+            )}
+          >
+            Contact
+          </Link>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2">
+          {/* Mobile Menu Button - Optional for mobile navigation */}
+          <div className="md:hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "text-xs",
+                isHomePage ? "text-white" : "text-gray-700"
+              )}
+            >
+              Menu
+            </Button>
+          </div>
+
           <Button
             asChild
             variant={"secondary"}
@@ -70,18 +115,6 @@ export function Navbar() {
             )}
           >
             <Link href="/account">My Account</Link>
-          </Button>
-          <Button
-            asChild
-            variant={isHomePage ? "ghost" : "outline"}
-            className={cn(
-              "transition-all",
-              isHomePage
-                ? "border border-secondary/20"
-                : "text-[#003580] border-[#003580]/20 hover:bg-[#003580]/5"
-            )}
-          >
-            <Link href="/profile">My Profile</Link>
           </Button>
         </div>
       </div>

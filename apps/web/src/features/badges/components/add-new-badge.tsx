@@ -23,17 +23,22 @@ import { Label } from "@repo/ui/components/label";
 import { createBadge } from "../actions/create-badge.action";
 
 interface AddNewBadgeProps {
-  editingBadge?: any
-  onEditComplete?: () => void
+  editingBadge?: any;
+  onEditComplete?: () => void;
 }
 
-export function AddNewBadge({ editingBadge, onEditComplete }: AddNewBadgeProps) {
-  const [open, setOpen] = useState(!!editingBadge)
-  const [loading, setLoading] = useState(false)
-  const toastId = useId()
+export function AddNewBadge({
+  editingBadge,
+  onEditComplete,
+}: AddNewBadgeProps) {
+  const [open, setOpen] = useState(!!editingBadge);
+  const [loading, setLoading] = useState(false);
+  const toastId = useId();
 
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string>(editingBadge?.iconUrl || "")
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>(
+    editingBadge?.iconUrl || ""
+  );
 
   const [formData, setFormData] = useState({
     title: editingBadge?.title || "",
@@ -42,11 +47,11 @@ export function AddNewBadge({ editingBadge, onEditComplete }: AddNewBadgeProps) 
     points: editingBadge?.points || 0,
     level: editingBadge?.level || "",
     iconUrl: editingBadge?.iconUrl || "",
-  })
+  });
 
   useEffect(() => {
     if (editingBadge) {
-      setOpen(true)
+      setOpen(true);
       setFormData({
         title: editingBadge.title || "",
         description: editingBadge.description || "",
@@ -54,73 +59,63 @@ export function AddNewBadge({ editingBadge, onEditComplete }: AddNewBadgeProps) 
         points: editingBadge.points || 0,
         level: editingBadge.level || "",
         iconUrl: editingBadge.iconUrl || "",
-      })
-      setImagePreview(editingBadge.iconUrl || "")
+      });
+      setImagePreview(editingBadge.iconUrl || "");
     }
-  }, [editingBadge])
+  }, [editingBadge]);
 
   const handleOpenChange = (newOpen: boolean) => {
-    setOpen(newOpen)
+    setOpen(newOpen);
     if (!newOpen && editingBadge) {
-      onEditComplete?.()
+      onEditComplete?.();
     }
-  }
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setImageFile(file)
-      const reader = new FileReader()
+      setImageFile(file);
+      const reader = new FileReader();
       reader.onload = (e) => {
-        const result = e.target?.result as string
-        setImagePreview(result)
-        handleInputChange("iconUrl", result)
-      }
-      reader.readAsDataURL(file)
+        const result = e.target?.result as string;
+        setImagePreview(result);
+        handleInputChange("iconUrl", result);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const removeImage = () => {
-    setImageFile(null)
-    setImagePreview("")
-    handleInputChange("iconUrl", "")
-  }
+    setImageFile(null);
+    setImagePreview("");
+    handleInputChange("iconUrl", "");
+  };
 
   const handleInputChange = (field: string, value: string | number) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
-      e.preventDefault()
-      e.stopPropagation()
+      e.preventDefault();
+      e.stopPropagation();
 
-      setLoading(true)
+      setLoading(true);
       try {
-        toast.loading(editingBadge ? "Updating badge..." : "Creating new badge...", { id: toastId })
+        toast.loading(
+          editingBadge ? "Updating badge..." : "Creating new badge...",
+          { id: toastId }
+        );
 
-        await createBadge(formData)
+        // Use the createBadge action to save the badge to the database
+        await createBadge(formData);
 
-        const existingBadges = JSON.parse(localStorage.getItem("badges") || "[]")
-
-        if (editingBadge) {
-          const updatedBadges = existingBadges.map((badge: any) =>
-            badge.id === editingBadge.id
-              ? { ...formData, id: editingBadge.id, createdAt: editingBadge.createdAt }
-              : badge,
-          )
-          localStorage.setItem("badges", JSON.stringify(updatedBadges))
-          toast.success("Badge updated successfully!", { id: toastId })
-          onEditComplete?.()
-        } else {
-          const newBadge = {
-            ...formData,
-            id: Date.now().toString(),
-            createdAt: new Date().toISOString(),
-          }
-          localStorage.setItem("badges", JSON.stringify([...existingBadges, newBadge]))
-          toast.success("Badge created successfully!", { id: toastId })
-        }
+        toast.success(
+          editingBadge
+            ? "Badge updated successfully!"
+            : "Badge created successfully!",
+          { id: toastId }
+        );
 
         if (!editingBadge) {
           setFormData({
@@ -130,23 +125,24 @@ export function AddNewBadge({ editingBadge, onEditComplete }: AddNewBadgeProps) 
             points: 0,
             level: "",
             iconUrl: "",
-          })
-          setImageFile(null)
-          setImagePreview("")
+          });
+          setImageFile(null);
+          setImagePreview("");
         }
 
-        window.dispatchEvent(new CustomEvent("badgeCreated"))
+        window.dispatchEvent(new CustomEvent("badgeCreated"));
+        window.location.reload(); // Reload the page after badge creation
       } catch (error) {
-        const err = error as Error
-        console.error("Failed to create badge:", error)
-        toast.error(`Failed: ${err.message}`, { id: toastId })
+        const err = error as Error;
+        console.error("Failed to create badge:", error);
+        toast.error(`Failed: ${err.message}`, { id: toastId });
       } finally {
-        setLoading(false)
-        setOpen(false)
+        setLoading(false);
+        setOpen(false);
       }
     },
-    [formData, toastId, editingBadge, onEditComplete],
-  )
+    [formData, toastId, editingBadge, onEditComplete]
+  );
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -159,11 +155,15 @@ export function AddNewBadge({ editingBadge, onEditComplete }: AddNewBadgeProps) 
         </DialogTrigger>
       )}
 
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <form className="space-y-6" onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{editingBadge ? "Edit Badge" : "Create new Badge"}</DialogTitle>
-            <DialogDescription>Fill in the details to create a badge for a child/student.</DialogDescription>
+            <DialogTitle>
+              {editingBadge ? "Edit Badge" : "Create new Badge"}
+            </DialogTitle>
+            <DialogDescription>
+              Fill in the details to create a badge for a child/student.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4">
@@ -226,7 +226,9 @@ export function AddNewBadge({ editingBadge, onEditComplete }: AddNewBadgeProps) 
                 id="description"
                 placeholder="Awarded for excellent teamwork"
                 value={formData.description}
-                onChange={(e) => handleInputChange("description", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("description", e.target.value)
+                }
                 required
               />
             </div>
@@ -251,7 +253,9 @@ export function AddNewBadge({ editingBadge, onEditComplete }: AddNewBadgeProps) 
                 type="number"
                 placeholder="100"
                 value={formData.points}
-                onChange={(e) => handleInputChange("points", Number(e.target.value))}
+                onChange={(e) =>
+                  handleInputChange("points", Number(e.target.value))
+                }
                 required
               />
             </div>
@@ -269,15 +273,17 @@ export function AddNewBadge({ editingBadge, onEditComplete }: AddNewBadgeProps) 
             </div>
 
             {/* Icon URL */}
-            <div className="space-y-2">
-              <Label htmlFor="iconUrl">Icon URL (Optional if image uploaded)</Label>
+            {/* <div className="space-y-2">
+              <Label htmlFor="iconUrl">
+                Icon URL (Optional if image uploaded)
+              </Label>
               <Input
                 id="iconUrl"
                 placeholder="https://example.com/icon.png"
                 value={formData.iconUrl}
                 onChange={(e) => handleInputChange("iconUrl", e.target.value)}
               />
-            </div>
+            </div> */}
           </div>
 
           <DialogFooter>
@@ -286,11 +292,17 @@ export function AddNewBadge({ editingBadge, onEditComplete }: AddNewBadgeProps) 
             </DialogClose>
 
             <Button type="submit" disabled={loading}>
-              {loading ? (editingBadge ? "Updating..." : "Creating...") : editingBadge ? "Update" : "Create"}
+              {loading
+                ? editingBadge
+                  ? "Updating..."
+                  : "Creating..."
+                : editingBadge
+                  ? "Update"
+                  : "Create"}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -115,53 +115,21 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
 // 🔎 Get one class
 export const getOne: AppRouteHandler<GetByIdRoute> = async (c) => {
   const { id } = c.req.valid("param");
-  const session = c.get("session") as Session | undefined;
 
-  if (!session?.userId) {
-    return c.json(
-      { message: HttpStatusPhrases.UNAUTHORIZED },
-      HttpStatusCodes.UNAUTHORIZED
-    );
-  }
+  // Fetch the class by ID
+  const classItem = await db.query.classes.findFirst({
+    where: eq(classes.id, String(id)),
+  });
 
-  const where = session.activeOrganizationId
-    ? and(
-        eq(classes.id, String(id)),
-        eq(nurseries.id, classes.nurseryId),
-        eq(nurseries.createdBy, session.userId),
-        eq(nurseries.organizationId, session.activeOrganizationId)
-      )
-    : and(
-        eq(classes.id, String(id)),
-        eq(nurseries.id, classes.nurseryId),
-        eq(nurseries.createdBy, session.userId)
-      );
-
-  const row = await db
-    .select({
-      id: classes.id,
-      nurseryId: classes.nurseryId,
-      name: classes.name,
-      mainTeacherId: classes.mainTeacherId,
-      teacherIds: classes.teacherIds,
-      childIds: classes.childIds,
-      createdAt: classes.createdAt,
-      updatedAt: classes.updatedAt,
-    })
-    .from(classes)
-    .innerJoin(nurseries, eq(nurseries.id, classes.nurseryId))
-    .where(where)
-    .limit(1);
-
-  const item = row[0];
-  if (!item) {
+  // If the class is not found, return a 404 response
+  if (!classItem) {
     return c.json(
       { message: HttpStatusPhrases.NOT_FOUND },
       HttpStatusCodes.NOT_FOUND
     );
   }
 
-  return c.json(item, HttpStatusCodes.OK);
+  return c.json(classItem, HttpStatusCodes.OK);
 };
 
 // ✏️ Update class

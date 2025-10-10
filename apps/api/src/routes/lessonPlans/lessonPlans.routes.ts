@@ -60,6 +60,34 @@ export const getById = createRoute({
   },
 });
 
+// Get lesson plans by class ID route definition
+export const getByClassId = createRoute({
+  tags,
+  summary: "Get lesson plans by class ID",
+  method: "get",
+  path: "/class/:classId",
+  request: {
+    params: z.object({
+      classId: z.string(),
+    }),
+    query: queryParamsSchema,
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      getPaginatedSchema(z.array(lessonPlan)),
+      "The list of lesson plans for the class"
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthorized access"
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      errorMessageSchema,
+      "No lesson plans found for this class"
+    ),
+  },
+});
+
 // Create LessonPlan route definition
 export const create = createRoute({
   tags,
@@ -139,6 +167,7 @@ export const remove = createRoute({
 // Export types
 export type ListRoute = typeof list;
 export type GetByIdRoute = typeof getById;
+export type GetByClassIdRoute = typeof getByClassId;
 export type CreateRoute = typeof create;
 export type UpdateRoute = typeof update;
 export type RemoveRoute = typeof remove;
