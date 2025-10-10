@@ -4,7 +4,7 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import { db } from "@api/db";
 import type { AppRouteHandler } from "@api/types";
-import { children } from "@repo/database";
+import { childrens } from "@repo/database";
 
 import type {
   CreateRoute,
@@ -15,7 +15,22 @@ import type {
 } from "./children.routes";
 // 🔍 List all children
 export const list: AppRouteHandler<ListRoute> = async (c) => {
-  const results = await db.query.children.findMany({});
+  const session = c.get("session");
+
+  if (!session?.activeOrganizationId) {
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
+
+  const organizationId = session.activeOrganizationId;
+
+  // Fetch children filtered by the current organization ID
+  const results = await db.query.childrens.findMany({
+    where: eq(childrens.organizationId, organizationId),
+  });
+
   const page = 1; // or from query params
   const limit = results.length; // or from query params
   const totalCount = results.length;
@@ -48,7 +63,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   }
 
   const [inserted] = await db
-    .insert(children)
+    .insert(childrens)
     .values({
       ...body,
       organizationId: session.activeOrganizationId,
@@ -63,8 +78,8 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
 export const getOne: AppRouteHandler<GetByIdRoute> = async (c) => {
   const { id } = c.req.valid("param");
 
-  const child = await db.query.children.findFirst({
-    where: eq(children.id, String(id)),
+  const child = await db.query.childrens.findFirst({
+    where: eq(childrens.id, String(id)),
   });
 
   if (!child) {
@@ -91,12 +106,12 @@ export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
   }
 
   const [updated] = await db
-    .update(children)
+    .update(childrens)
     .set({
       ...updates,
       updatedAt: new Date(),
     })
-    .where(eq(children.id, String(id)))
+    .where(eq(childrens.id, String(id)))
     .returning();
 
   if (!updated) {
@@ -122,8 +137,8 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   }
 
   const [deleted] = await db
-    .delete(children)
-    .where(eq(children.id, String(id)))
+    .delete(childrens)
+    .where(eq(childrens.id, String(id)))
     .returning();
 
   if (!deleted) {

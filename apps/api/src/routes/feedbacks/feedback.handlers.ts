@@ -8,6 +8,7 @@ import { feedbacks } from "@repo/database";
 
 import type {
   CreateRoute,
+  GetByChildIdRoute,
   GetByIdRoute,
   ListRoute,
   RemoveRoute,
@@ -78,6 +79,42 @@ export const getOne: AppRouteHandler<GetByIdRoute> = async (c) => {
   return c.json(feedback, HttpStatusCodes.OK);
 };
 
+// 🧒 Get feedbacks by child ID
+export const getByChildId: AppRouteHandler<GetByChildIdRoute> = async (c) => {
+  const { childId } = c.req.valid("param");
+  const session = c.get("session");
+
+  if (!session) {
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
+
+  const results = await db.query.feedbacks.findMany({
+    where: eq(feedbacks.childId, String(childId)),
+    orderBy: (feedbacks, { desc }) => [desc(feedbacks.createdAt)],
+  });
+
+  const page = 1; // or from query params
+  const limit = results.length; // or from query params
+  const totalCount = results.length;
+  const totalPages = Math.ceil(totalCount / limit);
+
+  return c.json(
+    {
+      data: results,
+      meta: {
+        totalCount,
+        limit,
+        currentPage: page,
+        totalPages,
+      },
+    },
+    HttpStatusCodes.OK
+  );
+};
+
 // Update feedback
 export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
   const { id } = c.req.valid("param");
@@ -134,7 +171,10 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
     );
   }
 
-  return c.body(null, HttpStatusCodes.NO_CONTENT);
+  return c.json(
+    { message: "Feedback deleted successfully" },
+    HttpStatusCodes.OK
+  );
 };
 
 // import { eq } from "drizzle-orm";

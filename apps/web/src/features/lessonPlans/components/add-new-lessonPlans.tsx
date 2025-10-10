@@ -14,14 +14,34 @@ import {
   DialogTrigger,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/components/select";
 import { useAppForm } from "@repo/ui/components/tanstack-form";
 
+import { getClient } from "@/lib/rpc/client";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { addLessonPlan } from "../actions/add-lessonPlans.action"; // ⬅️ renamed action
 import { addLessonPlanSchema } from "../schemas"; // ⬅️ renamed schema (see notes below)
 export function AddNewLessonPlan() {
   const [open, setOpen] = useState<boolean>(false);
   const toastId = useId();
+
+  // Fetch classes for dropdown
+  const { data: classesData, isLoading: isClassesLoading } = useQuery({
+    queryKey: ["classes"],
+    queryFn: async () => {
+      const rpcClient = await getClient();
+      const response = await rpcClient.api.classes.$get();
+      if (!response.ok) throw new Error("Failed to fetch classes");
+      return await response.json();
+    },
+  });
 
   const form = useAppForm({
     // Validates on change with the lesson plan schema
@@ -127,17 +147,33 @@ export function AddNewLessonPlan() {
                 name="classId"
                 children={(field) => (
                   <field.FormItem>
-                    <field.FormLabel>Class ID</field.FormLabel>
+                    <field.FormLabel>Class</field.FormLabel>
                     <field.FormControl>
-                      <Input
-                        placeholder="class UUID"
+                      <Select
                         value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        onBlur={field.handleBlur}
-                      />
+                        onValueChange={(value) => field.handleChange(value)}
+                        disabled={isClassesLoading}
+                      >
+                        <SelectTrigger>
+                          <SelectValue
+                            placeholder={
+                              isClassesLoading
+                                ? "Loading classes..."
+                                : "Select a class"
+                            }
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {classesData?.data?.map((classItem: any) => (
+                            <SelectItem key={classItem.id} value={classItem.id}>
+                              {classItem.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </field.FormControl>
                     <field.FormDescription>
-                      Must reference an existing class record.
+                      Select the class for this lesson plan.
                     </field.FormDescription>
                     <field.FormMessage />
                   </field.FormItem>

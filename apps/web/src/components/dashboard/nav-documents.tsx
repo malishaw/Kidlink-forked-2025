@@ -1,6 +1,7 @@
 "use client";
 
-import { type Icon } from "@tabler/icons-react";
+import { type LucideIcon } from "lucide-react";
+import Link from "next/link";
 
 import {
   SidebarGroup,
@@ -8,9 +9,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@repo/ui/components/sidebar";
-import Link from "next/link";
+import { cn } from "@repo/ui/lib/utils";
 
 export function NavDocuments({
   items,
@@ -18,61 +18,43 @@ export function NavDocuments({
   items: {
     name: string;
     url: string;
-    icon: Icon;
+    icon: LucideIcon;
+    isActive?: boolean;
   }[];
 }) {
-  const { isMobile } = useSidebar();
-
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Nursery Management</SidebarGroupLabel>
+    <SidebarGroup>
+      <SidebarGroupLabel>Management</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton
+              asChild
+              className={cn(
+                "transition-colors duration-200",
+                item.isActive &&
+                  "bg-purple-800 text-white hover:bg-purple-700 [&>svg]:text-white"
+              )}
+            >
               <Link href={item.url}>
-                <item.icon />
-                <span>{item.name}</span>
+                <item.icon
+                  className={cn(
+                    "transition-colors duration-200",
+                    item.isActive ? "text-white" : "text-muted-foreground"
+                  )}
+                />
+                <span
+                  className={cn(
+                    "transition-colors duration-200",
+                    item.isActive ? "text-white font-medium" : ""
+                  )}
+                >
+                  {item.name}
+                </span>
               </Link>
             </SidebarMenuButton>
-            {/* <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuAction
-                  showOnHover
-                  className="data-[state=open]:bg-accent rounded-sm"
-                >
-                  <IconDots />
-                  <span className="sr-only">More</span>
-                </SidebarMenuAction>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-24 rounded-lg"
-                side={isMobile ? "bottom" : "right"}
-                align={isMobile ? "end" : "start"}
-              >
-                <DropdownMenuItem>
-                  <IconFolder />
-                  <span>Open</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <IconShare3 />
-                  <span>Share</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive">
-                  <IconTrash />
-                  <span>Delete</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu> */}
           </SidebarMenuItem>
         ))}
-        {/* <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <IconDots className="text-sidebar-foreground/70" />
-            <span>More</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem> */}
       </SidebarMenu>
     </SidebarGroup>
   );

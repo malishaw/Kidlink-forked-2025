@@ -8,6 +8,7 @@ export const lessonPlan = createSelectSchema(lessonPlans);
 export const lessonPlanInsertSchema = createInsertSchema(lessonPlans).omit({
   id: true,
   childId: true,
+  organizationId: true,
   teacherId: true,
   updatedAt: true,
   createdAt: true,

@@ -4,6 +4,7 @@ import * as handlers from "./lessonPlans.handler";
 import * as routes from "./lessonPlans.routes";
 
 const router = createRouter()
+  .openapi(routes.getByClassId, handlers.getByClassId)
   .openapi(routes.list, handlers.list)
   .openapi(routes.create, handlers.create)
   .openapi(routes.getById, handlers.getOne)

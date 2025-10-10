@@ -202,14 +202,90 @@ export function ParentsList() {
                 onChange={handleFormChange}
                 className="w-full border border-gray-200 rounded-xl px-4 py-2"
               />
-              <input
-                type="text"
-                name="avatar"
-                placeholder="Avatar URL"
-                value={formData.avatar}
-                onChange={handleFormChange}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2"
-              />
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Profile Picture
+                </label>
+                <div className="flex items-center gap-4">
+                  <div className="relative h-24 w-24 rounded-xl overflow-hidden border-2 border-gray-200">
+                    {formData.avatar ? (
+                      <img
+                        src={formData.avatar}
+                        alt="Avatar preview"
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = "/placeholder.svg";
+                        }}
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-gray-50 flex items-center justify-center">
+                        <Users className="h-8 w-8 text-gray-400" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          try {
+                            // Create a temporary URL for preview
+                            const previewUrl = URL.createObjectURL(file);
+                            setFormData({
+                              ...formData,
+                              avatar: previewUrl,
+                            });
+
+                            // Here you would typically upload the file to your server
+                            // and get back a permanent URL
+                            // const uploadedUrl = await uploadImage(file);
+                            // setFormData({ ...formData, avatar: uploadedUrl });
+                          } catch (error) {
+                            console.error("Error uploading image:", error);
+                            alert("Failed to upload image");
+                          }
+                        }
+                      }}
+                      className="hidden"
+                      id="avatar-upload"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() =>
+                        document.getElementById("avatar-upload")?.click()
+                      }
+                      className="w-full"
+                    >
+                      Upload Image
+                    </Button>
+                    {/* <div className="relative">
+                      <input
+                        type="text"
+                        name="avatar"
+                        placeholder="or paste image URL"
+                        value={formData.avatar}
+                        onChange={handleFormChange}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm"
+                      />
+                      {formData.avatar && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-6 p-1 text-gray-400 hover:text-gray-600"
+                          onClick={() =>
+                            setFormData({ ...formData, avatar: "" })
+                          }
+                        >
+                          ✕
+                        </Button>
+                      )}
+                    </div> */}
+                  </div>
+                </div>
+              </div>
               <div className="flex justify-end gap-4 mt-4">
                 <Button
                   type="button"

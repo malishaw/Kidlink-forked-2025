@@ -115,9 +115,10 @@ export const remove = createRoute({
     params: z.object({ id: z.string() }),
   },
   responses: {
-    204: {
-      description: "No Content",
-    },
+    200: jsonContent(
+      z.object({ message: z.string() }),
+      "Badge deleted successfully"
+    ),
     401: jsonContent(errorMessageSchema, "Unauthorized"),
     404: jsonContent(errorMessageSchema, "Not Found"),
   },
