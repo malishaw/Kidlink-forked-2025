@@ -130,9 +130,37 @@ export const remove = createRoute({
   },
 });
 
+// Get children by parent ID route definition
+export const getByParentId = createRoute({
+  tags,
+  summary: "Get children by parent ID",
+  method: "get",
+  path: "/parent/:parentId",
+  request: {
+    params: z.object({
+      parentId: z.string(),
+    }),
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      getPaginatedSchema(z.array(children)),
+      "The list of children for the given parent ID"
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthorized access"
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      errorMessageSchema,
+      "No children found for the given parent ID"
+    ),
+  },
+});
+
 // Export types
 export type ListRoute = typeof list;
 export type GetByIdRoute = typeof getById;
 export type CreateRoute = typeof create;
 export type UpdateRoute = typeof update;
 export type RemoveRoute = typeof remove;
+export type GetByParentIdRoute = typeof getByParentId;

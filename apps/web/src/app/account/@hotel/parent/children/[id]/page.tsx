@@ -118,25 +118,7 @@ export default function Page() {
     setAssignParentError("");
     setAssignParentSuccess(false);
     try {
-      // Find the selected parent by id
-      const selectedParent = parents.find(
-        (parent: any) => parent.id === selectedParentId
-      );
-
-      if (!selectedParent) {
-        throw new Error("Selected parent not found");
-      }
-
-      // Check if the parent has a userId
-      if (!selectedParent.userId) {
-        throw new Error("Selected parent does not have a userId");
-      }
-
-      // Store the parent's userId in the child's parentId field
-      await updateChildren(id, {
-        ...children,
-        parentId: selectedParent.userId,
-      });
+      await updateChildren(id, { ...children, parentId: selectedParentId });
       setAssignParentSuccess(true);
     } catch (err: any) {
       setAssignParentError(err.message || "Failed to assign parent");

@@ -1,7 +1,7 @@
 "use client";
 
-import { IconBuildings, IconDashboard } from "@tabler/icons-react";
-import { usePathname } from "next/navigation";
+import { IconBuildings } from "@tabler/icons-react";
+import { usePathname, useRouter } from "next/navigation";
 import * as React from "react";
 
 import { NavDocuments } from "@/components/dashboard/nav-documents";
@@ -23,7 +23,8 @@ import { Skeleton } from "@repo/ui/components/skeleton";
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const activeOrg = authClient.useActiveOrganization();
   const { data: session } = authClient.useSession();
-  const pathname = usePathname(); // Get current pathname to determine active document
+  const pathname = usePathname();
+  const router = useRouter();
 
   // State for organization member data
   const [activeMember, setActiveMember] = React.useState<{
@@ -63,136 +64,107 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       email: session?.user?.email || "user@example.com",
       avatar: "/avatars/shadcn.jpg",
     },
-    navMain: [
-      {
-        title: "Dashboard",
-        url: "/dashboard/housing",
-        icon: IconDashboard,
-        isActive: pathname === "/dashboard/housing",
-      },
-    ],
     documents: [
       {
         name: "Manage Nursery",
         url: "/account/manage/nursery",
         icon: IconBuildings,
-        isActive: pathname === "/account/manage/nursery",
       },
-      {
-        name: "Classes",
-        url: "/account/manage/classes",
-        icon: IconBuildings,
-        isActive: pathname === "/account/manage/classes",
-      },
+      { name: "Classes", url: "/account/manage/classes", icon: IconBuildings },
       {
         name: "Teachers",
         url: "/account/manage/teachers",
         icon: IconBuildings,
-        isActive: pathname === "/account/manage/teachers",
       },
-      {
-        name: "Parents",
-        url: "/account/manage/parents",
-        icon: IconBuildings,
-        isActive: pathname === "/account/manage/parents",
-      },
+      { name: "Parents", url: "/account/manage/parents", icon: IconBuildings },
       {
         name: "Notifications",
         url: "/account/manage/notification",
         icon: IconBuildings,
-        isActive: pathname === "/account/manage/notification",
       },
       {
         name: "Children",
         url: "/account/manage/children",
         icon: IconBuildings,
-        isActive: pathname === "/account/manage/children",
       },
       {
         name: "Feedback",
         url: "/account/manage/feedback",
         icon: IconBuildings,
-        isActive: pathname === "/account/manage/feedback",
       },
-      {
-        name: "Badges",
-        url: "/account/manage/badges",
-        icon: IconBuildings,
-        isActive: pathname === "/account/manage/badges",
-      },
+      { name: "Badges", url: "/account/manage/badges", icon: IconBuildings },
       {
         name: "User Management",
         url: "/account/manage/user-management",
         icon: IconBuildings,
-        isActive: pathname === "/account/manage/user-management",
       },
       {
         name: "Lesson Plans",
         url: "/account/manage/lessonplans",
         icon: IconBuildings,
-        isActive: pathname === "/account/manage/lessonplans",
       },
-      {
-        name: "Events",
-        url: "/account/manage/events",
-        icon: IconBuildings,
-        isActive: pathname === "/account/manage/events",
-      },
-      {
-        name: "Chat",
-        url: "/account/manage/chat",
-        icon: IconBuildings,
-        isActive: pathname === "/account/manage/chat",
-      },
-      {
-        name: "Gallery",
-        url: "/account/manage/gallery",
-        icon: IconBuildings,
-        isActive: pathname === "/account/manage/gallery",
-      },
-      {
-        name: "Payments",
-        url: "/account/manage/payment",
-        icon: IconBuildings,
-        isActive: pathname === "/account/manage/payment",
-      },
+      { name: "Events", url: "/account/manage/events", icon: IconBuildings },
+      { name: "Chat", url: "/account/manage/chat", icon: IconBuildings },
+      { name: "Gallery", url: "/account/manage/gallery", icon: IconBuildings },
+      { name: "Payments", url: "/account/manage/payment", icon: IconBuildings },
     ],
   };
 
+  // --- Parent specific docs (under /account/parent) ---
+  const parentDocuments = [
+    // { name: "Classes", url: "/account/parent/classes", icon: IconBuildings },
+    { name: "Children", url: "/account/parent/children", icon: IconBuildings },
+    { name: "Events", url: "/account/parent/events", icon: IconBuildings },
+    { name: "Parents", url: "/account/parent/parents", icon: IconBuildings },
+    {
+      name: "Lesson Plans",
+      url: "/account/parent/lessonplans",
+      icon: IconBuildings,
+    },
+  ];
+
   // Filter documents based on organization role
   const filteredDocuments = React.useMemo(() => {
-    if (isLoadingMember || !activeMember) {
-      return []; // Show no documents while loading or if no member data
-    }
-
+    if (isLoadingMember || !activeMember) return [];
     const role = activeMember.role.toLowerCase();
 
+    let docs = [];
     if (role === "owner") {
-      return data.documents; // Show all documents
+      docs = data.documents;
     } else if (role === "teacher") {
-      return data.documents.filter((doc) =>
+      docs = data.documents.filter((d) =>
         [
           "/account/manage/classes",
           "/account/manage/children",
-          "/account/manage/feedback",
           "/account/manage/badges",
           "/account/manage/lessonplans",
           "/account/manage/events",
-        ].includes(doc.url)
+        ].includes(d.url)
       );
     } else if (role === "parent") {
-      return data.documents.filter((doc) =>
-        [
-          "/account/manage/classes",
-          "/account/manage/children",
-          "/account/manage/events",
-          "/account/manage/payment",
-        ].includes(doc.url)
-      );
+      docs = parentDocuments;
     }
 
-    return []; // Default to no documents if role is unrecognized
-  }, [activeMember, isLoadingMember, data.documents]);
+    return docs.map((d) => ({ ...d, isActive: pathname === d.url }));
+  }, [activeMember, isLoadingMember, pathname, data.documents]);
+
+  // --- Redirect parent role to /account/parent namespace ---
+  React.useEffect(() => {
+    if (!activeMember) return;
+    const role = activeMember.role.toLowerCase();
+    if (role === "parent") {
+      // If still on /account/manage/* move to parallel /account/parent/*
+      if (pathname.startsWith("/account/manage/")) {
+        const target = pathname.replace("/account/manage/", "/account/parent/");
+        router.replace(target);
+        return;
+      }
+      // If on /account root redirect to a default parent page
+      if (pathname === "/account" || pathname === "/account/") {
+        router.replace("/account/parent/classes");
+      }
+    }
+  }, [activeMember, pathname, router]);
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -224,7 +196,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        {/* <NavMain items={data.navMain} /> */}
         <NavDocuments items={filteredDocuments} />
         <NavSecondary items={[]} className="mt-auto" />
       </SidebarContent>
