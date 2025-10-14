@@ -71,12 +71,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconBuildings,
       },
       { name: "Classes", url: "/account/manage/classes", icon: IconBuildings },
-      {
-        name: "Teachers",
-        url: "/account/manage/teachers",
-        icon: IconBuildings,
-      },
-      { name: "Parents", url: "/account/manage/parents", icon: IconBuildings },
+      // {
+      //   name: "Teachers",
+      //   url: "/account/manage/teachers",
+      //   icon: IconBuildings,
+      // },
+      // { name: "Parents", url: "/account/manage/parents", icon: IconBuildings },
       {
         name: "Notifications",
         url: "/account/manage/notification",
@@ -136,6 +136,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         [
           "/account/manage/classes",
           "/account/manage/children",
+          "/account/manage/teachers",
           "/account/manage/badges",
           "/account/manage/lessonplans",
           "/account/manage/events",

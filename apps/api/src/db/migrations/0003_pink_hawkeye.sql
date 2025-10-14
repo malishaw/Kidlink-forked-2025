@@ -1,0 +1,1 @@
+ALTER TABLE "teacher" ADD COLUMN "user_id" text;
