@@ -136,6 +136,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         [
           "/account/manage/classes",
           "/account/manage/children",
+          "/account/manage/teachers",
           "/account/manage/badges",
           "/account/manage/lessonplans",
           "/account/manage/events",
