@@ -121,6 +121,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       url: "/account/parent/lessonplans",
       icon: IconBuildings,
     },
+    { name: "Payments", url: "/account/parent/payment", icon: IconBuildings },
+
   ];
 
   // Filter documents based on organization role
