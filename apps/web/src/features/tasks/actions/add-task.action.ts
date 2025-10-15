@@ -14,8 +14,8 @@ export async function addTask(data: AddTaskSchema) {
   const response = await client.api.tasks.$post({
     json: {
       ...data,
-      done: false
-    }
+      done: false,
+    },
   });
 
   if (!response.ok) {
