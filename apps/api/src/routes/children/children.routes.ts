@@ -17,19 +17,24 @@ import {
 
 const tags: string[] = ["Children"];
 
-// List route definition
+// Extended query params schema to include childId filter
+const extendedQueryParamsSchema = queryParamsSchema.extend({
+  childId: z.string().optional(),
+});
+
+// List route definition with optional childId query parameter
 export const list = createRoute({
   tags,
   summary: "List all children",
   path: "/",
   method: "get",
   request: {
-    query: queryParamsSchema,
+    query: extendedQueryParamsSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       getPaginatedSchema(z.array(children)),
-      "The list of children"
+      "The list of children, optionally filtered by childId"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -157,6 +162,101 @@ export const getByParentId = createRoute({
   },
 });
 
+// Update the listWithObjects route with enhanced nursery object
+export const listWithObjects = createRoute({
+  tags,
+  summary: "List all children with populated objects",
+  path: "/with-objects",
+  method: "get",
+  request: {
+    query: extendedQueryParamsSchema,
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      getPaginatedSchema(
+        z.array(
+          z.object({
+            id: z.string(),
+            name: z.string(),
+            organizationId: z.string().nullable(),
+            nursery: z
+              .object({
+                id: z.string(),
+                name: z.string(),
+                address: z.string().nullable(),
+                phoneNumber: z.string().nullable(),
+                email: z.string().nullable(),
+                organizationId: z.string().nullable(),
+                capacity: z.number().nullable(),
+                description: z.string().nullable(),
+                imageUrl: z.string().nullable(),
+                operatingHours: z.string().nullable(),
+                facilities: z.string().nullable(),
+                ageRange: z.string().nullable(),
+                createdAt: z.string().nullable(),
+                updatedAt: z.string().nullable(),
+              })
+              .nullable(),
+            parent: z
+              .object({
+                id: z.string(),
+                name: z.string(),
+                email: z.string(),
+                phoneNumber: z.string(),
+                address: z.string().nullable(),
+                occupation: z.string().nullable(),
+                emergencyContact: z.string().nullable(),
+                createdAt: z.string().nullable(),
+                updatedAt: z.string().nullable(),
+              })
+              .nullable(),
+            class: z
+              .object({
+                id: z.string(),
+                name: z.string(),
+                teacherId: z.string().nullable(),
+                teacherName: z.string().nullable(),
+                capacity: z.number().nullable(),
+                ageRange: z.string().nullable(),
+                description: z.string().nullable(),
+                schedule: z.string().nullable(),
+                createdAt: z.string().nullable(),
+                updatedAt: z.string().nullable(),
+              })
+              .nullable(),
+            badges: z.array(
+              z.object({
+                id: z.string(),
+                name: z.string(),
+                description: z.string().nullable(),
+                imageUrl: z.string().nullable(),
+                category: z.string().nullable(),
+                points: z.number().nullable(),
+                requirements: z.string().nullable(),
+                earnedAt: z.string().nullable(),
+              })
+            ),
+            dateOfBirth: z.string().nullable(),
+            gender: z.string().nullable(),
+            emergencyContact: z.string().nullable(),
+            medicalNotes: z.string().nullable(),
+            profileImageUrl: z.string().nullable(),
+            imagesUrl: z.string().nullable(),
+            activities: z.string().nullable(),
+            createdAt: z.string().nullable(),
+            updatedAt: z.string().nullable(),
+          })
+        )
+      ),
+      "The list of children with populated objects including complete nursery details"
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthorized access"
+    ),
+  },
+});
+
 // Export types
 export type ListRoute = typeof list;
 export type GetByIdRoute = typeof getById;
@@ -164,3 +264,4 @@ export type CreateRoute = typeof create;
 export type UpdateRoute = typeof update;
 export type RemoveRoute = typeof remove;
 export type GetByParentIdRoute = typeof getByParentId;
+export type ListWithObjectsRoute = typeof listWithObjects;
