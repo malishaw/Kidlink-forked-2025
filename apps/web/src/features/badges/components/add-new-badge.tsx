@@ -19,6 +19,14 @@ import {
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/components/select";
+import { Textarea } from "@repo/ui/components/textarea";
 
 import { createBadge } from "../actions/create-badge.action";
 
@@ -155,20 +163,21 @@ export function AddNewBadge({
         </DialogTrigger>
       )}
 
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <form className="space-y-6" onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>
-              {editingBadge ? "Edit Badge" : "Create new Badge"}
+            <DialogTitle className="text-2xl font-bold text-slate-800">
+              {editingBadge ? "Edit Badge" : "Create New Badge"}
             </DialogTitle>
             <DialogDescription>
               Fill in the details to create a badge for a child/student.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4">
+          <div className="grid gap-6">
+            {/* Badge Image */}
             <div className="space-y-2">
-              <Label>Badge Image</Label>
+              <Label className="text-sm font-medium">Badge Image</Label>
               <div className="flex items-center gap-4">
                 <div className="flex-1">
                   <Input
@@ -180,7 +189,7 @@ export function AddNewBadge({
                   />
                   <Label
                     htmlFor="image-upload"
-                    className="flex items-center justify-center gap-2 h-10 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md cursor-pointer border border-input"
+                    className="flex items-center justify-center gap-2 h-12 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md cursor-pointer border border-input"
                   >
                     <Upload className="h-4 w-4" />
                     Upload Image
@@ -209,45 +218,89 @@ export function AddNewBadge({
 
             {/* Title */}
             <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title" className="text-sm font-medium">
+                Badge Title
+              </Label>
               <Input
                 id="title"
                 placeholder="Star Performer"
                 value={formData.title}
                 onChange={(e) => handleInputChange("title", e.target.value)}
+                className="h-12"
                 required
               />
             </div>
 
             {/* Description */}
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Input
+              <Label htmlFor="description" className="text-sm font-medium">
+                Description
+              </Label>
+              <Textarea
                 id="description"
-                placeholder="Awarded for excellent teamwork"
+                placeholder="Awarded for excellent teamwork and outstanding performance"
                 value={formData.description}
                 onChange={(e) =>
                   handleInputChange("description", e.target.value)
                 }
+                rows={3}
                 required
               />
             </div>
 
-            {/* Badge Type */}
-            <div className="space-y-2">
-              <Label htmlFor="badgeType">Badge Type</Label>
-              <Input
-                id="badgeType"
-                placeholder="Achievement / Participation"
-                value={formData.badgeType}
-                onChange={(e) => handleInputChange("badgeType", e.target.value)}
-                required
-              />
+            {/* Badge Type and Level - Grid Layout */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="badgeType" className="text-sm font-medium">
+                  Badge Type
+                </Label>
+                <Select
+                  value={formData.badgeType}
+                  onValueChange={(value) =>
+                    handleInputChange("badgeType", value)
+                  }
+                >
+                  <SelectTrigger className="h-12">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="achievement">🏆 Achievement</SelectItem>
+                    <SelectItem value="progress">📈 Progress</SelectItem>
+                    <SelectItem value="skill">🎯 Skill</SelectItem>
+                    <SelectItem value="participation">
+                      👥 Participation
+                    </SelectItem>
+                    <SelectItem value="creativity">🎨 Creativity</SelectItem>
+                    <SelectItem value="leadership">⭐ Leadership</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="level" className="text-sm font-medium">
+                  Level
+                </Label>
+                <Select
+                  value={formData.level}
+                  onValueChange={(value) => handleInputChange("level", value)}
+                >
+                  <SelectTrigger className="h-12">
+                    <SelectValue placeholder="Select level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="bronze">🥉 Bronze</SelectItem>
+                    <SelectItem value="silver">🥈 Silver</SelectItem>
+                    <SelectItem value="gold">🥇 Gold</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {/* Points */}
             <div className="space-y-2">
-              <Label htmlFor="points">Points</Label>
+              <Label htmlFor="points" className="text-sm font-medium">
+                Points
+              </Label>
               <Input
                 id="points"
                 type="number"
@@ -256,49 +309,34 @@ export function AddNewBadge({
                 onChange={(e) =>
                   handleInputChange("points", Number(e.target.value))
                 }
+                className="h-12"
                 required
               />
             </div>
-
-            {/* Level */}
-            <div className="space-y-2">
-              <Label htmlFor="level">Level</Label>
-              <Input
-                id="level"
-                placeholder="Bronze / Silver / Gold"
-                value={formData.level}
-                onChange={(e) => handleInputChange("level", e.target.value)}
-                required
-              />
-            </div>
-
-            {/* Icon URL */}
-            {/* <div className="space-y-2">
-              <Label htmlFor="iconUrl">
-                Icon URL (Optional if image uploaded)
-              </Label>
-              <Input
-                id="iconUrl"
-                placeholder="https://example.com/icon.png"
-                value={formData.iconUrl}
-                onChange={(e) => handleInputChange("iconUrl", e.target.value)}
-              />
-            </div> */}
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex gap-3 pt-4">
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline" className="flex-1 h-12">
+                Cancel
+              </Button>
             </DialogClose>
 
-            <Button type="submit" disabled={loading}>
-              {loading
-                ? editingBadge
-                  ? "Updating..."
-                  : "Creating..."
-                : editingBadge
-                  ? "Update"
-                  : "Create"}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="flex-1 h-12 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+            >
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 mr-2 border-2 border-green-200 border-t-green-600 rounded-full animate-spin" />
+                  {editingBadge ? "Updating..." : "Creating..."}
+                </>
+              ) : editingBadge ? (
+                "Update Badge"
+              ) : (
+                "Create Badge"
+              )}
             </Button>
           </DialogFooter>
         </form>
