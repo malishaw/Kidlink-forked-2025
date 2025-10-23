@@ -311,6 +311,7 @@ CREATE TABLE "payments" (
 	"child_id" text NOT NULL,
 	"amount" numeric NOT NULL,
 	"payment_method" varchar(50) NOT NULL,
+	"slip_url" text,
 	"status" varchar(20) DEFAULT 'pending' NOT NULL,
 	"paid_at" timestamp,
 	"organization_id" text,
@@ -319,18 +320,18 @@ CREATE TABLE "payments" (
 );
 --> statement-breakpoint
 CREATE TABLE "post_comments" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"post_id" uuid NOT NULL,
-	"user_id" uuid NOT NULL,
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"post_id" text NOT NULL,
+	"user_id" text NOT NULL,
 	"content" text NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE "post_likes" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"post_id" uuid NOT NULL,
-	"user_id" uuid NOT NULL,
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"post_id" text NOT NULL,
+	"user_id" text NOT NULL,
 	"type" varchar(20) DEFAULT 'like',
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
@@ -339,8 +340,8 @@ CREATE TABLE "post_likes" (
 CREATE TABLE "posts" (
 	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"organization_id" text,
-	"nursery_id" uuid NOT NULL,
-	"author_id" uuid NOT NULL,
+	"nursery_id" text NOT NULL,
+	"author_id" text NOT NULL,
 	"post_type" "post_type" NOT NULL,
 	"title" varchar(255),
 	"description" text,
@@ -424,6 +425,7 @@ CREATE TABLE "teacher" (
 	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"class_id" text,
 	"organization_id" text,
+	"user_id" text,
 	"name" text NOT NULL,
 	"phone_number" text NOT NULL,
 	"email" text NOT NULL,

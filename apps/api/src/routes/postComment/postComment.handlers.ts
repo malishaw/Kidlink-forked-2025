@@ -52,7 +52,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     .insert(postComments)
     .values({
       ...body,
-
+      organizationId: session.activeOrganizationId,
       userId: session.userId,
       createdAt: new Date(),
     })

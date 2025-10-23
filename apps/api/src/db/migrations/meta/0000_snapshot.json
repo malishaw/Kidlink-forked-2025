@@ -1,5 +1,5 @@
 {
-  "id": "f457c98c-9fbc-413c-88bd-6808f8b0f750",
+  "id": "34ee9d8c-68a5-4874-a2af-d0ee8bf9d898",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -2466,6 +2466,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "slip_url": {
+          "name": "slip_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "status": {
           "name": "status",
           "type": "varchar(20)",
@@ -2541,20 +2547,20 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
         },
         "post_id": {
           "name": "post_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
         "user_id": {
           "name": "user_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -2620,20 +2626,20 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
         },
         "post_id": {
           "name": "post_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
         "user_id": {
           "name": "user_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -2713,13 +2719,13 @@
         },
         "nursery_id": {
           "name": "nursery_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
         "author_id": {
           "name": "author_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -3415,6 +3421,12 @@
         },
         "organization_id": {
           "name": "organization_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false
