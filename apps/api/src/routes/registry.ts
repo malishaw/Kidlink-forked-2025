@@ -20,6 +20,9 @@ import nursery from "./nursery/nursery.index";
 import organization from "./organization/organization.index";
 import parent from "./parents/parent.index";
 import payment from "./payments/payments.index";
+import post from "./post/post.index";
+import postComment from "./postComment/postComment.index";
+import postLike from "./postLike/postLike.index";
 import propertyClasses from "./property-classes/property-classes.index";
 import system from "./system/system.index";
 import tasks from "./tasks/tasks.index";
@@ -38,6 +41,10 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/parent", parent)
     .route("/teacher", teacher)
     .route("/payment", payment)
+
+    .route("/post", post)
+    .route("/post-comment", postComment)
+    .route("/post-like", postLike)
 
     .route("/hotels", hotels)
     .route("/children", children)

@@ -5,6 +5,8 @@ export default defineConfig({
   out: "./src/db/migrations",
   dialect: "postgresql",
   dbCredentials: {
+
     url: "postgres://donext:donext123@127.0.0.1:5432/kidlink?schema=public",
+
   },
 });
