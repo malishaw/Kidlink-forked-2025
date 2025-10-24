@@ -37,3 +37,7 @@ export * from "./conversation.schema";
 export * from "./conversationParticipant.schema";
 
 export * from "./gallery.schema";
+
+export * from "./post.schema";
+export * from "./postComment.schema";
+export * from "./postLike.schema";

@@ -5,36 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1758016566466,
-      "tag": "0000_broad_hydra",
+      "when": 1761208577391,
+      "tag": "0000_windy_ultimates",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1758092006257,
-      "tag": "0001_medical_the_renegades",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1759995209084,
-      "tag": "0002_ordinary_hammerhead",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1760095534239,
-      "tag": "0003_pink_hawkeye",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1760526299872,
-      "tag": "0004_left_greymalkin",
+      "when": 1761211824830,
+      "tag": "0001_odd_revanche",
       "breakpoints": true
     }
   ]
