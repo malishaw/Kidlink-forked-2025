@@ -18,6 +18,7 @@ export const postCommentUpdateSchema = createInsertSchema(postComments)
     userId: true,
     createdAt: true,
     updatedAt: true,
+    postId: true,
   })
   .partial();
 
