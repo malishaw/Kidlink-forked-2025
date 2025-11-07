@@ -16,7 +16,7 @@ export const postLikeInsertSchema = createInsertSchema(postLikes).omit({
 export const postLikeUpdateSchema = createInsertSchema(postLikes)
   .omit({
     id: true,
-
+    postId: true,
     userId: true,
     createdAt: true,
     updatedAt: true,
