@@ -4,6 +4,7 @@ import { AppOpenAPI } from "@api/types";
 import { BASE_PATH } from "../lib/constants";
 import badges from "./badges/badges.index";
 import children from "./children/children.index";
+import comment from "./comment/comment.index";
 import conversationParticipant from "./conversationParticipants/conversationParticipant.index";
 import conversation from "./conversations/conversation.index";
 import event from "./event/event.index";
@@ -44,6 +45,7 @@ export function registerRoutes(app: AppOpenAPI) {
 
     .route("/post", post)
     .route("/post-comment", postComment)
+    .route("/comment", comment)
     .route("/post-like", postLike)
 
     .route("/hotels", hotels)
