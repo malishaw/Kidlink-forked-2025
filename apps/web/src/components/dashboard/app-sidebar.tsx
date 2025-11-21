@@ -83,7 +83,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconBuildings,
       },
       {
-        name: "posts",
+        name: "Posts",
         url: "/account/manage/post",
         icon: IconBuildings,
       },

@@ -21,20 +21,18 @@ import { Textarea } from "@repo/ui/components/textarea";
 import {
   Bell,
   Calendar,
-  FileText,
   Image as ImageIcon,
   Loader2,
   MapPin,
   MessageSquare,
   Plus,
   Send,
-  Upload,
   User,
   Users,
   Video,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { createPost } from "../actions/create-post";
@@ -42,7 +40,7 @@ import { useGetAllNurseriess } from "../actions/get-all-nurseries";
 import { useGetPosts } from "../actions/get-post";
 
 type PostType = "activity" | "announcement" | "event";
-type MediaType = "image" | "video" | "document";
+type MediaType = "image" | "video";
 
 interface FormData {
   nurseryId: string;
@@ -91,8 +89,12 @@ export default function NurseryPostsLanding() {
     organizationId: "",
   });
 
-  const [mediaInput, setMediaInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showMediaUpload, setShowMediaUpload] = useState<MediaType | null>(
+    null
+  );
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const { data: session } = authClient.useSession();
   const currentUserId = session?.user?.id || "";
@@ -129,13 +131,24 @@ export default function NurseryPostsLanding() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleAddMediaUrl = () => {
-    if (mediaInput.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        mediaUrls: [...prev.mediaUrls, mediaInput.trim()],
-      }));
-      setMediaInput("");
+  const handleFileUpload = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: MediaType
+  ) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const dataUrl = event.target?.result as string;
+          setFormData((prev) => ({
+            ...prev,
+            mediaUrls: [...prev.mediaUrls, dataUrl],
+            mediaType: type,
+          }));
+        };
+        reader.readAsDataURL(file);
+      });
     }
   };
 
@@ -186,7 +199,7 @@ export default function NurseryPostsLanding() {
         place: "",
         organizationId: "",
       });
-      setMediaInput("");
+      setShowMediaUpload(null);
       setIsModalOpen(false);
       alert("Post created successfully!");
     } catch (error: any) {
@@ -194,45 +207,6 @@ export default function NurseryPostsLanding() {
       alert(error.message || "Something went wrong");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const getTypeIcon = (type: PostType) => {
-    switch (type) {
-      case "activity":
-        return <Users className="h-5 w-5" />;
-      case "announcement":
-        return <Bell className="h-5 w-5" />;
-      case "event":
-        return <Calendar className="h-5 w-5" />;
-      default:
-        return <MessageSquare className="h-5 w-5" />;
-    }
-  };
-
-  const getTypeColor = (type: PostType) => {
-    switch (type) {
-      case "activity":
-        return "bg-amber-500/10 text-amber-600 border-amber-200";
-      case "announcement":
-        return "bg-blue-500/10 text-blue-600 border-blue-200";
-      case "event":
-        return "bg-rose-500/10 text-rose-600 border-rose-200";
-      default:
-        return "bg-gray-100 text-gray-700 border-gray-200";
-    }
-  };
-
-  const getMediaIcon = (type?: MediaType) => {
-    switch (type) {
-      case "image":
-        return <ImageIcon className="h-4 w-4" />;
-      case "video":
-        return <Video className="h-4 w-4" />;
-      case "document":
-        return <FileText className="h-4 w-4" />;
-      default:
-        return <Upload className="h-4 w-4" />;
     }
   };
 
@@ -245,7 +219,7 @@ export default function NurseryPostsLanding() {
   );
 
   return (
-    <div className="py-12 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="py-12 bg-white">
       {/* Fixed Add Post Button - Top Right */}
       <button
         onClick={() => setIsModalOpen(true)}
@@ -275,8 +249,6 @@ export default function NurseryPostsLanding() {
           </div>
         </div>
       </div>
-
-      {/* Posts Section */}
 
       {/* Create Post Modal */}
       {isModalOpen && (
@@ -449,87 +421,129 @@ export default function NurseryPostsLanding() {
               </div>
 
               {/* Media Section */}
-              <div className="space-y-3 border-t pt-6">
+              <div className="space-y-4 border-t pt-6">
                 <Label className="text-sm font-medium text-gray-700">
                   Add Media (Optional)
                 </Label>
 
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { value: "image", label: "Image", icon: ImageIcon },
-                    { value: "video", label: "Video", icon: Video },
-                    { value: "document", label: "Document", icon: FileText },
-                  ].map((type) => (
-                    <button
-                      key={type.value}
-                      onClick={() =>
-                        handleInputChange("mediaType", type.value as MediaType)
-                      }
-                      className={`p-3 rounded-lg border transition-all text-sm font-medium flex items-center justify-center gap-2 ${
-                        formData.mediaType === type.value
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 bg-white hover:border-gray-300"
-                      }`}
-                    >
-                      <type.icon className="h-4 w-4" />
-                      {type.label}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Paste media URL here..."
-                    value={mediaInput}
-                    onChange={(e) => setMediaInput(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter") {
-                        handleAddMediaUrl();
-                        e.preventDefault();
-                      }
-                    }}
-                    className="h-10 text-base flex-1"
-                  />
-                  <Button
-                    onClick={handleAddMediaUrl}
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    disabled={!mediaInput.trim()}
-                    className="px-4"
+                {/* Media Type Buttons */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() =>
+                      setShowMediaUpload(
+                        showMediaUpload === "image" ? null : "image"
+                      )
+                    }
+                    className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                      showMediaUpload === "image"
+                        ? "border-blue-500 bg-blue-50 text-blue-700"
+                        : "border-gray-200 bg-white hover:border-gray-300"
+                    }`}
                   >
-                    <Upload className="h-4 w-4" />
-                  </Button>
+                    <ImageIcon className="h-6 w-6" />
+                    <span className="text-sm font-medium">Image</span>
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      setShowMediaUpload(
+                        showMediaUpload === "video" ? null : "video"
+                      )
+                    }
+                    className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                      showMediaUpload === "video"
+                        ? "border-blue-500 bg-blue-50 text-blue-700"
+                        : "border-gray-200 bg-white hover:border-gray-300"
+                    }`}
+                  >
+                    <Video className="h-6 w-6" />
+                    <span className="text-sm font-medium">Video</span>
+                  </button>
                 </div>
 
+                {/* Upload Area */}
+                {showMediaUpload === "image" && (
+                  <div className="space-y-3">
+                    <div
+                      onClick={() => imageInputRef.current?.click()}
+                      className="border-2 border-dashed border-blue-300 bg-blue-50 rounded-lg p-8 text-center cursor-pointer hover:bg-blue-100 transition"
+                    >
+                      <ImageIcon className="h-12 w-12 text-blue-600 mx-auto mb-3" />
+                      <p className="text-sm font-medium text-blue-900">
+                        Click to upload images
+                      </p>
+                      <p className="text-xs text-blue-700">
+                        PNG, JPG, GIF up to 10MB (select multiple)
+                      </p>
+                    </div>
+                    <input
+                      ref={imageInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handleFileUpload(e, "image")}
+                      className="hidden"
+                    />
+                  </div>
+                )}
+
+                {showMediaUpload === "video" && (
+                  <div className="space-y-3">
+                    <div
+                      onClick={() => videoInputRef.current?.click()}
+                      className="border-2 border-dashed border-purple-300 bg-purple-50 rounded-lg p-8 text-center cursor-pointer hover:bg-purple-100 transition"
+                    >
+                      <Video className="h-12 w-12 text-purple-600 mx-auto mb-3" />
+                      <p className="text-sm font-medium text-purple-900">
+                        Click to upload video
+                      </p>
+                      <p className="text-xs text-purple-700">
+                        MP4, WebM up to 50MB
+                      </p>
+                    </div>
+                    <input
+                      ref={videoInputRef}
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) => handleFileUpload(e, "video")}
+                      className="hidden"
+                    />
+                  </div>
+                )}
+
+                {/* Media Preview */}
                 {formData.mediaUrls.length > 0 && (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <p className="text-sm font-medium text-gray-700">
-                      Added Media:
+                      {formData.mediaUrls.length} Media Uploaded:
                     </p>
-                    <div className="space-y-2 max-h-40 overflow-y-auto bg-gray-50 rounded-lg p-3">
+                    <div className="grid grid-cols-2 gap-3">
                       {formData.mediaUrls.map((url, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center justify-between p-2 bg-white rounded-lg border"
+                          className="relative rounded-lg overflow-hidden bg-gray-100 aspect-square"
                         >
-                          <div className="flex items-center gap-2 min-w-0 flex-1">
-                            <div className="p-2 bg-gray-100 rounded flex-shrink-0">
-                              {getMediaIcon(formData.mediaType)}
-                            </div>
-                            <span className="text-sm text-gray-700 truncate">
-                              {url.length > 40
-                                ? url.substring(0, 40) + "..."
-                                : url}
-                            </span>
-                          </div>
+                          {formData.mediaType === "image" ? (
+                            <img
+                              src={url}
+                              alt={`preview-${idx}`}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <video
+                              src={url}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
                           <button
                             onClick={() => handleRemoveMediaUrl(idx)}
-                            type="button"
-                            className="p-1 hover:bg-red-100 rounded transition flex-shrink-0"
+                            className="absolute top-1 right-1 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full transition shadow-lg"
                           >
-                            <X className="h-4 w-4 text-red-600" />
+                            <X className="h-4 w-4" />
                           </button>
+                          <div className="absolute bottom-1 left-1 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                            {idx + 1}
+                          </div>
                         </div>
                       ))}
                     </div>
