@@ -202,27 +202,26 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
 export const getMyNursery: AppRouteHandler<GetMyNurseryRoute> = async (c) => {
   const session = c.get("session") as Session | undefined;
 
-  if (!session?.userId) {
+  if (!session?.userId || !session.activeOrganizationId) {
     return c.json(
       { message: HttpStatusPhrases.UNAUTHORIZED },
       HttpStatusCodes.UNAUTHORIZED
     );
   }
 
-  // Optionally filter by organization as well
-  const where = session.activeOrganizationId
-    ? and(
-        eq(nurseries.createdBy, session.userId),
-        eq(nurseries.organizationId, session.activeOrganizationId)
-      )
-    : eq(nurseries.createdBy, session.userId);
-
+  // Get nursery by organization only (not requiring createdBy match)
   const nursery = await db.query.nurseries.findFirst({
-    where,
+    where: eq(nurseries.organizationId, session.activeOrganizationId),
   });
 
   if (!nursery) {
-    return c.json({ message: "Nursery not found" }, HttpStatusCodes.NOT_FOUND);
+    return c.json(
+      {
+        message: "No nursery found for your organization.",
+        organizationId: session.activeOrganizationId,
+      },
+      HttpStatusCodes.NOT_FOUND
+    );
   }
 
   return c.json(nursery, HttpStatusCodes.OK);

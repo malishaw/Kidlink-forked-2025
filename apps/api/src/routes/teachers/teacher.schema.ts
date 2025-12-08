@@ -13,6 +13,7 @@ export const teacherInsertSchema = createInsertSchema(teachers)
     updatedAt: true,
     createdAt: true,
     organizationId: true,
+    userId: true,
   })
   .transform((data) => ({ ...data }));
 
@@ -23,6 +24,7 @@ export const teacherUpdateSchema = createInsertSchema(teachers)
     organizationId: true,
     createdAt: true,
     updatedAt: true,
+    userId: true,
   })
   .partial();
 

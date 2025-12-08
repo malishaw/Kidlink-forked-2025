@@ -87,7 +87,7 @@ export const getOne: AppRouteHandler<GetByIdRoute> = async (c) => {
 export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const updates = c.req.valid("json");
-  const session = c.get("user");
+  const session = c.get("session");
 
   if (!session) {
     return c.json(
@@ -96,23 +96,95 @@ export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
     );
   }
 
-  const [updated] = await db
-    .update(payments)
-    .set({
-      ...updates,
-      updatedAt: new Date(),
-    })
-    .where(eq(payments.id, String(id)))
-    .returning();
+  try {
+    // First, get the existing payment record
+    const existingPayment = await db.query.payments.findFirst({
+      where: eq(payments.id, id),
+    });
 
-  if (!updated) {
+    if (!existingPayment) {
+      return c.json(
+        { message: HttpStatusPhrases.NOT_FOUND },
+        HttpStatusCodes.NOT_FOUND
+      );
+    }
+
+    // Build update data object with only the fields that are actually provided
+    const updateData: any = {};
+
+    // Check if the field exists in the updates object and has a valid value
+    if (
+      "amount" in updates &&
+      updates.amount !== undefined &&
+      updates.amount !== null &&
+      updates.amount !== ""
+    ) {
+      updateData.amount = updates.amount;
+    }
+    if (
+      "paymentMethod" in updates &&
+      updates.paymentMethod !== undefined &&
+      updates.paymentMethod !== null &&
+      updates.paymentMethod !== ""
+    ) {
+      updateData.paymentMethod = updates.paymentMethod;
+    }
+    if ("slipUrl" in updates && updates.slipUrl !== undefined) {
+      updateData.slipUrl = updates.slipUrl;
+    }
+    if (
+      "status" in updates &&
+      updates.status !== undefined &&
+      updates.status !== null &&
+      updates.status !== ""
+    ) {
+      updateData.status = updates.status;
+    }
+    if ("paidAt" in updates && updates.paidAt !== undefined) {
+      updateData.paidAt = updates.paidAt ? new Date(updates.paidAt) : null;
+    }
+
+    // Always update the updatedAt field if there are changes
+    if (Object.keys(updateData).length > 0) {
+      updateData.updatedAt = new Date();
+    } else {
+      return c.json(existingPayment, HttpStatusCodes.OK); // No changes needed
+    }
+
+    console.log("Updating payment with data:", updateData);
+    console.log("Payment ID:", id);
+    console.log("Original updates received:", updates);
+
+    const [updated] = await db
+      .update(payments)
+      .set(updateData)
+      .where(eq(payments.id, id))
+      .returning();
+
+    if (!updated) {
+      return c.json(
+        { message: HttpStatusPhrases.NOT_FOUND },
+        HttpStatusCodes.NOT_FOUND
+      );
+    }
+
+    return c.json(updated, HttpStatusCodes.OK);
+  } catch (error) {
+    console.error("Update payment error:", error);
+    console.error("Error details:", {
+      id,
+      updates,
+      error: error instanceof Error ? error.message : error,
+    });
+
     return c.json(
-      { message: HttpStatusPhrases.NOT_FOUND },
-      HttpStatusCodes.NOT_FOUND
+      {
+        message: "Failed to update payment",
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      HttpStatusCodes.INTERNAL_SERVER_ERROR
     );
   }
-
-  return c.json(updated, HttpStatusCodes.OK);
 };
 
 //  Delete payments

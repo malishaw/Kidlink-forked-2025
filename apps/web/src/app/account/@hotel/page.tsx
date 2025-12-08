@@ -2,6 +2,7 @@
 
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
+
 import {
   Card,
   CardContent,
@@ -20,6 +21,7 @@ import {
   UserCheck,
   Users,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Import your action files
 import { SignoutButton } from "@/features/auth/components/signout-button";
@@ -30,6 +32,8 @@ import { ParentsList } from "@/features/parents/actions/get-parent";
 import { TeachersList } from "@/features/teachers/actions/get-teacher";
 
 export default function NurseryDashboard() {
+  const router = useRouter();
+
   // Fetch data from your action files
   const { data: childrenData, isLoading: childrenLoading } = ChildrensList({
     page: 1,
@@ -89,6 +93,44 @@ export default function NurseryDashboard() {
       description: "Badges earned",
       color: "bg-yellow-500",
       trend: "+15 this week",
+    },
+  ];
+
+  const quickActions = [
+    {
+      label: "Add New Child",
+      icon: Users,
+      action: () => {
+        router.push("/account/manage/children?action=add");
+      },
+    },
+    {
+      label: "Manage Teachers",
+      icon: GraduationCap,
+      action: () => {
+        router.push("/account/manage/teachers");
+      },
+    },
+    {
+      label: "Schedule Activity",
+      icon: Calendar,
+      action: () => {
+        router.push("/account/manage/activities");
+      },
+    },
+    {
+      label: "Send Notification",
+      icon: Bell,
+      action: () => {
+        router.push("/account/manage/notifications");
+      },
+    },
+    {
+      label: "Award Badges",
+      icon: Award,
+      action: () => {
+        router.push("/account/manage/badges");
+      },
     },
   ];
 
@@ -206,27 +248,22 @@ export default function NurseryDashboard() {
                 Quick Actions
               </CardTitle>
             </CardHeader>
+
             <CardContent className="space-y-3">
-              <Button className="w-full justify-start" variant="outline">
-                <Users className="h-4 w-4 mr-2" />
-                Add New Child
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <GraduationCap className="h-4 w-4 mr-2" />
-                Manage Teachers
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <Calendar className="h-4 w-4 mr-2" />
-                Schedule Activity
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <Bell className="h-4 w-4 mr-2" />
-                Send Notification
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <Award className="h-4 w-4 mr-2" />
-                Award Badges
-              </Button>
+              {quickActions.map((actionItem) => {
+                const IconComponent = actionItem.icon;
+                return (
+                  <Button
+                    key={actionItem.label}
+                    className="w-full justify-start"
+                    variant="outline"
+                    onClick={actionItem.action}
+                  >
+                    <IconComponent className="h-4 w-4 mr-2" />
+                    {actionItem.label}
+                  </Button>
+                );
+              })}
             </CardContent>
           </Card>
         </div>

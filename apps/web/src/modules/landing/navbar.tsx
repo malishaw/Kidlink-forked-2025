@@ -34,7 +34,7 @@ export function Navbar() {
           </Link>
 
           {/* Navigation Links */}
-          <Link
+          {/* <Link
             href="/search"
             className={cn(
               "font-medium text-sm hover:underline transition-colors opacity-70 hover:opacity-100",
@@ -45,7 +45,7 @@ export function Navbar() {
             )}
           >
             Explore
-          </Link>
+          </Link> */}
         </div>
 
         {/* Center Navigation Links */}

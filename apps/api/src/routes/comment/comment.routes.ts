@@ -2,7 +2,6 @@ import { createRoute } from "@hono/zod-openapi";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { z } from "zod";
-// import { teacher } from "@repo/database";
 
 import {
   errorMessageSchema,
@@ -10,18 +9,13 @@ import {
   queryParamsSchema,
   stringIdParamSchema,
 } from "@api/lib/helpers";
-import {
-  teacherInsertSchema,
-  teacherSchema,
-  teacherUpdateSchema,
-} from "./tacher.schema";
+import { comment, commentInsertSchema } from "./comment.schema";
 
-const tags: string[] = ["teacher"];
+const tags: string[] = ["Comment"];
 
-// List route definition
 export const list = createRoute({
   tags,
-  summary: "List all teacher",
+  summary: "List all comments",
   path: "/",
   method: "get",
   request: {
@@ -29,8 +23,8 @@ export const list = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      getPaginatedSchema(z.array(teacherSchema)),
-      "The list of teacher"
+      getPaginatedSchema(z.array(comment)),
+      "The list of comments"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -39,70 +33,85 @@ export const list = createRoute({
   },
 });
 
-// Get by ID route definition
 export const getById = createRoute({
   tags,
-  summary: "Get teacher by ID",
+  summary: "Get comment by ID",
   method: "get",
   path: "/:id",
   request: {
     params: stringIdParamSchema,
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(teacherSchema, "The teacher item"),
+    [HttpStatusCodes.OK]: jsonContent(comment, "The comment item"),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
       "Unauthorized access"
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       errorMessageSchema,
-      "teacher not found"
+      "Comment not found"
     ),
   },
 });
 
-// Create teacher route definition
-export const create = createRoute({
+export const getByPostId = createRoute({
   tags,
-  summary: "Create teacher",
-  method: "post",
-  path: "/",
+  summary: "Get comments by post ID",
+  method: "get",
+  path: "/post/:postId",
   request: {
-    body: jsonContentRequired(teacherInsertSchema, "Create uploaded teacher"),
-  },
-  responses: {
-    [HttpStatusCodes.CREATED]: jsonContent(
-      teacherSchema,
-      "The teacher created"
-    ),
-    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
-      errorMessageSchema,
-      "Unauthorized access"
-    ),
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(
-      errorMessageSchema,
-      "teacher not created"
-    ),
-  },
-});
-
-// Update teacher route definition
-export const update = createRoute({
-  tags,
-  summary: "Update teacher",
-  method: "patch",
-  path: "/:id",
-  request: {
-    params: stringIdParamSchema,
-    body: jsonContentRequired(
-      teacherUpdateSchema,
-      "Update teacher details schema"
-    ),
+    params: z.object({ postId: z.string() }),
+    query: queryParamsSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      teacherUpdateSchema,
-      "The teacher item"
+      getPaginatedSchema(z.array(comment)),
+      "The list of comments for the post"
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthorized access"
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      errorMessageSchema,
+      "Post not found"
+    ),
+  },
+});
+
+export const create = createRoute({
+  tags,
+  summary: "Create comment",
+  method: "post",
+  path: "/",
+  request: {
+    body: jsonContentRequired(commentInsertSchema, "Create comment"),
+  },
+  responses: {
+    [HttpStatusCodes.CREATED]: jsonContent(comment, "The comment created"),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthorized access"
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      errorMessageSchema,
+      "Comment not created"
+    ),
+  },
+});
+
+export const remove = createRoute({
+  tags,
+  summary: "Remove Comment",
+  method: "delete",
+  path: "/:id",
+  request: {
+    params: stringIdParamSchema,
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      z.object({ message: z.string() }),
+      "The comment item"
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(errorMessageSchema, "Not found"),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
@@ -112,27 +121,8 @@ export const update = createRoute({
   },
 });
 
-// Delete teacher route definition
-export const remove = createRoute({
-  method: "delete",
-  path: "/:id",
-  tags: ["teacher"],
-  summary: "Delete a teacher",
-  request: {
-    params: z.object({ id: z.string() }),
-  },
-  responses: {
-    204: {
-      description: "No Content",
-    },
-    401: jsonContent(errorMessageSchema, "Unauthorized"),
-    404: jsonContent(errorMessageSchema, "Not Found"),
-  },
-});
-
-// Export types
 export type ListRoute = typeof list;
 export type GetByIdRoute = typeof getById;
+export type GetByPostIdRoute = typeof getByPostId;
 export type CreateRoute = typeof create;
-export type UpdateRoute = typeof update;
 export type RemoveRoute = typeof remove;

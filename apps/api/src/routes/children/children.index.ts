@@ -4,6 +4,7 @@ import * as handlers from "./children.handlers";
 import * as routes from "./children.routes";
 
 const router = createRouter()
+  .openapi(routes.listWithObjects, handlers.listWithObjects)
   .openapi(routes.getByParentId, handlers.getByParentId)
 
   .openapi(routes.list, handlers.list)

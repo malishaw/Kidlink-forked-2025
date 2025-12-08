@@ -163,13 +163,6 @@ export const getByUserId: AppRouteHandler<GetByUserIdRoute> = async (c) => {
     where: eq(parents.userId, userId),
   });
 
-  if (results.length === 0) {
-    return c.json(
-      { message: HttpStatusPhrases.NOT_FOUND },
-      HttpStatusCodes.NOT_FOUND
-    );
-  }
-
   const page = 1; // or from query params
   const limit = results.length; // or from query params
   const totalCount = results.length;

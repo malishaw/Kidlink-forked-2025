@@ -140,7 +140,12 @@ export default function ClassDetailPage() {
                   Main Teacher
                 </h4>
                 <p className="text-blue-600">
-                  {data?.mainTeacherId ?? "Not assigned"}
+                  {/* Use the same logic as in the "Assign Main Teacher" section */}
+                  {data?.mainTeacherId
+                    ? teachersQuery.data?.data?.find(
+                        (teacher: any) => teacher.id === data?.mainTeacherId
+                      )?.name || data.mainTeacherId
+                    : "Not assigned"}
                 </p>
               </div>
               <div className="bg-green-50 p-4 rounded-xl">

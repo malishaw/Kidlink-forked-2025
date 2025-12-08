@@ -132,89 +132,157 @@ export const getOne: AppRouteHandler<GetByIdRoute> = async (c) => {
   return c.json(classItem, HttpStatusCodes.OK);
 };
 
-// ✏️ Update class
+// ✏️ Update class - Fixed version
 export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const updates = c.req.valid("json");
   const session = c.get("session") as Session | undefined;
 
   if (!session?.userId) {
-    throw new Error(HttpStatusPhrases.UNAUTHORIZED);
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
+    );
   }
 
-  // Disallow clearing nurseryId to null; ownership checks rely on join
-  if ("nurseryId" in updates && updates.nurseryId === null) {
-    throw new Error("nurseryId cannot be set to null");
-  }
+  try {
+    console.log("Received updates:", updates); // Debug log
 
-  const ownershipWhere = session.activeOrganizationId
-    ? and(
-        eq(classes.id, String(id)),
-        eq(nurseries.id, classes.nurseryId),
-        eq(nurseries.createdBy, session.userId),
-        eq(nurseries.organizationId, session.activeOrganizationId)
-      )
-    : and(
-        eq(classes.id, String(id)),
-        eq(nurseries.id, classes.nurseryId),
-        eq(nurseries.createdBy, session.userId)
-      );
-
-  const existing = await db
-    .select({ classId: classes.id })
-    .from(classes)
-    .innerJoin(nurseries, eq(nurseries.id, classes.nurseryId))
-    .where(ownershipWhere)
-    .limit(1);
-
-  if (!existing.length) {
-    throw new Error(HttpStatusPhrases.NOT_FOUND);
-  }
-
-  if (updates.nurseryId) {
-    const nurseryWhere = session.activeOrganizationId
-      ? and(
-          eq(nurseries.id, updates.nurseryId),
-          eq(nurseries.createdBy, session.userId),
-          eq(nurseries.organizationId, session.activeOrganizationId)
-        )
-      : and(
-          eq(nurseries.id, updates.nurseryId),
-          eq(nurseries.createdBy, session.userId)
-        );
-
-    const newParent = await db.query.nurseries.findFirst({
-      where: nurseryWhere,
+    // First, get the existing class to preserve current values
+    const existingClass = await db.query.classes.findFirst({
+      where: eq(classes.id, String(id)),
     });
-    if (!newParent) {
-      throw new Error("Target nursery not found");
+
+    if (!existingClass) {
+      return c.json({ message: "Class not found" }, HttpStatusCodes.NOT_FOUND);
     }
-  }
 
-  // Normalize arrays if present
-  const teacherIds = Array.isArray(updates.teacherIds)
-    ? Array.from(new Set(updates.teacherIds))
-    : undefined;
-  const childIds = Array.isArray(updates.childIds)
-    ? Array.from(new Set(updates.childIds))
-    : undefined;
+    console.log("Existing class:", existingClass); // Debug log
 
-  const [updated] = await db
-    .update(classes)
-    .set({
-      ...updates,
-      ...(teacherIds ? { teacherIds } : {}),
-      ...(childIds ? { childIds } : {}),
+    // Check ownership through organization
+    if (
+      session.activeOrganizationId &&
+      existingClass.organizationId !== session.activeOrganizationId
+    ) {
+      return c.json(
+        { message: HttpStatusPhrases.UNAUTHORIZED },
+        HttpStatusCodes.UNAUTHORIZED
+      );
+    }
+
+    // If nurseryId is being updated, validate the new nursery exists and belongs to user
+    if (updates.nurseryId && updates.nurseryId !== existingClass.nurseryId) {
+      const nurseryWhere = session.activeOrganizationId
+        ? and(
+            eq(nurseries.id, updates.nurseryId),
+            eq(nurseries.organizationId, session.activeOrganizationId)
+          )
+        : eq(nurseries.id, updates.nurseryId);
+
+      const newNursery = await db.query.nurseries.findFirst({
+        where: nurseryWhere,
+      });
+
+      if (!newNursery) {
+        return c.json(
+          { message: "Target nursery not found or unauthorized" },
+          HttpStatusCodes.NOT_FOUND
+        );
+      }
+    }
+
+    // Preserve existing arrays and merge with updates
+    const currentTeacherIds = existingClass.teacherIds || [];
+    const currentChildIds = existingClass.childIds || [];
+
+    // Handle teacherIds: preserve existing if not provided in updates
+    let finalTeacherIds = currentTeacherIds;
+    if (updates.teacherIds !== undefined) {
+      if (Array.isArray(updates.teacherIds)) {
+        // Merge new teacherIds with existing ones, removing duplicates
+        const newTeacherIds = updates.teacherIds.filter(
+          (id) => id != null && id !== ""
+        );
+        finalTeacherIds = Array.from(
+          new Set([...currentTeacherIds, ...newTeacherIds])
+        );
+      } else if (updates.teacherIds === null) {
+        // Explicitly clear teacherIds
+        finalTeacherIds = [];
+      }
+    }
+
+    // Handle childIds: preserve existing if not provided in updates
+    let finalChildIds = currentChildIds;
+    if (updates.childIds !== undefined) {
+      if (Array.isArray(updates.childIds)) {
+        // Merge new childIds with existing ones, removing duplicates
+        const newChildIds = updates.childIds.filter(
+          (id) => id != null && id !== ""
+        );
+        finalChildIds = Array.from(
+          new Set([...currentChildIds, ...newChildIds])
+        );
+      } else if (updates.childIds === null) {
+        // Explicitly clear childIds
+        finalChildIds = [];
+      }
+    }
+
+    // Build update object - ONLY include fields that are actually being updated
+    const updateData: any = {
       updatedAt: new Date(),
-    })
-    .where(eq(classes.id, String(id)))
-    .returning();
+    };
 
-  if (!updated) {
-    throw new Error(HttpStatusPhrases.NOT_FOUND);
+    // Only update fields that are explicitly provided and valid
+    if (
+      updates.name !== undefined &&
+      updates.name !== null &&
+      updates.name !== ""
+    ) {
+      updateData.name = updates.name;
+    }
+
+    if (updates.mainTeacherId !== undefined) {
+      updateData.mainTeacherId = updates.mainTeacherId;
+    }
+
+    // Only update nurseryId if it's provided and not empty
+    if (
+      updates.nurseryId !== undefined &&
+      updates.nurseryId !== null &&
+      updates.nurseryId !== ""
+    ) {
+      updateData.nurseryId = updates.nurseryId;
+    }
+
+    // Always update arrays (they're properly handled above)
+    updateData.teacherIds = finalTeacherIds;
+    updateData.childIds = finalChildIds;
+
+    console.log("Final update data:", updateData); // Debug log
+
+    const [updated] = await db
+      .update(classes)
+      .set(updateData)
+      .where(eq(classes.id, String(id)))
+      .returning();
+
+    if (!updated) {
+      return c.json(
+        { message: "Failed to update class" },
+        HttpStatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+
+    return c.json(updated, HttpStatusCodes.OK);
+  } catch (error) {
+    console.error("Error updating class:", error);
+    return c.json(
+      { message: "Internal server error", error: error.message },
+      HttpStatusCodes.INTERNAL_SERVER_ERROR
+    );
   }
-
-  return c.json(updated, HttpStatusCodes.OK);
 };
 
 // 🗑️ Delete class

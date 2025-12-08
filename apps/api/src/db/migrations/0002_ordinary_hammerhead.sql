@@ -1,1 +1,0 @@
-ALTER TABLE "parent" ADD COLUMN "user_id" text;

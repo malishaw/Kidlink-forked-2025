@@ -127,9 +127,38 @@ export const remove = createRoute({
   },
 });
 
+// Get teachers by userId route definition
+export const getByUserId = createRoute({
+  tags,
+  summary: "Get teachers by userId",
+  method: "get",
+  path: "/user/:userId",
+  request: {
+    params: z.object({
+      userId: z.string().min(1, "Invalid user ID format"),
+    }),
+    query: queryParamsSchema,
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      getPaginatedSchema(z.array(teacher)),
+      "The list of teachers filtered by userId"
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthorized access"
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      errorMessageSchema,
+      "No teachers found for the given userId"
+    ),
+  },
+});
+
 // Export types
 export type ListRoute = typeof list;
 export type GetByIdRoute = typeof getById;
 export type CreateRoute = typeof create;
 export type UpdateRoute = typeof update;
 export type RemoveRoute = typeof remove;
+export type GetByUserIdRoute = typeof getByUserId;

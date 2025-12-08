@@ -4,7 +4,7 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import { db } from "@api/db";
 import type { AppRouteHandler } from "@api/types";
-import { teacher } from "@repo/database";
+import { posts } from "@repo/database";
 
 import type {
   CreateRoute,
@@ -12,10 +12,11 @@ import type {
   ListRoute,
   RemoveRoute,
   UpdateRoute,
-} from "./teacher.routes";
-// 🔍 List all teacher
+} from "./post.routes";
+
+// 🔍 List all posts
 export const list: AppRouteHandler<ListRoute> = async (c) => {
-  const results = await db.query.teacher.findMany({});
+  const results = await db.query.posts.findMany({});
   const page = 1; // or from query params
   const limit = results.length; // or from query params
   const totalCount = results.length;
@@ -35,7 +36,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   );
 };
 
-// Create new teacher
+// Create new post
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const body = c.req.valid("json");
   const session = c.get("session");
@@ -48,7 +49,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   }
 
   const [inserted] = await db
-    .insert(teacher)
+    .insert(posts)
     .values({
       ...body,
       organizationId: session.activeOrganizationId,
@@ -59,25 +60,25 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   return c.json(inserted, HttpStatusCodes.CREATED);
 };
 
-// 🔍 Get a single teacher
+// 🔍 Get a single post
 export const getOne: AppRouteHandler<GetByIdRoute> = async (c) => {
   const { id } = c.req.valid("param");
 
-  const child = await db.query.teacher.findFirst({
-    where: eq(teacher.id, String(id)),
+  const post = await db.query.posts.findFirst({
+    where: eq(posts.id, String(id)),
   });
 
-  if (!child) {
+  if (!post) {
     return c.json(
       { message: HttpStatusPhrases.NOT_FOUND },
       HttpStatusCodes.NOT_FOUND
     );
   }
 
-  return c.json(child, HttpStatusCodes.OK);
+  return c.json(post, HttpStatusCodes.OK);
 };
 
-// Update teacher
+// Update post
 export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const updates = c.req.valid("json");
@@ -91,12 +92,12 @@ export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
   }
 
   const [updated] = await db
-    .update(teacher)
+    .update(posts)
     .set({
       ...updates,
       updatedAt: new Date(),
     })
-    .where(eq(teacher.id, String(id)))
+    .where(eq(posts.id, String(id)))
     .returning();
 
   if (!updated) {
@@ -109,7 +110,7 @@ export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
   return c.json(updated, HttpStatusCodes.OK);
 };
 
-//  Delete teacher
+//  Delete post
 export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const session = c.get("user") as { organizationId?: string } | undefined;
@@ -122,8 +123,8 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   }
 
   const [deleted] = await db
-    .delete(teacher)
-    .where(eq(teacher.id, String(id)))
+    .delete(posts)
+    .where(eq(posts.id, String(id)))
     .returning();
 
   if (!deleted) {
@@ -133,7 +134,7 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
     );
   }
 
-  return c.json({ message: "Deleted successfully" }, HttpStatusCodes.OK);
+  return c.body(null, HttpStatusCodes.NO_CONTENT);
 };
 
 // import { eq } from "drizzle-orm";
@@ -142,7 +143,7 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
 
 // import { db } from "@api/db";
 // import type { AppRouteHandler } from "@api/types";
-// import { teacher } from "@repo/database";
+// import { posts } from "@repo/database";
 
 // import type {
 //   ListRoute,
@@ -150,11 +151,11 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
 //   GetByIdRoute,
 //   UpdateRoute,
 //   RemoveRoute,
-// } from "./teacher.routes";
+// } from "./post.routes";
 
-// // 📝 List all teacher
+// // 📝 List all posts
 // export const list: AppRouteHandler<ListRoute> = async (c) => {
-//   const results = await db.query.teacher.findMany({});
+//   const results = await db.query.posts.findMany({});
 //   return c.json(
 //     {
 //       data: results,
@@ -164,7 +165,7 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
 //   );
 // };
 
-// // ➕ Create new teacher
+// // ➕ Create new post
 // export const create: AppRouteHandler<CreateRoute> = async (c) => {
 //   const body = c.req.valid("json");
 //   const session = c.get("user") as { organizationId?: string } | undefined;
@@ -177,7 +178,7 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
 //   }
 
 //   const [inserted] = await db
-//     .insert(teacher)
+//     .insert(posts)
 //     .values({
 //       ...body,
 //       organizationId: session.organizationId,
@@ -189,12 +190,12 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
 //   return c.json(inserted, HttpStatusCodes.CREATED);
 // };
 
-// // 🔍 Get a single teacher
+// // 🔍 Get a single post
 // export const getOne: AppRouteHandler<GetByIdRoute> = async (c) => {
 //   const { id } = c.req.valid("params");
 
-//   const found = await db.query.teacher.findFirst({
-//     where: eq(teacher.id, String(id)),
+//   const found = await db.query.posts.findFirst({
+//     where: eq(posts.id, String(id)),
 //   });
 
 //   if (!found) {
@@ -207,7 +208,7 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
 //   return c.json(found, HttpStatusCodes.OK);
 // };
 
-// // ✏️ Update teacher
+// // ✏️ Update post
 // export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
 //   const { id } = c.req.valid("params");
 //   const updates = c.req.valid("json");
@@ -221,12 +222,12 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
 //   }
 
 //   const [updated] = await db
-//     .update(teacher)
+//     .update(posts)
 //     .set({
 //       ...updates,
 //       updatedAt: new Date(),
 //     })
-//     .where(eq(teacher.id, String(id)))
+//     .where(eq(posts.id, String(id)))
 //     .returning();
 
 //   if (!updated) {
@@ -239,7 +240,7 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
 //   return c.json(updated, HttpStatusCodes.OK);
 // };
 
-// // 🗑 Delete teacher
+// // 🗑 Delete post
 // export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
 //   const { id } = c.req.valid("params");
 //   const session = c.get("user") as { organizationId?: string } | undefined;
@@ -252,8 +253,8 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
 //   }
 
 //   const [deleted] = await db
-//     .delete(teacher)
-//     .where(eq(teacher.id, String(id)))
+//     .delete(posts)
+//     .where(eq(posts.id, String(id)))
 //     .returning();
 
 //   if (!deleted) {

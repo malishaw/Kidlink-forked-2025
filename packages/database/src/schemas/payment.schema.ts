@@ -17,6 +17,7 @@ export const payments = pgTable("payments", {
     .notNull(),
   amount: numeric("amount").notNull(),
   paymentMethod: varchar("payment_method", { length: 50 }).notNull(), // e.g., cash, card
+  slipUrl: text("slip_url"), // URL to the payment slip image
   status: varchar("status", { length: 20 }).default("pending").notNull(), // pending, completed, failed
   paidAt: timestamp("paid_at"),
   organizationId: text("organization_id").references(() => organization.id),

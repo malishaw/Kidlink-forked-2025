@@ -27,7 +27,6 @@ import {
   GraduationCap,
   Heart,
   Mail,
-  MapPin,
   MessageSquare,
   Phone,
   Plus,
@@ -320,7 +319,7 @@ export default function Page() {
                       <p className="text-slate-800">{children.gender}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                  {/* <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
                     <MapPin className="w-5 h-5 text-slate-500" />
                     <div>
                       <p className="text-sm font-medium text-slate-600">
@@ -328,7 +327,7 @@ export default function Page() {
                       </p>
                       <p className="text-slate-800">{children.address}</p>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
