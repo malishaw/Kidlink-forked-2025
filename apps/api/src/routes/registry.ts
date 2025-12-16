@@ -3,6 +3,7 @@ import { AppOpenAPI } from "@api/types";
 
 import { BASE_PATH } from "../lib/constants";
 import badges from "./badges/badges.index";
+import book from "./books/book.index";
 import children from "./children/children.index";
 import comment from "./comment/comment.index";
 import conversationParticipant from "./conversationParticipants/conversationParticipant.index";
@@ -60,6 +61,7 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/conversation", conversation)
     .route("/conversation-participant", conversationParticipant)
     .route("/gallery", gallery)
+    .route("/books", book)
     .route("/classes", nurseryClass);
 }
 

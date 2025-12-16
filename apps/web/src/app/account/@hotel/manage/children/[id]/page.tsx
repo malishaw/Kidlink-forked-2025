@@ -18,6 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/card";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   AlertCircle,
   Calendar,
@@ -39,6 +40,7 @@ import { useState } from "react";
 export default function Page() {
   const params = useParams();
   const id = (params?.id as string) || "1";
+  const queryClient = useQueryClient();
   const { data, isLoading, error } = useChildrensList({});
   const children = data?.data?.find((c: any) => c.id === id);
 
@@ -104,7 +106,9 @@ export default function Page() {
     setAssignSuccess(false);
     try {
       await updateChildren(id, { ...children, classId: selectedClassId });
+      await queryClient.invalidateQueries({ queryKey: ["children"] });
       setAssignSuccess(true);
+      setTimeout(() => setAssignSuccess(false), 3000);
     } catch (err: any) {
       setAssignError(err.message || "Failed to assign class");
     } finally {
@@ -136,7 +140,9 @@ export default function Page() {
         ...children,
         parentId: selectedParent.userId,
       });
+      await queryClient.invalidateQueries({ queryKey: ["children"] });
       setAssignParentSuccess(true);
+      setTimeout(() => setAssignParentSuccess(false), 3000);
     } catch (err: any) {
       setAssignParentError(err.message || "Failed to assign parent");
     } finally {
@@ -155,13 +161,10 @@ export default function Page() {
         : [...currentBadges, selectedBadgeId];
 
       await updateChildren(id, { ...children, badgeId: updatedBadges });
+      await queryClient.invalidateQueries({ queryKey: ["children"] });
       setAssignBadgeSuccess(true);
       setSelectedBadgeId(""); // Reset selection
-
-      // Reload the page to show updated data
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      setTimeout(() => setAssignBadgeSuccess(false), 3000);
     } catch (err: any) {
       setAssignBadgeError(err.message || "Failed to assign badge");
     } finally {
@@ -180,12 +183,9 @@ export default function Page() {
       );
 
       await updateChildren(id, { ...children, badgeId: updatedBadges });
+      await queryClient.invalidateQueries({ queryKey: ["children"] });
       setAssignBadgeSuccess(true);
-
-      // Reload the page to show updated data
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      setTimeout(() => setAssignBadgeSuccess(false), 3000);
     } catch (err: any) {
       setAssignBadgeError(err.message || "Failed to remove badge");
     } finally {

@@ -18,11 +18,11 @@ export const useGetParentById = (id: string) => {
     queryKey: ["parent", id],
     queryFn: async () => {
       const rpcClient = await getClient();
-      const response = await rpcClient.api.parent[":id"].$get({
+      const response = await (rpcClient.api?.parent?.[":id"] as any)?.$get({
         param: { id },
       });
-      if (!response.ok) throw new Error("Failed to fetch parent");
-      const json = await response.json();
+      if (!response?.ok) throw new Error("Failed to fetch parent");
+      const json = await response?.json();
       return json as Parent;
     },
     enabled: !!id,

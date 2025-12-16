@@ -58,7 +58,10 @@ export function ChildrensList() {
     queryKey: ["all-classes"],
     queryFn: async () => {
       const rpcClient = await getClient();
-      const classesRes = await rpcClient.api["classes"].$get();
+      if (!rpcClient || !rpcClient.api) {
+        throw new Error("RPC client is not properly initialized");
+      }
+      const classesRes = await (rpcClient.api.classes as any).$get();
 
       if (!classesRes.ok) {
         const errorData = await classesRes.json();
@@ -73,11 +76,12 @@ export function ChildrensList() {
   const classesData = classesResponse?.data || [];
 
   const getClassName = (classId: string): string => {
+    if (!classId) return "";
     if (classesLoading) return "Loading...";
     const classData = classesData.find(
       (cls: { id: string }) => cls.id === classId
     );
-    return classData?.name || "No assigned class";
+    return classData?.name || "Unknown class";
   };
 
   // Fetch all badges
@@ -89,7 +93,10 @@ export function ChildrensList() {
     queryKey: ["all-badges"],
     queryFn: async () => {
       const rpcClient = await getClient();
-      const badgesRes = await rpcClient.api["badges"].$get();
+      if (!rpcClient || !rpcClient.api) {
+        throw new Error("RPC client is not properly initialized");
+      }
+      const badgesRes = await (rpcClient.api.badges as any).$get();
 
       if (!badgesRes.ok) {
         const errorData = await badgesRes.json();
@@ -102,6 +109,49 @@ export function ChildrensList() {
   });
 
   const badgesData = badgesResponse?.data || [];
+
+  // Fetch all parents
+  const {
+    data: parentsResponse,
+    isLoading: parentsLoading,
+    error: parentsError,
+  } = useQuery({
+    queryKey: ["all-parents"],
+    queryFn: async () => {
+      const rpcClient = await getClient();
+      if (!rpcClient || !rpcClient.api) {
+        throw new Error("RPC client is not properly initialized");
+      }
+      const parentsRes = await (rpcClient.api.parents as any).$get();
+
+      if (!parentsRes.ok) {
+        const errorData = await parentsRes.json();
+        throw new Error(errorData.message || "Failed to fetch parents");
+      }
+
+      const parents = await parentsRes.json();
+      return parents;
+    },
+  });
+
+  const parentsData = parentsResponse?.data || [];
+
+  // Helper to get parent name by parentId (userId)
+  const getParentName = (parentId: string | undefined): string => {
+    if (!parentId) return "";
+    if (parentsLoading) return "Loading...";
+    const parent = parentsData.find(
+      (p: any) => p.userId === parentId || p.id === parentId
+    );
+    return parent?.name || "Unknown Parent";
+  };
+
+  // Helper to get badge name from badge ID
+  const getBadgeName = (badgeId: string): string => {
+    if (badgesLoading) return "Loading...";
+    const badge = badgesData.find((b: any) => b.id === badgeId);
+    return badge?.title || badge?.name || "Unknown Badge";
+  };
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -163,8 +213,8 @@ export function ChildrensList() {
     const fetchClassNames = async () => {
       const classIdMap: Record<string, string> = { ...classNames };
       const classIdsToFetch = childrensData
-        .map((child) => child.classId)
-        .filter((classId) => classId && !classIdMap[classId]);
+        .map((child: any) => child.classId)
+        .filter((classId: any) => classId && !classIdMap[classId]);
 
       if (classIdsToFetch.length === 0) return;
 
@@ -182,29 +232,6 @@ export function ChildrensList() {
 
     fetchClassNames();
   }, [childrensData, classNames]);
-
-  // Add a function to fetch parent names based on parent ID
-  const getParentName = (parentId: string): string => {
-    if (!parentId) return "No assigned parent";
-    const {
-      data: parentData,
-      isLoading: parentLoading,
-      error: parentError,
-    } = useGetParentById(parentId);
-
-    if (parentLoading) return "Loading...";
-    if (parentError) return "Error fetching parent";
-
-    return parentData?.name || "Unknown parent";
-  };
-
-  const getBadgeName = (badgeId: string): string => {
-    if (badgesLoading) return "Loading...";
-    const badgeData = badgesData.find(
-      (badge: { id: string }) => badge.id === badgeId
-    );
-    return badgeData?.title || "No badge assigned";
-  };
 
   if (isLoading || classesLoading) {
     return (
@@ -826,13 +853,34 @@ export function ChildrensList() {
                         {children.name}
                       </CardTitle>
                       <div className="flex flex-wrap gap-2">
-                        <div className="px-3 py-1 bg-blue-100/80 text-blue-700 rounded-full text-xs font-medium">
-                          {getClassName(children.classId)}
-                        </div>
-                        {children.badgeId && (
-                          <div className="px-3 py-1 bg-amber-100/80 text-amber-700 rounded-full text-xs font-medium flex items-center gap-1">
-                            🏆 {getBadgeName(children.badgeId)}
+                        {children.classId && getClassName(children.classId) && (
+                          <div className="px-3 py-1 bg-blue-100/80 text-blue-700 rounded-full text-xs font-medium">
+                            {getClassName(children.classId)}
                           </div>
+                        )}
+                        {children.parentId &&
+                          getParentName(children.parentId) && (
+                            <div className="px-3 py-1 bg-green-100/80 text-green-700 rounded-full text-xs font-medium flex items-center gap-1">
+                              👤 {getParentName(children.parentId)}
+                            </div>
+                          )}
+                        {children.badgeId && (
+                          <>
+                            {Array.isArray(children.badgeId) ? (
+                              children.badgeId.map((badgeId: string) => (
+                                <div
+                                  key={badgeId}
+                                  className="px-3 py-1 bg-amber-100/80 text-amber-700 rounded-full text-xs font-medium flex items-center gap-1"
+                                >
+                                  🏆 {getBadgeName(badgeId)}
+                                </div>
+                              ))
+                            ) : (
+                              <div className="px-3 py-1 bg-amber-100/80 text-amber-700 rounded-full text-xs font-medium flex items-center gap-1">
+                                🏆 {getBadgeName(children.badgeId)}
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>

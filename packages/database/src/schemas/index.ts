@@ -41,3 +41,5 @@ export * from "./gallery.schema";
 export * from "./post.schema";
 export * from "./postComment.schema";
 export * from "./postLike.schema";
+
+export * from "./book.schema";

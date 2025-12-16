@@ -1,5 +1,5 @@
 {
-  "id": "34ee9d8c-68a5-4874-a2af-d0ee8bf9d898",
+  "id": "caf3b162-b4da-4fec-9642-d8153f2510ca",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -238,6 +238,97 @@
           "tableTo": "user",
           "columnsFrom": [
             "teacher_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.books": {
+      "name": "books",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "author_id": {
+          "name": "author_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "media_urls": {
+          "name": "media_urls",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "books_organization_id_organization_id_fk": {
+          "name": "books_organization_id_organization_id_fk",
+          "tableFrom": "books",
+          "tableTo": "organization",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "books_author_id_user_id_fk": {
+          "name": "books_author_id_user_id_fk",
+          "tableFrom": "books",
+          "tableTo": "user",
+          "columnsFrom": [
+            "author_id"
           ],
           "columnsTo": [
             "id"
@@ -2552,6 +2643,12 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "post_id": {
           "name": "post_id",
           "type": "text",
@@ -2587,6 +2684,19 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "post_comments_organization_id_organization_id_fk": {
+          "name": "post_comments_organization_id_organization_id_fk",
+          "tableFrom": "post_comments",
+          "tableTo": "organization",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "post_comments_post_id_posts_id_fk": {
           "name": "post_comments_post_id_posts_id_fk",
           "tableFrom": "post_comments",
@@ -2763,12 +2873,6 @@
         "place": {
           "name": "place",
           "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "date_time": {
-          "name": "date_time",
-          "type": "timestamp",
           "primaryKey": false,
           "notNull": false
         },

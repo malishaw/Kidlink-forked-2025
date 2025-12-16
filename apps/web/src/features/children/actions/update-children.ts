@@ -6,7 +6,11 @@ import type { childrenUpdateType } from "../schemas"; // make sure you have this
 export async function updateChildren(id: string, data: childrenUpdateType) {
   const rpcClient = await getClient();
 
-  const response = await rpcClient.api.children[":id"].$patch({
+  if (!rpcClient?.api?.children) {
+    throw new Error("RPC client is not properly initialized");
+  }
+
+  const response = await (rpcClient.api.children as any)[":id"].$patch({
     param: { id },
     json: data,
   });
