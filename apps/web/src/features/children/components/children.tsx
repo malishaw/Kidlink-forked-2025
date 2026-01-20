@@ -22,6 +22,8 @@ import { useEffect, useState } from "react";
 
 import { createChildren } from "@/features/children/actions/create-children";
 import { ChildrensList as useChildrensList } from "@/features/children/actions/get-children";
+import { updateChildren } from "@/features/children/actions/update-children";
+import { deleteChildren } from "@/features/children/actions/use-delete-children";
 import { getClient } from "@/lib/rpc/client";
 
 const useGetClassById = async (classId: string) => {
@@ -119,6 +121,7 @@ export function ChildrensList() {
     imagesUrl: "",
     activities: "",
   });
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,8 +135,13 @@ export function ChildrensList() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await createChildren(formData);
+      if (editingId) {
+        await updateChildren(editingId, formData);
+      } else {
+        await createChildren(formData);
+      }
       setIsModalOpen(false);
+      setEditingId(null);
       setFormData({
         name: "",
         organizationId: "",
@@ -633,7 +641,24 @@ export function ChildrensList() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setIsModalOpen(false)}
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      setEditingId(null);
+                      setFormData({
+                        name: "",
+                        organizationId: "",
+                        nurseryId: "",
+                        parentId: "",
+                        classId: "",
+                        dateOfBirth: "",
+                        gender: "",
+                        emergencyContact: "",
+                        medicalNotes: "",
+                        profileImageUrl: "",
+                        imagesUrl: "",
+                        activities: "",
+                      });
+                    }}
                   >
                     Cancel
                   </Button>
@@ -642,7 +667,11 @@ export function ChildrensList() {
                     className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? "Saving..." : "Save Children"}
+                    {isSubmitting
+                      ? "Saving..."
+                      : editingId
+                        ? "Update Children"
+                        : "Save Children"}
                   </Button>
                 </div>
               </form>
@@ -944,17 +973,68 @@ export function ChildrensList() {
                     </div>
                   )}
 
-                  {/* Action Button */}
-                  <div className="pt-2">
+                  {/* Action Buttons */}
+                  <div className="pt-2 flex gap-3">
                     <Button
-                      className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                      className="flex-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                       onClick={(e) => {
                         e.stopPropagation();
                         router.push(`/account/manage/children/${children.id}`);
                       }}
                     >
                       <Eye className="h-4 w-4 mr-2" />
-                      View Profile
+                      View
+                    </Button>
+
+                    <Button
+                      className="flex-1 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-white font-semibold py-3 rounded-xl shadow-md transition-all duration-200"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFormData({
+                          name: children.name || "",
+                          organizationId: children.organizationId || "",
+                          nurseryId: children.nurseryId || "",
+                          parentId: children.parentId || "",
+                          classId: children.classId || "",
+                          dateOfBirth: children.dateOfBirth || "",
+                          gender: children.gender || "",
+                          emergencyContact: children.emergencyContact || "",
+                          medicalNotes: children.medicalNotes || "",
+                          profileImageUrl:
+                            children.profileImageUrl || children.avatar || "",
+                          imagesUrl: children.imagesUrl || "",
+                          activities: children.activities || "",
+                        });
+                        setEditingId(children.id);
+                        setIsModalOpen(true);
+                      }}
+                    >
+                      Edit
+                    </Button>
+
+                    <Button
+                      className="flex-1 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-semibold py-3 rounded-xl shadow-md transition-all duration-200"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        if (
+                          !confirm(
+                            `Delete ${children.name}? This action cannot be undone.`
+                          )
+                        )
+                          return;
+                        try {
+                          setIsSubmitting(true);
+                          await deleteChildren(children.id);
+                          window.location.reload();
+                        } catch (err) {
+                          console.error(err);
+                          alert("Failed to delete child");
+                        } finally {
+                          setIsSubmitting(false);
+                        }
+                      }}
+                    >
+                      Delete
                     </Button>
                   </div>
                 </div>
