@@ -6,6 +6,7 @@ import { classes } from "@repo/database";
 // Base select schema (from Drizzle)
 export const classSchema = createSelectSchema(classes, {
   teacherIds: z.array(z.string()), // force teacherIds to be string[]
+  childIds: z.array(z.string()), // force childIds to be string[]
   nurseryId: z.string().nullable(),
   mainTeacherId: z.string().nullable(),
 });
@@ -13,6 +14,7 @@ export const classSchema = createSelectSchema(classes, {
 // Insert schema
 export const classInsertSchema = createInsertSchema(classes, {
   teacherIds: z.array(z.string()).default([]),
+  childIds: z.array(z.string()).default([]),
   nurseryId: z.string().nullable(),
   mainTeacherId: z.string().nullable(),
 }).omit({

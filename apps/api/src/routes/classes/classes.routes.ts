@@ -4,15 +4,15 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { z } from "zod";
 
 import {
-  errorMessageSchema,
-  getPaginatedSchema,
-  queryParamsSchema,
-  stringIdParamSchema,
+    errorMessageSchema,
+    getPaginatedSchema,
+    queryParamsSchema,
+    stringIdParamSchema,
 } from "@api/lib/helpers";
 import {
-  classesInsertSchema,
-  classesSchema,
-  classesUpdateSchema,
+    classesInsertSchema,
+    classesSchema,
+    classesUpdateSchema,
 } from "./classes.schema";
 
 const tags: string[] = ["classes"];
@@ -99,7 +99,7 @@ export const update = createRoute({
     ),
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(classesUpdateSchema, "The classes item"),
+    [HttpStatusCodes.OK]: jsonContent(classesSchema, "The updated classes item"),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(errorMessageSchema, "Not found"),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,

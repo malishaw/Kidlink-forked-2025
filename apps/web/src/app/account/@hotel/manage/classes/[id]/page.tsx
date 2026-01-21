@@ -14,7 +14,13 @@ export default function ClassDetailPage() {
   const [selectedChildren, setSelectedChildren] = React.useState<string[]>([]);
   const [assignChildLoading, setAssignChildLoading] = React.useState(false);
   const [assignChildError, setAssignChildError] = React.useState<string>("");
+  const [removingChildIds, setRemovingChildIds] = React.useState<Set<string>>(new Set());
   const childrenQuery = ChildrensList({ page: 1, limit: 50 });
+
+  // Edit class state
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editName, setEditName] = React.useState("");
+  const [saveLoading, setSaveLoading] = React.useState(false);
 
   // Assign additional teacher state
   const [selectedAdditionalTeachers, setSelectedAdditionalTeachers] =
@@ -23,6 +29,7 @@ export default function ClassDetailPage() {
     React.useState(false);
   const [assignAdditionalTeacherError, setAssignAdditionalTeacherError] =
     React.useState<string>("");
+  const [removingTeacherIds, setRemovingTeacherIds] = React.useState<Set<string>>(new Set());
   const handleAssignChild = async () => {
     if (!selectedChildren.length || !classId) return;
     setAssignChildLoading(true);
@@ -44,6 +51,86 @@ export default function ClassDetailPage() {
       setAssignChildLoading(false);
     }
   };
+
+  // Handle removing a child from the class
+  const handleRemoveChild = async (childIdToRemove: string) => {
+    if (!classId) return;
+
+    if (!confirm("Are you sure you want to remove this child from the class?")) {
+      return;
+    }
+
+    setRemovingChildIds((prev) => new Set(prev).add(childIdToRemove));
+    try {
+      const currentChildIds = Array.isArray(data?.childIds) ? data.childIds : [];
+      const newChildIds = currentChildIds.filter((id: string) => id !== childIdToRemove);
+
+      console.log("[handleRemoveChild] classId:", classId);
+      console.log("[handleRemoveChild] childIdToRemove:", childIdToRemove);
+      console.log("[handleRemoveChild] currentChildIds:", currentChildIds);
+      console.log("[handleRemoveChild] newChildIds:", newChildIds);
+
+      const result = await updateClass(classId, { childIds: newChildIds });
+      console.log("[handleRemoveChild] updateClass result:", result);
+      refetch();
+    } catch (err: any) {
+      console.error("[handleRemoveChild] Error:", err);
+      alert(err.message || "Failed to remove child");
+    } finally {
+      setRemovingChildIds((prev) => {
+        const next = new Set(prev);
+        next.delete(childIdToRemove);
+        return next;
+      });
+    }
+  };
+
+  // Handle starting edit mode
+  const handleStartEditing = () => {
+    setEditName(data?.name || "");
+    setIsEditing(true);
+  };
+
+  // Handle saving class name
+  const handleSaveClassName = async () => {
+    if (!classId || !editName.trim()) return;
+    setSaveLoading(true);
+    try {
+      await updateClass(classId, { name: editName.trim() });
+      refetch();
+      setIsEditing(false);
+    } catch (err: any) {
+      alert(err.message || "Failed to update class name");
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+  // Handle removing a teacher from the class
+  const handleRemoveTeacher = async (teacherIdToRemove: string) => {
+    if (!classId) return;
+
+    if (!confirm("Are you sure you want to remove this teacher from the class?")) {
+      return;
+    }
+
+    setRemovingTeacherIds((prev) => new Set(prev).add(teacherIdToRemove));
+    try {
+      const currentTeacherIds = Array.isArray(data?.teacherIds) ? data.teacherIds : [];
+      const newTeacherIds = currentTeacherIds.filter((id: string) => id !== teacherIdToRemove);
+      await updateClass(classId, { teacherIds: newTeacherIds });
+      refetch();
+    } catch (err: any) {
+      alert(err.message || "Failed to remove teacher");
+    } finally {
+      setRemovingTeacherIds((prev) => {
+        const next = new Set(prev);
+        next.delete(teacherIdToRemove);
+        return next;
+      });
+    }
+  };
+
   const params = useParams();
   const classId = params?.id as string;
 
@@ -115,21 +202,56 @@ export default function ClassDetailPage() {
         {/* Class Details Card */}
         <div className="bg-white/90 backdrop-blur-sm border-0 shadow-xl rounded-2xl overflow-hidden">
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6">
-            <div className="flex items-center gap-6">
-              <div className="h-20 w-20 bg-white/20 rounded-xl flex items-center justify-center">
-                <span className="text-2xl font-bold text-white">
-                  {data?.name?.charAt(0) || "C"}
-                </span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-6">
+                <div className="h-20 w-20 bg-white/20 rounded-xl flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white">
+                    {(isEditing ? editName : data?.name)?.charAt(0) || "C"}
+                  </span>
+                </div>
+                <div className="text-white flex-1">
+                  {isEditing ? (
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="text"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="text-2xl font-bold bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
+                        placeholder="Enter class name"
+                        autoFocus
+                      />
+                      <button
+                        onClick={handleSaveClassName}
+                        disabled={saveLoading || !editName.trim()}
+                        className="px-4 py-2 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50"
+                      >
+                        {saveLoading ? "Saving..." : "Save"}
+                      </button>
+                      <button
+                        onClick={() => setIsEditing(false)}
+                        className="px-4 py-2 bg-white/20 text-white font-semibold rounded-lg hover:bg-white/30 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <h2 className="text-3xl font-bold mb-1">
+                      {data?.name || "Unnamed Class"}
+                    </h2>
+                  )}
+                </div>
               </div>
-              <div className="text-white">
-                <h2 className="text-3xl font-bold mb-1">
-                  {data?.name || "Unnamed Class"}
-                </h2>
-                {/* <div className="flex items-center gap-4 text-blue-100">
-                  <span>ID: {data?.id ?? "—"}</span>
-                  <span>Nursery: {data?.nurseryId ?? "—"}</span>
-                </div> */}
-              </div>
+              {!isEditing && (
+                <button
+                  onClick={handleStartEditing}
+                  className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Edit Class
+                </button>
+              )}
             </div>
           </div>
 
@@ -208,12 +330,30 @@ export default function ClassDetailPage() {
                     const child = childrenQuery.data?.data?.find(
                       (c: any) => c.id === childId
                     );
+                    const isRemoving = removingChildIds.has(childId);
                     return (
                       <span
                         key={childId}
-                        className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
+                        className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm flex items-center gap-2 group"
                       >
                         {child?.name || childId}
+                        <button
+                          onClick={() => handleRemoveChild(childId)}
+                          disabled={isRemoving}
+                          className="w-4 h-4 rounded-full bg-purple-200 hover:bg-red-500 hover:text-white text-purple-600 flex items-center justify-center transition-colors disabled:opacity-50"
+                          title="Remove child from class"
+                        >
+                          {isRemoving ? (
+                            <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                          ) : (
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          )}
+                        </button>
                       </span>
                     );
                   })}
@@ -379,12 +519,30 @@ export default function ClassDetailPage() {
                     const teacher = teachersQuery.data?.data?.find(
                       (t: any) => t.id === teacherId
                     );
+                    const isRemoving = removingTeacherIds.has(teacherId);
                     return (
                       <span
                         key={teacherId}
-                        className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
+                        className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm flex items-center gap-2"
                       >
                         {teacher?.name || teacherId}
+                        <button
+                          onClick={() => handleRemoveTeacher(teacherId)}
+                          disabled={isRemoving}
+                          className="w-4 h-4 rounded-full bg-green-200 hover:bg-red-500 hover:text-white text-green-600 flex items-center justify-center transition-colors disabled:opacity-50"
+                          title="Remove teacher from class"
+                        >
+                          {isRemoving ? (
+                            <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                          ) : (
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          )}
+                        </button>
                       </span>
                     );
                   })}

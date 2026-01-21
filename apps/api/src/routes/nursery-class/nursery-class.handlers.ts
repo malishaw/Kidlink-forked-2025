@@ -7,11 +7,11 @@ import type { AppRouteHandler } from "@api/types";
 import { classes, nurseries } from "@repo/database";
 
 import type {
-  CreateRoute,
-  GetByIdRoute,
-  ListRoute,
-  RemoveRoute,
-  UpdateRoute,
+    CreateRoute,
+    GetByIdRoute,
+    ListRoute,
+    RemoveRoute,
+    UpdateRoute,
 } from "./nursery-class.routes";
 
 // Session shape placed on ctx by your auth middleware
@@ -195,16 +195,13 @@ export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
     const currentTeacherIds = existingClass.teacherIds || [];
     const currentChildIds = existingClass.childIds || [];
 
-    // Handle teacherIds: preserve existing if not provided in updates
+    // Handle teacherIds: REPLACE if provided in updates (don't merge)
     let finalTeacherIds = currentTeacherIds;
     if (updates.teacherIds !== undefined) {
       if (Array.isArray(updates.teacherIds)) {
-        // Merge new teacherIds with existing ones, removing duplicates
-        const newTeacherIds = updates.teacherIds.filter(
+        // REPLACE with the new array (this allows removal of teachers)
+        finalTeacherIds = updates.teacherIds.filter(
           (id) => id != null && id !== ""
-        );
-        finalTeacherIds = Array.from(
-          new Set([...currentTeacherIds, ...newTeacherIds])
         );
       } else if (updates.teacherIds === null) {
         // Explicitly clear teacherIds
@@ -212,16 +209,13 @@ export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
       }
     }
 
-    // Handle childIds: preserve existing if not provided in updates
+    // Handle childIds: REPLACE if provided in updates (don't merge)
     let finalChildIds = currentChildIds;
     if (updates.childIds !== undefined) {
       if (Array.isArray(updates.childIds)) {
-        // Merge new childIds with existing ones, removing duplicates
-        const newChildIds = updates.childIds.filter(
+        // REPLACE with the new array (this allows removal of children)
+        finalChildIds = updates.childIds.filter(
           (id) => id != null && id !== ""
-        );
-        finalChildIds = Array.from(
-          new Set([...currentChildIds, ...newChildIds])
         );
       } else if (updates.childIds === null) {
         // Explicitly clear childIds

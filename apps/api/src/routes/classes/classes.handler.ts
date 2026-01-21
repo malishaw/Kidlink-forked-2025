@@ -84,6 +84,9 @@ export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
   const updates = c.req.valid("json");
   const session = c.get("user");
 
+  console.log("[PATCH /classes/:id] ID:", id);
+  console.log("[PATCH /classes/:id] Updates received:", JSON.stringify(updates, null, 2));
+
   if (!session) {
     return c.json(
       { message: HttpStatusPhrases.UNAUTHORIZED },
@@ -99,6 +102,8 @@ export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
     })
     .where(eq(classes.id, String(id)))
     .returning();
+
+  console.log("[PATCH /classes/:id] Updated result:", JSON.stringify(updated, null, 2));
 
   if (!updated) {
     return c.json(
