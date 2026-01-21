@@ -1,22 +1,31 @@
 "use client";
 
+import { getClient } from "@/lib/rpc/client";
 import { PencilIcon } from "lucide-react";
 import { useCallback, useId, useState } from "react";
 
 import { Button } from "@repo/ui/components/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@repo/ui/components/select";
 import { useAppForm } from "@repo/ui/components/tanstack-form";
 
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { updateLessonPlan } from "../actions/update-lesson-plan.action";
 import type { lessonPlan } from "../schemas";
@@ -30,10 +39,24 @@ export function EditLessonPlan({ lesson, trigger }: Props) {
   const [open, setOpen] = useState<boolean>(false);
   const toastId = useId();
 
+  // Fetch classes for dropdown
+  const { data: classesData, isLoading: isClassesLoading } = useQuery({
+    queryKey: ["classes"],
+    queryFn: async () => {
+      const rpcClient = await getClient();
+      const response = await rpcClient.api.classes.$get({
+        query: { page: "1", limit: "100" },
+      });
+      if (!response.ok) throw new Error("Failed to fetch classes");
+      return await response.json();
+    },
+  });
+
   const form = useAppForm({
     defaultValues: {
       title: lesson.title || "",
       content: lesson.content || "",
+      classId: lesson.classId || "",
     },
     onSubmit: async ({ value }) => {
       try {
@@ -42,6 +65,7 @@ export function EditLessonPlan({ lesson, trigger }: Props) {
         const payload = {
           title: value.title?.trim() || undefined,
           content: value.content?.trim() || undefined,
+          classId: value.classId || undefined,
         };
 
         await updateLessonPlan(lesson.id, payload);
@@ -119,6 +143,41 @@ export function EditLessonPlan({ lesson, trigger }: Props) {
                         onChange={(e) => field.handleChange(e.target.value)}
                         onBlur={field.handleBlur}
                       />
+                    </field.FormControl>
+                    <field.FormMessage />
+                  </field.FormItem>
+                )}
+              />
+
+              {/* classId */}
+              <form.AppField
+                name="classId"
+                children={(field) => (
+                  <field.FormItem>
+                    <field.FormLabel>Class</field.FormLabel>
+                    <field.FormControl>
+                      <Select
+                        value={field.state.value}
+                        onValueChange={(value) => field.handleChange(value)}
+                        disabled={isClassesLoading}
+                      >
+                        <SelectTrigger>
+                          <SelectValue
+                            placeholder={
+                              isClassesLoading
+                                ? "Loading classes..."
+                                : "Select a class"
+                            }
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {classesData?.data?.map((classItem: any) => (
+                            <SelectItem key={classItem.id} value={classItem.id}>
+                              {classItem.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </field.FormControl>
                     <field.FormMessage />
                   </field.FormItem>

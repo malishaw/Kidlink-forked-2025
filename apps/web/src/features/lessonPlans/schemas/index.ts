@@ -18,7 +18,6 @@ export const lessonPlanUpdateSchema = createInsertSchema(lessonPlans)
   .omit({
     id: true,
     organizationId: true,
-    classId: true,
     teacherId: true,
     createdAt: true,
     updatedAt: true,
