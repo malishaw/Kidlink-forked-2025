@@ -10,7 +10,7 @@ import { useState } from "react";
 
 // Helper component to display individual feedback card
 function FeedbackCard({ feedback }: { feedback: any }) {
-  const { data: childData } = useGetChildById(feedba ck.childId);
+  const { data: childData } = useGetChildById(feedback.childId);
   const { data: teacherData } = useGetTeacherById(feedback.teacherId);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState<string>(

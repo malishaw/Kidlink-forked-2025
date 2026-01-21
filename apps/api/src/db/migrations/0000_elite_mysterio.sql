@@ -119,6 +119,22 @@ CREATE TABLE "feedback" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
+CREATE TABLE "galleries" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"organization_id" text,
+	"type" varchar(50) NOT NULL,
+	"title" varchar(255) NOT NULL,
+	"description" text,
+	"images" text[],
+	"child_id" text,
+	"class_id" text,
+	"event_id" text,
+	"user_id" text NOT NULL,
+	"created_by" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "hotel_amenities" (
 	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"hotel_id" text NOT NULL,
@@ -279,6 +295,7 @@ CREATE TABLE "organization" (
 CREATE TABLE "parent" (
 	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"organization_id" text,
+	"user_id" text,
 	"child_id" text[],
 	"name" text NOT NULL,
 	"phone_number" text NOT NULL,
@@ -293,6 +310,7 @@ CREATE TABLE "payments" (
 	"child_id" text NOT NULL,
 	"amount" numeric NOT NULL,
 	"payment_method" varchar(50) NOT NULL,
+	"slip_url" text,
 	"status" varchar(20) DEFAULT 'pending' NOT NULL,
 	"paid_at" timestamp,
 	"organization_id" text,
@@ -372,6 +390,7 @@ CREATE TABLE "teacher" (
 	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"class_id" text,
 	"organization_id" text,
+	"user_id" text,
 	"name" text NOT NULL,
 	"phone_number" text NOT NULL,
 	"email" text NOT NULL,
@@ -419,6 +438,7 @@ ALTER TABLE "event" ADD CONSTRAINT "event_organization_id_organization_id_fk" FO
 ALTER TABLE "feedback" ADD CONSTRAINT "feedback_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "feedback" ADD CONSTRAINT "feedback_child_id_childrens_id_fk" FOREIGN KEY ("child_id") REFERENCES "public"."childrens"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "feedback" ADD CONSTRAINT "feedback_teacher_id_user_id_fk" FOREIGN KEY ("teacher_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "galleries" ADD CONSTRAINT "galleries_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hotel_amenities" ADD CONSTRAINT "hotel_amenities_hotel_id_hotels_id_fk" FOREIGN KEY ("hotel_id") REFERENCES "public"."hotels"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hotel_images" ADD CONSTRAINT "hotel_images_hotel_id_hotels_id_fk" FOREIGN KEY ("hotel_id") REFERENCES "public"."hotels"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hotel_images" ADD CONSTRAINT "hotel_images_room_type_id_room_types_id_fk" FOREIGN KEY ("room_type_id") REFERENCES "public"."room_types"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
