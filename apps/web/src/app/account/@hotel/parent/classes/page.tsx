@@ -1,6 +1,7 @@
 "use client";
 
 import CreateClassForm from "@/features/classes/components/create-class-form";
+import { useMyNursery } from "@/features/nursery/actions/get-my-nursery.action";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -8,6 +9,9 @@ import { useState } from "react";
 export default function Home() {
   const router = useRouter();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+
+  // Fetch current nursery (title/description)
+  const { data: myNursery, isLoading: nurseryLoading } = useMyNursery();
 
   // Fetch all classes
   const classesQuery = useQuery({
@@ -70,9 +74,6 @@ export default function Home() {
             <h1 className="text-4xl font-bold text-slate-800 mb-2">
               Class Management
             </h1>
-            <p className="text-xl text-slate-600">
-              Create and manage your classes
-            </p>
           </div>
 
           {/* Right Side - Add Class Button */}
@@ -89,6 +90,17 @@ export default function Home() {
             </svg>
             Add Class
           </button>
+        </div>
+
+        <div className="border p-2 rounded-lg" >
+          {myNursery?.title && (
+              <h2 className="text-lg font-semibold text-blue-800 mb-2">
+                {myNursery.title}
+              </h2>
+            )}
+            <p className="text-sm text-slate-600">
+              {myNursery?.description || ""}
+            </p>
         </div>
 
         {/* Classes Section */}

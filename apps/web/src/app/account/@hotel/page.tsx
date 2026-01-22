@@ -26,10 +26,14 @@ import { SignoutButton } from "@/features/auth/components/signout-button";
 import { BadgesList } from "@/features/badges/actions/get-badge.action";
 import { ChildrensList } from "@/features/children/actions/get-children";
 import { useGetNotifications } from "@/features/notification/actions/get-notification";
+import { useMyNursery } from "@/features/nursery/actions/get-my-nursery.action";
 import { ParentsList } from "@/features/parents/actions/get-parent";
 import { TeachersList } from "@/features/teachers/actions/get-teacher";
 
 export default function NurseryDashboard() {
+  // Fetch current nursery (title/description)
+  const { data: myNursery, isLoading: nurseryLoading } = useMyNursery();
+
   // Fetch data from your action files
   const { data: childrenData, isLoading: childrenLoading } = ChildrensList({
     page: 1,
@@ -101,9 +105,7 @@ export default function NurseryDashboard() {
             <h1 className="text-4xl font-bold text-gray-900 mb-2">
               🏫 Kidlink Nursery Dashboard
             </h1>
-            <p className="text-gray-600">
-              Welcome back! Here's what's happening in your nursery today.
-            </p>
+
           </div>
           <div className="flex items-center gap-4">
             <Button variant="outline" className="flex items-center gap-2">
@@ -112,6 +114,16 @@ export default function NurseryDashboard() {
             </Button>
             <SignoutButton />
           </div>
+        </div>
+                <div className="border p-2 rounded-lg" >
+          {myNursery?.title && (
+              <h2 className="text-lg font-semibold text-blue-800 mb-2">
+                {myNursery.title}
+              </h2>
+            )}
+            <p className="text-sm text-slate-600">
+              {myNursery?.description || ""}
+            </p>
         </div>
 
         {/* Stats Cards */}
