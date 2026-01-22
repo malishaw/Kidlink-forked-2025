@@ -1,10 +1,5 @@
 "use client";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@repo/ui/components/avatar";
 import { Button } from "@repo/ui/components/button";
 import {
   Dialog,
@@ -23,7 +18,8 @@ import {
 } from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
 import { useQueryClient } from "@tanstack/react-query";
-import { Edit3, Trash2, Upload, X } from "lucide-react";
+import { Edit, Trash2, Upload, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { deleteBadge as deleteBadgeAction } from "../actions/delete-badge.action";
@@ -47,10 +43,12 @@ interface BadgeListProps {
 
 export function BadgeList({ organizationId }: BadgeListProps) {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
   const [updatingIds, setUpdatingIds] = useState<Set<string>>(new Set());
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState<BadgeData | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [updateFormData, setUpdateFormData] = useState<BadgeData>({
     title: "",
     description: "",
@@ -83,6 +81,21 @@ export function BadgeList({ organizationId }: BadgeListProps) {
     });
     setImagePreview(badge.iconUrl || ""); // Set the preview to the current icon URL
     setIsUpdateModalOpen(true);
+  };
+
+  // Open details modal (view-only) with badge data
+  const openDetailsModal = (badge: BadgeData) => {
+    setSelectedBadge(badge);
+    setUpdateFormData({
+      title: badge.title,
+      description: badge.description,
+      badgeType: badge.badgeType,
+      points: badge.points,
+      level: badge.level,
+      iconUrl: badge.iconUrl || "",
+    });
+    setImagePreview(badge.iconUrl || "");
+    setIsDetailsModalOpen(true);
   };
 
   // Handle form input changes
@@ -166,6 +179,12 @@ export function BadgeList({ organizationId }: BadgeListProps) {
       toast.success("Badge updated successfully!");
       setIsUpdateModalOpen(false);
       setSelectedBadge(null);
+      // Refresh the page so other caches and views show the updated badge
+      try {
+        router.refresh();
+      } catch (e) {
+        // no-op
+      }
     } catch (err: any) {
       console.error("Failed to update badge:", err);
       toast.error(err?.message || "Failed to update badge");
@@ -200,6 +219,12 @@ export function BadgeList({ organizationId }: BadgeListProps) {
       await deleteBadgeAction(badgeId);
       queryClient.removeQueries({ queryKey: ["badge", badgeId] });
       toast.success("Badge deleted successfully!");
+      // Refresh the page after deletion to ensure UI reflects removal
+      try {
+        router.refresh();
+      } catch (e) {
+        // no-op
+      }
     } catch (error) {
       snapshots.forEach(([key, data]) => queryClient.setQueryData(key, data));
       console.error("Failed to delete badge:", error);
@@ -307,8 +332,9 @@ export function BadgeList({ organizationId }: BadgeListProps) {
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-amber-200/20 to-transparent rounded-full blur-2xl"></div>
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-orange-200/20 to-transparent rounded-full blur-2xl"></div>
 
-              <div className="relative z-10 p-6">
-                {/* Header Section */}
+
+
+              {/* <div className="relative z-10 p-6">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="relative">
                     <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
@@ -343,12 +369,10 @@ export function BadgeList({ organizationId }: BadgeListProps) {
                   </div>
                 </div>
 
-                {/* Description */}
                 <p className="text-sm text-slate-600 leading-relaxed line-clamp-2 mb-4 min-h-[2.5rem]">
                   {badge.description}
                 </p>
 
-                {/* Footer Section */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div
@@ -370,7 +394,6 @@ export function BadgeList({ organizationId }: BadgeListProps) {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex gap-2 mt-4 pt-4 border-t border-white/50">
                   <Button
                     variant="ghost"
@@ -401,11 +424,126 @@ export function BadgeList({ organizationId }: BadgeListProps) {
                     )}
                   </Button>
                 </div>
-              </div>
+              </div> */}
+
+
+
+
+              {/*  */}
+              <div
+  onClick={() => openDetailsModal(badge)}
+  className="flex flex-col items-center justify-center gap-3 p-3 cursor-pointer group"
+>
+  {/* CIRCLE BADGE */}
+  <div
+    className="relative w-28 h-28 rounded-full
+               bg-gradient-to-br from-amber-400 to-orange-500
+               flex items-center justify-center
+               shadow-lg transition-all duration-200
+               group-hover:scale-105 group-hover:shadow-xl"
+  >
+    {badge.iconUrl ? (
+      <img
+        src={badge.iconUrl}
+        alt={badge.title}
+        className="w-24 h-24 rounded-full object-cover"
+      />
+    ) : (
+      <span className="text-4xl text-white">
+        {getBadgeTypeIcon(badge.badgeType)}
+      </span>
+    )}
+
+    {/* SOFT SHINE */}
+    <div className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+  </div>
+
+  {/* BADGE NAME (OUTSIDE CIRCLE) */}
+  <h3 className="text-sm font-bold text-slate-800 text-center max-w-[7rem] truncate group-hover:text-amber-700 transition-colors">
+    {badge.title}
+  </h3>
+</div>
+
             </div>
           </div>
         ))}
       </div>
+
+      {/* Details Badge Modal - Modernized */}
+      <Dialog open={isDetailsModalOpen} onOpenChange={setIsDetailsModalOpen}>
+        <DialogContent className="sm:max-w-3xl w-full">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-extrabold text-slate-900">
+              Badge Details
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-6 py-4 md:grid-cols-3">
+            <div className="col-span-1 flex items-center justify-center">
+              <div className="w-40 h-40 rounded-full overflow-hidden shadow-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                {selectedBadge?.iconUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={selectedBadge.iconUrl} alt={selectedBadge.title} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-5xl">{getBadgeTypeIcon(selectedBadge?.badgeType || "")}</span>
+                )}
+              </div>
+            </div>
+
+            <div className="col-span-2">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <h3 className="text-2xl font-semibold text-slate-900">{selectedBadge?.title}</h3>
+                  <p className="text-sm text-slate-600 mt-2">{selectedBadge?.description}</p>
+
+                  <div className="flex flex-wrap items-center gap-3 mt-4">
+                    <div className={`px-3 py-1.5 rounded-full text-xs font-semibold ${getLevelColor(selectedBadge?.level || "")}`}>
+                      {selectedBadge?.level}
+                    </div>
+                    <div className="text-sm font-semibold text-slate-800">{selectedBadge?.points} pts</div>
+                    <div className="text-sm text-slate-500">{selectedBadge?.badgeType}</div>
+                    {selectedBadge?.createdAt && (
+                      <div className="text-xs text-slate-400">Created: {new Date(selectedBadge.createdAt).toLocaleString()}</div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex-shrink-0 flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      if (selectedBadge) {
+                        setIsDetailsModalOpen(false);
+                        openUpdateModal(selectedBadge);
+                      }
+                    }}
+                    className="h-10 w-10 rounded-md flex items-center justify-center border border-slate-100 bg-white shadow-sm"
+                    aria-label="Edit badge"
+                  >
+                    <Edit className="w-4 h-4 text-blue-600" />
+                  </Button>
+
+                  <Button
+                    variant="destructive"
+                    onClick={async () => {
+                      if (!selectedBadge?.id) return;
+                      const ok = window.confirm("Delete this badge? This action cannot be undone.");
+                      if (!ok) return;
+                      await handleDeleteBadge(selectedBadge.id);
+                      setIsDetailsModalOpen(false);
+                      setSelectedBadge(null);
+                    }}
+                    className="h-10 px-4 rounded-md bg-white text-red-600 hover:bg-red-50 border border-red-100 shadow-sm"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Update Badge Modal */}
       <Dialog open={isUpdateModalOpen} onOpenChange={setIsUpdateModalOpen}>
