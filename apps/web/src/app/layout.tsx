@@ -3,7 +3,7 @@ import "@repo/ui/globals.css";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Toaster } from "sonner";
-import { fontHeading, fontSans } from "../lib/fonts";
+import { fontCartoon, fontHeading, fontSans } from "../lib/fonts";
 
 export const metadata: Metadata = {
   title: "Kidlink",
@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${fontSans.variable} ${fontHeading.variable} font-sans antialiased`}
+        className={`${fontSans.variable} ${fontHeading.variable} ${fontCartoon.variable} font-sans antialiased`}
       >
         <Providers>
           <Suspense>

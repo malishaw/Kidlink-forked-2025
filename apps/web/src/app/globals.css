@@ -1,1 +1,53 @@
 @import "@repo/ui/globals.css";
+
+@theme inline {
+  --font-cartoon: var(--font-cartoon);
+}
+
+@utility font-cartoon {
+  font-family: var(--font-cartoon);
+}
+
+@utility chunky-border {
+  border-width: 4px;
+  border-color: currentColor;
+}
+
+@utility bubble-shadow {
+  box-shadow: 0 10px 0 0 rgba(0, 0, 0, 0.1);
+}
+
+@utility bubble-shadow-hover {
+  &:hover {
+    box-shadow: 0 5px 0 0 rgba(0, 0, 0, 0.1);
+    transform: translateY(5px);
+  }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+
+@utility animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(-5%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
+  50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); }
+}
+
+@utility animate-bounce-slow {
+  animation: bounce-slow 3s infinite;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@utility animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
