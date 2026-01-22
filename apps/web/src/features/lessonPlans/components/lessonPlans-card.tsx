@@ -1,11 +1,9 @@
 "use client";
 
 import { formatDistanceToNow } from "date-fns";
-import { PencilIcon } from "lucide-react";
 import { useId, useTransition } from "react";
 
 import { Badge } from "@repo/ui/components/badge";
-import { Button } from "@repo/ui/components/button";
 import {
   Card,
   CardContent,
@@ -21,8 +19,8 @@ import { toast } from "sonner";
 
 // ⬇️ Adjust these imports to your actual action filenames/exports.
 import { updateLessonPlan } from "../actions/update-lesson-plan.action";
-import { EditLessonPlan } from "./edit-lesson-plan";
 import { DeleteLessonPlan } from "./delete-lesson-plan";
+import { EditLessonPlan } from "./edit-lesson-plan";
 
 // ⬇️ Types from your new schema file
 import type {
@@ -139,6 +137,12 @@ export function LessonPlanCard({ lesson }: Props) {
           Created {formatDistanceToNow(createdAt)} ago
         </CardDescription>
       </CardHeader>
+
+      <CardContent className="px-4 pt-0 pb-0">
+        <p className="text-sm text-gray-700 break-words whitespace-pre-wrap">
+          {data?.content || data?.body || "No content provided."}
+        </p>
+      </CardContent>
 
       <Separator />
 
