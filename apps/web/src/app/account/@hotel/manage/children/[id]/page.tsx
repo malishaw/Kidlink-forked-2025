@@ -34,13 +34,30 @@ import {
   Users,
 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Page() {
   const params = useParams();
   const id = (params?.id as string) || "1";
   const { data, isLoading, error } = useChildrensList({});
   const children = data?.data?.find((c: any) => c.id === id);
+
+  // Local child state so UI updates immediately after assignments
+  const [childDetails, setChildDetails] = useState<any>(children);
+  const [selectedClassId, setSelectedClassId] = useState(
+    children?.classId || ""
+  );
+  const [selectedParentId, setSelectedParentId] = useState(
+    children?.parentId || ""
+  );
+
+  useEffect(() => {
+    setChildDetails(children);
+    setSelectedClassId(children?.classId || "");
+    setSelectedParentId(children?.parentId || "");
+  }, [children]);
+
+  const child = childDetails || children;
 
   // Fetch feedbacks for this child
   const {
@@ -56,19 +73,14 @@ export default function Page() {
     error: classesError,
   } = useClassesList({});
   const classes = classesData?.data || [];
+  const assignedClass = classes.find((c: any) => c.id === child?.classId);
 
   // Assign class state
-  const [selectedClassId, setSelectedClassId] = useState(
-    children?.classId || ""
-  );
   const [assignLoading, setAssignLoading] = useState(false);
   const [assignError, setAssignError] = useState("");
   const [assignSuccess, setAssignSuccess] = useState(false);
 
   // Assign parent state
-  const [selectedParentId, setSelectedParentId] = useState(
-    children?.parentId || ""
-  );
   const [assignParentLoading, setAssignParentLoading] = useState(false);
   const [assignParentError, setAssignParentError] = useState("");
   const [assignParentSuccess, setAssignParentSuccess] = useState(false);
@@ -80,6 +92,9 @@ export default function Page() {
     error: parentsError,
   } = useParentsList({});
   const parents = parentsData?.data || [];
+  const assignedParent =
+    parents.find((p: any) => p.userId === child?.parentId) ||
+    parents.find((p: any) => p.id === child?.parentId);
 
   // Badges fetch
   const badgesQuery = BadgesList({ page: 1, limit: 50 });
@@ -89,10 +104,10 @@ export default function Page() {
   const [assignBadgeSuccess, setAssignBadgeSuccess] = useState(false);
 
   // Get current badges array, ensuring it's always an array
-  const currentBadges = Array.isArray(children?.badgeId)
-    ? children.badgeId
-    : children?.badgeId
-      ? [children.badgeId]
+  const currentBadges = Array.isArray(child?.badgeId)
+    ? child.badgeId
+    : child?.badgeId
+      ? [child.badgeId]
       : [];
 
   // Feedback form state
@@ -106,7 +121,12 @@ export default function Page() {
     setAssignError("");
     setAssignSuccess(false);
     try {
-      await updateChildren(id, { ...children, classId: selectedClassId });
+      await updateChildren(id, { ...child, classId: selectedClassId });
+      // update local state so UI reflects change immediately
+      setChildDetails((prev: any) => ({
+        ...(prev || {}),
+        classId: selectedClassId,
+      }));
       setAssignSuccess(true);
     } catch (err: any) {
       setAssignError(err.message || "Failed to assign class");
@@ -135,10 +155,11 @@ export default function Page() {
       }
 
       // Store the parent's userId in the child's parentId field
-      await updateChildren(id, {
-        ...children,
+      await updateChildren(id, { ...child, parentId: selectedParent.userId });
+      setChildDetails((prev: any) => ({
+        ...(prev || {}),
         parentId: selectedParent.userId,
-      });
+      }));
       setAssignParentSuccess(true);
     } catch (err: any) {
       setAssignParentError(err.message || "Failed to assign parent");
@@ -157,7 +178,12 @@ export default function Page() {
         ? currentBadges
         : [...currentBadges, selectedBadgeId];
 
-      await updateChildren(id, { ...children, badgeId: updatedBadges });
+      await updateChildren(id, { ...child, badgeId: updatedBadges });
+      // update local state and UI
+      setChildDetails((prev: any) => ({
+        ...(prev || {}),
+        badgeId: updatedBadges,
+      }));
       setAssignBadgeSuccess(true);
       setSelectedBadgeId(""); // Reset selection
       setIsBadgeSelectionOpen(false); // Close modal immediately
@@ -178,13 +204,12 @@ export default function Page() {
         (id) => id !== badgeIdToRemove
       );
 
-      await updateChildren(id, { ...children, badgeId: updatedBadges });
+      await updateChildren(id, { ...child, badgeId: updatedBadges });
+      setChildDetails((prev: any) => ({
+        ...(prev || {}),
+        badgeId: updatedBadges,
+      }));
       setAssignBadgeSuccess(true);
-
-      // Reload the page to show updated data
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
     } catch (err: any) {
       setAssignBadgeError(err.message || "Failed to remove badge");
     } finally {
@@ -408,6 +433,17 @@ export default function Page() {
                 </div>
               ) : (
                 <>
+                  {/* Show currently assigned class */}
+                  {assignedClass || child?.classId ? (
+                    <div className="p-3 bg-blue-50 rounded-lg">
+                      <p className="text-sm font-medium text-slate-700">
+                        Currently Assigned
+                      </p>
+                      <p className="font-semibold text-slate-800">
+                        {assignedClass?.name || child?.classId}
+                      </p>
+                    </div>
+                  ) : null}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">
                       Select Class
@@ -491,6 +527,22 @@ export default function Page() {
                 </div>
               ) : (
                 <>
+                  {/* Show currently assigned parent */}
+                  {assignedParent || child?.parentId ? (
+                    <div className="p-3 bg-green-50 rounded-lg">
+                      <p className="text-sm font-medium text-slate-700">
+                        Currently Assigned
+                      </p>
+                      <p className="font-semibold text-slate-800">
+                        {assignedParent?.name || child?.parentId}
+                        {/* {assignedParent?.email && (
+                          <span className="text-sm text-slate-500 ml-2">
+                            ({assignedParent.email})
+                          </span>
+                        )} */}
+                      </p>
+                    </div>
+                  ) : null}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">
                       Select Parent
