@@ -4,24 +4,25 @@ import { getClient } from "@/lib/rpc/client";
 import { PencilIcon } from "lucide-react";
 import { useCallback, useId, useState } from "react";
 
+import { RichTextEditor } from "@/components/rich-text-editor";
 import { Button } from "@repo/ui/components/button";
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@repo/ui/components/select";
 import { useAppForm } from "@repo/ui/components/tanstack-form";
 
@@ -86,7 +87,7 @@ export function EditLessonPlan({ lesson, trigger }: Props) {
       e.stopPropagation();
       form.handleSubmit();
     },
-    [form]
+    [form],
   );
 
   return (
@@ -136,12 +137,11 @@ export function EditLessonPlan({ lesson, trigger }: Props) {
                   <field.FormItem>
                     <field.FormLabel>Content (optional)</field.FormLabel>
                     <field.FormControl>
-                      <textarea
-                        className="w-full min-h-28 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        placeholder="Lesson plan content, activities, materials..."
+                      <RichTextEditor
                         value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
+                        onChange={(value) => field.handleChange(value)}
                         onBlur={field.handleBlur}
+                        placeholder="Lesson plan content, activities, materials..."
                       />
                     </field.FormControl>
                     <field.FormMessage />

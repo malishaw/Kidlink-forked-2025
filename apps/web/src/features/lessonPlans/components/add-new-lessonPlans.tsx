@@ -2,6 +2,7 @@
 import { PlusCircleIcon } from "lucide-react";
 import { useCallback, useId, useState } from "react";
 
+import { RichTextEditor } from "@/components/rich-text-editor";
 import { Button } from "@repo/ui/components/button";
 import {
   Dialog,
@@ -82,7 +83,7 @@ export function AddNewLessonPlan() {
       e.stopPropagation();
       form.handleSubmit();
     },
-    [form]
+    [form],
   );
 
   return (
@@ -128,13 +129,11 @@ export function AddNewLessonPlan() {
                   <field.FormItem>
                     <field.FormLabel>Content (optional)</field.FormLabel>
                     <field.FormControl>
-                      {/* Using native textarea to avoid guessing your UI lib API */}
-                      <textarea
-                        className="w-full min-h-28 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        placeholder="Plan outline, materials, activities..."
+                      <RichTextEditor
                         value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
+                        onChange={(value) => field.handleChange(value)}
                         onBlur={field.handleBlur}
+                        placeholder="Plan outline, materials, activities..."
                       />
                     </field.FormControl>
                     <field.FormMessage />
