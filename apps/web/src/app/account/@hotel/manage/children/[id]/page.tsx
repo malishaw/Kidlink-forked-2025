@@ -98,6 +98,9 @@ export default function Page() {
   // Feedback form state
   const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState(false);
 
+  // Badge selection modal state
+  const [isBadgeSelectionOpen, setIsBadgeSelectionOpen] = useState(false);
+
   const handleAssignClass = async () => {
     setAssignLoading(true);
     setAssignError("");
@@ -157,11 +160,7 @@ export default function Page() {
       await updateChildren(id, { ...children, badgeId: updatedBadges });
       setAssignBadgeSuccess(true);
       setSelectedBadgeId(""); // Reset selection
-
-      // Reload the page to show updated data
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      setIsBadgeSelectionOpen(false); // Close modal immediately
     } catch (err: any) {
       setAssignBadgeError(err.message || "Failed to assign badge");
     } finally {
@@ -383,7 +382,7 @@ export default function Page() {
         </Card>
 
         {/* Assignment Cards */}
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 gap-8">
           {/* Assign Class Section */}
           <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
             <CardHeader className="pb-4">
@@ -549,119 +548,95 @@ export default function Page() {
               )}
             </CardContent>
           </Card>
-
-          {/* Assign Badge Section */}
-          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl font-bold text-slate-800 flex items-center gap-3">
-                <div className="p-2 bg-yellow-100 rounded-lg">
-                  <span className="inline-block w-6 h-6 bg-yellow-400 rounded-full"></span>
-                </div>
-                Manage Badges
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {badgesQuery.isLoading ? (
-                <div className="flex items-center gap-3 p-4 bg-yellow-50 rounded-lg">
-                  Loading badges...
-                </div>
-              ) : badgesQuery.isError ? (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                  Failed to load badges.
-                </div>
-              ) : (
-                <>
-                  {/* Currently Assigned Badges */}
-                  {currentBadges.length > 0 && (
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-slate-700">
-                        Currently Assigned Badges
-                      </label>
-                      <div className="flex flex-wrap gap-2">
-                        {currentBadges.map((badgeId: string) => {
-                          const badge = badgesQuery.data?.data?.find(
-                            (b: any) => b.id === badgeId
-                          );
-                          return (
-                            <div
-                              key={badgeId}
-                              className="flex items-center gap-2 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm"
-                            >
-                              <span className="inline-block w-3 h-3 bg-yellow-400 rounded-full"></span>
-                              <span>{badge?.title || badgeId}</span>
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveBadge(badgeId)}
-                                className="ml-1 text-yellow-600 hover:text-yellow-800 font-bold"
-                                disabled={assignBadgeLoading}
-                              >
-                                ×
-                              </button>
+        </div>
+        <div className="w-full" >
+                  {/* Manage Badges Section - Full Width */}
+        <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl font-bold text-slate-800 flex items-center gap-3">
+              <div className="p-2 bg-yellow-100 rounded-lg">
+                <span className="inline-block w-6 h-6 bg-yellow-400 rounded-full"></span>
+              </div>
+              Manage Badges
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {badgesQuery.isLoading ? (
+              <div className="flex items-center gap-3 p-4 bg-yellow-50 rounded-lg">
+                Loading badges...
+              </div>
+            ) : badgesQuery.isError ? (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                Failed to load badges.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {/* Current badges grid with add button */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                  {/* Show current badges */}
+                  {currentBadges.map((badgeId: string) => {
+                    const badge = badgesQuery.data?.data?.find((b: any) => b.id === badgeId);
+                    if (!badge) return null;
+                    return (
+                      <div key={badgeId} className="relative group">
+                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] overflow-hidden">
+                          <div className="flex flex-col items-center justify-center gap-2 p-4">
+                            <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
+                              {badge.iconUrl ? (
+                                <img src={badge.iconUrl} alt={badge.title} className="w-12 h-12 rounded-full object-cover" />
+                              ) : (
+                                <span className="text-2xl text-white">🏅</span>
+                              )}
                             </div>
-                          );
-                        })}
+                            <h3 className="text-xs font-bold text-slate-800 text-center truncate max-w-full">{badge.title}</h3>
+                          </div>
+                          {/* Remove button */}
+                          <button
+                            onClick={() => handleRemoveBadge(badgeId)}
+                            className="absolute -top-0 -right-0 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity"
+                            disabled={assignBadgeLoading}
+                          >
+                            ×
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })}
 
-                  {/* Add New Badge */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">
-                      Add New Badge
-                    </label>
-                    <select
-                      className="w-full border border-gray-300 rounded-xl px-4 py-2 mb-4"
-                      value={selectedBadgeId}
-                      onChange={(e) => setSelectedBadgeId(e.target.value)}
-                    >
-                      <option value="">Select a badge to add</option>
-                      {badgesQuery.data?.data
-                        ?.filter(
-                          (badge: any) => !currentBadges.includes(badge.id)
-                        )
-                        ?.map((badge: any) => (
-                          <option key={badge.id} value={badge.id}>
-                            {badge.title}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-                  <button
-                    className="w-full px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-medium rounded-xl hover:from-yellow-600 hover:to-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
-                    onClick={handleAssignBadge}
-                    disabled={assignBadgeLoading || !selectedBadgeId}
+                  {/* Add badge button */}
+                  <div
+                    onClick={() => setIsBadgeSelectionOpen(true)}
+                    className="bg-white/70 backdrop-blur-sm rounded-2xl border-2 border-dashed border-gray-300 hover:border-yellow-400 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer group"
                   >
-                    {assignBadgeLoading ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        {currentBadges.length > 0
-                          ? "Updating..."
-                          : "Assigning..."}
-                      </>
-                    ) : (
-                      <>Add Badge</>
-                    )}
-                  </button>
-                  {assignBadgeError && (
-                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-red-700 text-sm flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4" />
-                        {assignBadgeError}
-                      </p>
+                    <div className="flex flex-col items-center justify-center align-ce gap-2 p-4 h-full min-h-[120px]">
+                      <div className="w-16 h-16 rounded-full bg-yellow-50 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow shadow-amber-400">
+                        <span className="text-2xl text-yellow-600 font-bold">+</span>
+                      </div>
+                      <span className="text-xs font-bold text-slate-600 group-hover:text-yellow-600 transition-colors">Add Badge</span>
                     </div>
-                  )}
-                  {assignBadgeSuccess && (
-                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                      <p className="text-green-700 text-sm flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4" />
-                        Badge updated successfully!
-                      </p>
-                    </div>
-                  )}
-                </>
-              )}
-            </CardContent>
-          </Card>
+                  </div>
+                </div>
+
+                {assignBadgeError && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-700 text-sm flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4" />
+                      {assignBadgeError}
+                    </p>
+                  </div>
+                )}
+                {assignBadgeSuccess && (
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-green-700 text-sm flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4" />
+                      Badge updated successfully!
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
         </div>
 
         {/* Feedback Section */}
@@ -856,6 +831,101 @@ export default function Page() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Badge Selection Modal */}
+      {isBadgeSelectionOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-slate-800">Select Badges to Assign</h2>
+                <button
+                  onClick={() => setIsBadgeSelectionOpen(false)}
+                  className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+            <div className="p-6 overflow-y-auto max-h-[60vh]">
+              {badgesQuery.isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 border-2 border-gray-200 border-t-gray-600 rounded-full animate-spin"></div>
+                    <span>Loading badges...</span>
+                  </div>
+                </div>
+              ) : badgesQuery.isError ? (
+                <div className="text-center py-12">
+                  <p className="text-red-500">Failed to load badges. Please try again.</p>
+                </div>
+              ) : !badgesQuery.data?.data || badgesQuery.data.data.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-24 h-24 bg-gradient-to-br from-amber-400 to-orange-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                    <span className="text-4xl">🏅</span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-800 mb-3">No Badges Available</h3>
+                  <p className="text-slate-600">Create badges first to assign them to children.</p>
+                </div>
+              ) : (
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {badgesQuery.data.data
+                    .filter((badge: any) => !currentBadges.includes(badge.id))
+                    .map((badge: any) => (
+                    <div key={badge.id} className="group cursor-pointer" onClick={() => {
+                      setSelectedBadgeId(badge.id);
+                      // Store the badge ID and close modal
+                      const updatedBadges = [...currentBadges, badge.id];
+                      updateChildren(id, { ...children, badgeId: updatedBadges })
+                        .then(() => {
+                          setAssignBadgeSuccess(true);
+                          setIsBadgeSelectionOpen(false);
+                          // Refresh page to show updated data
+                          setTimeout(() => {
+                            window.location.reload();
+                          }, 1000);
+                        })
+                        .catch((err: any) => {
+                          setAssignBadgeError(err.message || "Failed to assign badge");
+                        });
+                    }}>
+                      <div className="relative bg-white/70 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] overflow-hidden">
+                        {/* Decorative Background */}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-amber-200/20 to-transparent rounded-full blur-2xl"></div>
+                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-orange-200/20 to-transparent rounded-full blur-2xl"></div>
+
+                        <div className="flex flex-col items-center justify-center gap-3 p-6">
+                          {/* Badge Circle */}
+                          <div className="relative w-28 h-28 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg transition-all duration-200 group-hover:scale-105 group-hover:shadow-xl">
+                            {badge.iconUrl ? (
+                              <img src={badge.iconUrl} alt={badge.title} className="w-24 h-24 rounded-full object-cover" />
+                            ) : (
+                              <span className="text-4xl text-white">🏅</span>
+                            )}
+                            <div className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </div>
+
+                          {/* Badge Info */}
+                          <div className="text-center">
+                            <h3 className="text-sm font-bold text-slate-800 max-w-[7rem] truncate group-hover:text-amber-700 transition-colors">{badge.title}</h3>
+                            <div className="flex items-center justify-center gap-2 mt-2">
+                              <span className="text-xs px-2 py-1 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white rounded-full">{badge.level}</span>
+                              <span className="text-xs text-slate-600">{badge.points} pts</span>
+                            </div>
+                          </div>
+
+                          {/* Hover effect */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Feedback Form Modal */}
       {isFeedbackFormOpen && (
