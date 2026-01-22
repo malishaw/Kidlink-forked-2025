@@ -2,313 +2,177 @@
 
 import { Footer } from "@/modules/landing/footer";
 import { Navbar } from "@/modules/landing/navbar";
+import { Badge } from "@repo/ui/components/badge";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/components/card";
-import { Clock, Eye, FileText, Lock, Shield, UserCheck } from "lucide-react";
+    Clock,
+    Heart,
+    Mail,
+    MapPin,
+    Phone,
+    Search,
+    ShieldAlert,
+    Sparkles,
+    Zap
+} from "lucide-react";
 
 export default function PrivacyPolicyPage() {
+  const lastUpdated = "December 20, 2024";
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-teal-50">
+    <div className="bg-white min-h-screen overflow-x-hidden selection:bg-blue-200 selection:text-black">
       <Navbar />
-      {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <div className="flex justify-center mb-4">
-            <Shield className="w-16 h-16" />
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Privacy Policy
+
+      {/* Magical Header Section */}
+      <section className="relative pt-32 pb-24 px-4 bg-gradient-to-b from-blue-200 via-purple-100 to-white">
+        {/* Animated Background Icons */}
+        <div className="absolute top-24 left-10 text-6xl animate-bounce-slow opacity-20">🛡️</div>
+        <div className="absolute top-48 right-12 text-7xl animate-pulse opacity-20">🔒</div>
+        <div className="absolute bottom-10 left-1/4 text-5xl animate-bounce delay-300 opacity-20">✨</div>
+        <div className="absolute top-1/2 right-1/4 text-5xl animate-spin-slow opacity-10">🕵️</div>
+
+        <div className="container mx-auto max-w-4xl relative z-10 text-center">
+          <Badge className="mb-6 text-xl px-8 py-3 bg-white text-blue-600 chunky-border border-blue-300 font-cartoon animate-pulse shadow-lg">
+            Safety First! 🛡️
+          </Badge>
+          <h1 className="text-6xl md:text-8xl font-black font-cartoon text-gray-900 mb-8 leading-none drop-shadow-sm tracking-tight">
+            Our <span className="text-blue-600">Privacy</span> Promise ✨
           </h1>
-          <p className="text-xl opacity-90 max-w-3xl mx-auto">
-            Your privacy and data security are our top priorities. Learn how we
-            protect and handle your information.
+          <p className="text-2xl md:text-3xl font-bold text-gray-700 max-w-3xl mx-auto mb-10 leading-relaxed font-sans">
+            Your data is tucked in <span className="text-purple-500 italic">safely</span> and protected by our <span className="text-blue-500 underline decoration-8 decoration-blue-200">magic security shield</span>! 🔒
           </p>
-          <p className="text-sm opacity-75 mt-4">Last updated: December 2024</p>
+          <div className="inline-flex items-center gap-2 bg-white/50 px-6 py-2 rounded-full border-2 border-blue-100 font-cartoon text-blue-500">
+            <Clock className="w-5 h-5" />
+            Last updated: {lastUpdated} 📅
+          </div>
+        </div>
+      </section>
+
+      <div className="container mx-auto px-4 py-16 max-w-5xl space-y-20">
+
+        {/* Intro Card */}
+        <div className="bg-white chunky-border border-blue-400 p-8 md:p-16 rounded-[4rem] bubble-shadow relative group hover:-rotate-1 transition-all duration-500">
+           <div className="absolute -top-10 -right-10 text-7xl group-hover:rotate-12 transition-transform">📄</div>
+           <div className="space-y-8 relative z-10">
+              <Badge className="bg-blue-100 text-blue-700 chunky-border border-blue-200 text-xl px-6 py-2 font-cartoon">
+                 The Hello! 👋
+              </Badge>
+              <h2 className="text-4xl md:text-6xl font-black font-cartoon text-gray-800">Welcome to the Safe Zone!</h2>
+              <p className="text-xl md:text-2xl font-bold text-gray-600 leading-relaxed font-sans">
+                 KidLink ("we," "our," or "us") is like a giant, protective hug for your data! 🤗 We’re committed to making sure your information stays safe while we help manage your magical nursery world.
+              </p>
+           </div>
+        </div>
+
+        {/* Info Grid */}
+        <div className="grid md:grid-cols-2 gap-12">
+           {/* Section 1 */}
+           <div className="bg-purple-50 chunky-border border-purple-400 p-10 rounded-[3rem] bubble-shadow space-y-8 group hover:scale-[1.02] transition-transform">
+              <div className="bg-white w-20 h-20 rounded-3xl chunky-border border-purple-200 flex items-center justify-center shadow-xl mb-4 transform -rotate-6 group-hover:rotate-0 transition-transform">
+                 <Search className="w-10 h-10 text-purple-500" />
+              </div>
+              <h3 className="text-4xl font-black font-cartoon text-purple-700">Things We Peek at 🧐</h3>
+              <div className="space-y-6">
+                 <div>
+                    <h4 className="text-xl font-black font-cartoon text-gray-800 flex items-center gap-2">
+                       <Heart className="w-5 h-5 text-red-500" /> Personal Bits
+                    </h4>
+                    <p className="text-lg font-bold text-gray-600 font-sans">Names, emails, and phone numbers for our teachers and happy families!</p>
+                 </div>
+                 <div>
+                    <h4 className="text-xl font-black font-cartoon text-gray-800 flex items-center gap-2">
+                       <Zap className="w-5 h-5 text-yellow-500" /> App Magic
+                    </h4>
+                    <p className="text-lg font-bold text-gray-600 font-sans">How you use our platform, your browser type, and access times.</p>
+                 </div>
+                 <div>
+                    <h4 className="text-xl font-black font-cartoon text-gray-800 flex items-center gap-2">
+                       <Sparkles className="w-5 h-5 text-blue-500" /> Learning Fun
+                    </h4>
+                    <p className="text-lg font-bold text-gray-600 font-sans">Progress reports, magical photos, and chats between teachers and parents.</p>
+                 </div>
+              </div>
+           </div>
+
+           {/* Section 2 */}
+           <div className="bg-green-50 chunky-border border-green-400 p-10 rounded-[3rem] bubble-shadow space-y-8 group hover:scale-[1.02] transition-transform">
+              <div className="bg-white w-20 h-20 rounded-3xl chunky-border border-green-200 flex items-center justify-center shadow-xl mb-4 transform rotate-6 group-hover:rotate-0 transition-transform">
+                 <ShieldAlert className="w-10 h-10 text-green-500" />
+              </div>
+              <h3 className="text-4xl font-black font-cartoon text-green-700">How We Use Magic ✨</h3>
+              <div className="space-y-6">
+                 <div className="flex gap-4 p-5 bg-white/60 rounded-3xl chunky-border border-green-100">
+                    <div className="text-4xl bounce-slow">🚀</div>
+                    <p className="text-lg font-bold text-gray-600 font-sans">To keep the KidLink ship sailing smooth and fast at all times!</p>
+                 </div>
+                 <div className="flex gap-4 p-5 bg-white/60 rounded-3xl chunky-border border-green-100">
+                    <div className="text-4xl">💬</div>
+                    <p className="text-lg font-bold text-gray-600 font-sans">To help teachers and parents talk with superpower speed!</p>
+                 </div>
+                 <div className="flex gap-4 p-5 bg-white/60 rounded-3xl chunky-border border-green-100">
+                    <div className="text-4xl">🛠️</div>
+                    <p className="text-lg font-bold text-gray-600 font-sans">To build new, even more magical features for everyone to enjoy!</p>
+                 </div>
+              </div>
+           </div>
+        </div>
+
+        {/* Security Fort */}
+        <div className="bg-blue-600 chunky-border border-white p-10 md:p-20 rounded-[5rem] bubble-shadow relative overflow-hidden text-white group hover:rotate-1 transition-all duration-700">
+           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]"></div>
+           <div className="grid md:grid-cols-2 gap-16 items-center relative z-10">
+              <div className="space-y-8 text-center md:text-left">
+                 <Badge className="bg-white text-blue-700 chunky-border border-blue-200 text-xl px-6 py-2 font-cartoon">
+                    Our Fort! 🏰
+                 </Badge>
+                 <h2 className="text-5xl md:text-8xl font-black font-cartoon leading-tight">Your Data’s <span className="text-yellow-300">Invisible</span> Shield! 🛡️</h2>
+                 <p className="text-xl md:text-2xl font-bold text-blue-50 leading-relaxed font-sans">
+                    We use <span className="underline decoration-wavy decoration-yellow-400">super-strong encryption</span> to keep your data safe from pesky intruders! Our fort is guarded by digital knights. ⚔️
+                 </p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-md rounded-[4rem] p-10 chunky-border border-white/20 shadow-2xl">
+                 <ul className="space-y-6">
+                    {[
+                       { icon: "🔐", text: "Encryption Locks" },
+                       { icon: "🛡️", text: "Safety Audits" },
+                       { icon: "🔑", text: "Multi-Factor Keys" },
+                       { icon: "☁️", text: "Secure Backups" }
+                    ].map((item, i) => (
+                       <li key={i} className="flex items-center gap-6 text-2xl font-black font-cartoon">
+                          <span className="bg-white p-4 rounded-3xl chunky-border border-blue-400 text-3xl shadow-lg">{item.icon}</span>
+                          {item.text}
+                       </li>
+                    ))}
+                 </ul>
+              </div>
+           </div>
+        </div>
+
+        {/* Final CTA Area */}
+        <div className="bg-yellow-400 chunky-border border-gray-900 p-12 md:p-24 rounded-[4rem] bubble-shadow text-center space-y-10 group relative overflow-hidden">
+           <div className="absolute top-10 right-10 text-6xl animate-pulse opacity-30">✨</div>
+           <div className="text-9xl group-hover:scale-125 transition-all duration-700 animate-bounce-slow inline-block">📞</div>
+           <h2 className="text-5xl md:text-8xl font-black font-cartoon text-gray-900 leading-none">Got a <span className="text-white drop-shadow-md">Question</span>?</h2>
+           <p className="text-2xl md:text-3xl font-bold text-gray-800 max-w-2xl mx-auto font-sans">
+              Don't be shy! Our magic helper team is always here to answer your safety questions. 🌈
+           </p>
+
+           <div className="grid md:grid-cols-3 gap-8">
+              <div className="bg-white/40 p-8 rounded-3xl chunky-border border-gray-900 flex flex-col items-center bubble-shadow-hover transition-all">
+                 <Mail className="w-10 h-10 mb-4" />
+                 <span className="font-cartoon text-2xl">privacy@kidlink.com</span>
+              </div>
+              <div className="bg-white/40 p-8 rounded-3xl chunky-border border-gray-900 flex flex-col items-center bubble-shadow-hover transition-all">
+                 <Phone className="w-10 h-10 mb-4" />
+                 <span className="font-cartoon text-2xl">+1 (555) MAGIC</span>
+              </div>
+              <div className="bg-white/40 p-8 rounded-3xl chunky-border border-gray-900 flex flex-col items-center bubble-shadow-hover transition-all">
+                 <MapPin className="w-10 h-10 mb-4" />
+                 <span className="font-cartoon text-2xl text-center">Magic St, Education City</span>
+              </div>
+           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-16 max-w-4xl">
-        {/* Introduction */}
-        <Card className="mb-8 shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-2xl text-blue-800 flex items-center">
-              <FileText className="w-6 h-6 mr-2" />
-              Introduction
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="prose max-w-none">
-            <p className="text-gray-700 leading-relaxed">
-              KidLink ("we," "our," or "us") is committed to protecting your
-              privacy and ensuring the security of your personal information.
-              This Privacy Policy explains how we collect, use, disclose, and
-              safeguard your information when you use our nursery management
-              system.
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Information We Collect */}
-        <Card className="mb-8 shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-2xl text-blue-800 flex items-center">
-              <Eye className="w-6 h-6 mr-2" />
-              Information We Collect
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  Personal Information
-                </h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-700">
-                  <li>
-                    Names, email addresses, and contact information of parents,
-                    teachers, and administrators
-                  </li>
-                  <li>Emergency contact information</li>
-                  <li>
-                    Child information including names, birthdates, and medical
-                    notes (with parental consent)
-                  </li>
-                  <li>Payment and billing information</li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  Usage Information
-                </h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-700">
-                  <li>
-                    Log data including IP addresses, browser type, and access
-                    times
-                  </li>
-                  <li>Device information and operating system details</li>
-                  <li>
-                    Usage patterns and feature interactions within the platform
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  Educational Content
-                </h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-700">
-                  <li>Progress reports and assessment data</li>
-                  <li>Photos and videos (with explicit parental consent)</li>
-                  <li>Communication logs between parents and teachers</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* How We Use Information */}
-        <Card className="mb-8 shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-2xl text-blue-800 flex items-center">
-              <UserCheck className="w-6 h-6 mr-2" />
-              How We Use Your Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Service Delivery
-                </h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-700 text-sm">
-                  <li>Provide and maintain our nursery management platform</li>
-                  <li>Process payments and billing</li>
-                  <li>Facilitate communication between parents and teachers</li>
-                  <li>Generate progress reports and assessments</li>
-                </ul>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Platform Improvement
-                </h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-700 text-sm">
-                  <li>Analyze usage patterns to improve functionality</li>
-                  <li>Develop new features based on user needs</li>
-                  <li>Ensure platform security and prevent misuse</li>
-                  <li>Provide customer support and technical assistance</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Data Protection */}
-        <Card className="mb-8 shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-2xl text-blue-800 flex items-center">
-              <Lock className="w-6 h-6 mr-2" />
-              Data Protection & Security
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div className="bg-green-50 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold text-green-800 mb-3">
-                  Security Measures
-                </h3>
-                <ul className="list-disc list-inside space-y-2 text-green-700">
-                  <li>End-to-end encryption for all data transmission</li>
-                  <li>Regular security audits and vulnerability assessments</li>
-                  <li>Multi-factor authentication for all user accounts</li>
-                  <li>Secure data centers with 24/7 monitoring</li>
-                  <li>Regular automated backups with encryption</li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  Access Controls
-                </h3>
-                <p className="text-gray-700 mb-3">
-                  We implement strict access controls to ensure that only
-                  authorized personnel can access your data:
-                </p>
-                <ul className="list-disc list-inside space-y-2 text-gray-700">
-                  <li>
-                    Role-based access permissions for different user types
-                  </li>
-                  <li>Regular access reviews and audit trails</li>
-                  <li>Immediate revocation of access when no longer needed</li>
-                  <li>Background checks for all employees with data access</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Your Rights */}
-        <Card className="mb-8 shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-2xl text-blue-800">
-              Your Privacy Rights
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <div className="flex items-start space-x-3">
-                  <div className="bg-blue-100 p-2 rounded-lg mt-1">
-                    <Eye className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">Access Your Data</h4>
-                    <p className="text-sm text-gray-600">
-                      Request a copy of all personal data we hold about you
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <div className="bg-purple-100 p-2 rounded-lg mt-1">
-                    <FileText className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">Correct Your Data</h4>
-                    <p className="text-sm text-gray-600">
-                      Update or correct any inaccurate information
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <div className="bg-red-100 p-2 rounded-lg mt-1">
-                    <Lock className="w-4 h-4 text-red-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">Delete Your Data</h4>
-                    <p className="text-sm text-gray-600">
-                      Request deletion of your personal information
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-start space-x-3">
-                  <div className="bg-teal-100 p-2 rounded-lg mt-1">
-                    <UserCheck className="w-4 h-4 text-teal-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">Limit Processing</h4>
-                    <p className="text-sm text-gray-600">
-                      Restrict how we process your personal data
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <div className="bg-orange-100 p-2 rounded-lg mt-1">
-                    <Shield className="w-4 h-4 text-orange-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">Data Portability</h4>
-                    <p className="text-sm text-gray-600">
-                      Transfer your data to another service provider
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <div className="bg-gray-100 p-2 rounded-lg mt-1">
-                    <Clock className="w-4 h-4 text-gray-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">Withdraw Consent</h4>
-                    <p className="text-sm text-gray-600">
-                      Revoke consent for data processing at any time
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Contact Information */}
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-2xl text-blue-800">Contact Us</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-700 mb-4">
-              If you have any questions about this Privacy Policy or wish to
-              exercise your privacy rights, please contact us:
-            </p>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="space-y-2">
-                <p>
-                  <strong>Email:</strong> privacy@kidlink.com
-                </p>
-                <p>
-                  <strong>Phone:</strong> +1 (555) 123-4567
-                </p>
-                <p>
-                  <strong>Address:</strong> 123 Education Street, Suite 100,
-                  Learning City, LC 12345
-                </p>
-              </div>
-            </div>
-            <p className="text-sm text-gray-600 mt-4">
-              We will respond to your privacy requests within 30 days of
-              receipt.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
       <Footer />
     </div>
   );
