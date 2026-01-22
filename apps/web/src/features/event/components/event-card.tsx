@@ -89,7 +89,7 @@ export function EventCard({ event, onEdit, onDelete }: EventCardProps) {
           <div className="flex justify-between items-start gap-2">
             <CardTitle className="line-clamp-2 text-lg">{event.name}</CardTitle>
             <Badge variant="outline" className={getStatusColor(event.status)}>
-              {event.status || "draft"}
+              published
             </Badge>
           </div>
           {event.description && (
@@ -132,6 +132,12 @@ export function EventCard({ event, onEdit, onDelete }: EventCardProps) {
             <div className="text-sm">
               <span className="font-medium">Price: </span>
               <span>${event.ticketPrice}</span>
+            </div>
+          )}
+
+          {event.description&& (
+            <div>
+              <span className="line-clamp-4" >{event.description}</span>
             </div>
           )}
         </CardContent>
