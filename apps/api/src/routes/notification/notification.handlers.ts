@@ -7,12 +7,12 @@ import type { AppRouteHandler } from "@api/types";
 import { notifications } from "@repo/database";
 
 import type {
-  CreateRoute,
-  GetByIdRoute,
-  GetByUserIdRoute,
-  ListRoute,
-  RemoveRoute,
-  UpdateRoute,
+    CreateRoute,
+    GetByIdRoute,
+    GetByUserIdRoute,
+    ListRoute,
+    RemoveRoute,
+    UpdateRoute,
 } from "./notification.routes";
 
 // 🔍 List all notifications
@@ -49,16 +49,25 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     );
   }
 
-  const [inserted] = await db
-    .insert(notifications)
-    .values({
-      ...body,
-      organizationId: session.activeOrganizationId,
-      createdAt: new Date(),
-    })
-    .returning();
+  try {
+    const [inserted] = await db
+      .insert(notifications)
+      .values({
+        ...body,
+        organizationId: session.activeOrganizationId || undefined,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
 
-  return c.json(inserted, HttpStatusCodes.CREATED);
+    return c.json(inserted, HttpStatusCodes.CREATED);
+  } catch (error) {
+    console.error("Error creating notification:", error);
+    return c.json(
+      { message: "Failed to create notification" },
+      HttpStatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
 };
 
 // 🔍 Get a single notification
@@ -141,23 +150,31 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
 // Get notifications by receiverId
 export const getByUserId: AppRouteHandler<GetByUserIdRoute> = async (c) => {
   const { receiverId } = c.req.valid("query");
+
   if (!receiverId) {
-    // Return the expected error response type
     return c.json(
       { message: "Missing receiverId" },
       HttpStatusCodes.BAD_REQUEST
     );
   }
-  // Find notifications where receiverId matches
-  const results = await db.query.notifications.findMany({
-    where: eq(notifications.receiverId, [receiverId]),
+
+  // Get all notifications and filter client-side since drizzle array contains is complex
+  const allNotifications = await db.query.notifications.findMany({});
+
+  // Filter for notifications where this receiverId is in the receiverId array
+  const filtered = allNotifications.filter((notif: any) => {
+    const receiverIds = Array.isArray(notif.receiverId)
+      ? notif.receiverId
+      : [];
+    return receiverIds.includes(receiverId);
   });
-  // Ensure createdAt and updatedAt are strings
-  const serializedResults = results.map((notif) => ({
+
+  // Serialize dates
+  const serialized = filtered.map((notif: any) => ({
     ...notif,
     createdAt: notif.createdAt ? notif.createdAt.toISOString() : null,
     updatedAt: notif.updatedAt ? notif.updatedAt.toISOString() : null,
   }));
-  // Return only the array, as expected by the route response type
-  return c.json(serializedResults, HttpStatusCodes.OK);
+
+  return c.json(serialized, HttpStatusCodes.OK);
 };

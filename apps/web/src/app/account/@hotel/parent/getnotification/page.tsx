@@ -1,6 +1,6 @@
 import { NotificationInbox } from "@/features/notification/components/notification-inbox";
 
-export default function TeacherNotificationPage() {
+export default function ParentNotificationPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
       <div className="max-w-4xl mx-auto space-y-8">
