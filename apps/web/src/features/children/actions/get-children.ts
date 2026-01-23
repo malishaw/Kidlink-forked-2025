@@ -20,7 +20,7 @@ export const ChildrensList = (params: FilterParams) => {
         query: {
           page: page.toString(),
           limit: limit.toString(),
-          // search: search || undefined,
+          search: search || undefined,
           sort: sort || undefined,
         },
       });

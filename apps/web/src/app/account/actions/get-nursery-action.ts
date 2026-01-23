@@ -20,7 +20,10 @@ export interface Nursery {
 }
 
 export const useGetNurseries = () => {
-  return useQuery<Nursery[]>({
+  return useQuery<{
+    data: Nursery[];
+    meta: { totalCount: number; limit: number; currentPage: number; totalPages: number };
+  }>({
     queryKey: ["nurseries"],
     queryFn: async () => {
       const rpcClient = await getClient();
@@ -32,11 +35,8 @@ export const useGetNurseries = () => {
 
       const json = await response.json();
 
-      // Normalize to an array (handles list, {data: [...]}, or single object)
-      if (Array.isArray(json)) return json as Nursery[];
-      if (Array.isArray(json?.data)) return json.data as Nursery[];
-      if (json && typeof json === "object") return [json as Nursery];
-      return [];
+      // Return the full response with data and meta
+      return json;
     },
   });
 };

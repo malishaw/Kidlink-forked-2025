@@ -5,30 +5,39 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import { db } from "@api/db";
 import type { AppRouteHandler } from "@api/types";
 import {
-  badges,
-  childrens,
-  classes,
-  nurseries,
-  parents,
-  teachers,
+    badges,
+    childrens,
+    classes,
+    nurseries,
+    parents,
+    teachers,
 } from "@repo/database";
 
 import type {
-  CreateRoute,
-  GetByIdRoute,
-  GetByParentIdRoute,
-  ListRoute,
-  ListWithObjectsRoute,
-  RemoveRoute,
-  UpdateRoute,
+    CreateRoute,
+    GetByIdRoute,
+    GetByParentIdRoute,
+    ListRoute,
+    ListWithObjectsRoute,
+    RemoveRoute,
+    UpdateRoute,
 } from "./children.routes";
 
 // 🔍 List all childrens with optional childId filter
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const session = c.get("session");
+  const user = c.get("user");
   const { childId } = c.req.valid("query");
 
-  if (!session?.activeOrganizationId) {
+  if (!session || !user) {
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
+
+  // Allow system admins to fetch all data, or require activeOrganizationId for others
+  if (user.role !== "admin" && !session.activeOrganizationId) {
     return c.json(
       { message: HttpStatusPhrases.UNAUTHORIZED },
       HttpStatusCodes.UNAUTHORIZED
@@ -38,7 +47,9 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   const organizationId = session.activeOrganizationId;
 
   // Build where conditions
-  const whereConditions = [eq(childrens.organizationId, organizationId)];
+  const whereConditions = organizationId
+    ? [eq(childrens.organizationId, organizationId)]
+    : []; // No filter for admins - they see all
 
   // Add childId filter if provided
   if (childId) {
@@ -48,13 +59,17 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   // Fetch children filtered by the current organization ID and optionally by childId
   const results = await db.query.childrens.findMany({
     where:
-      whereConditions.length > 1 ? and(...whereConditions) : whereConditions[0],
+      whereConditions.length > 1 ? and(...whereConditions) : (whereConditions.length === 1 ? whereConditions[0] : undefined),
   });
 
+  // Get total count for pagination
+  const totalCount = await db.$count(childrens,
+    whereConditions.length > 1 ? and(...whereConditions) : (whereConditions.length === 1 ? whereConditions[0] : undefined)
+  );
+
   const page = 1; // or from query params
-  const limit = results.length; // or from query params
-  const totalCount = results.length;
-  const totalPages = Math.ceil(totalCount / limit);
+  const limit = results.length || 10; // or from query params
+  const totalPages = Math.ceil(totalCount / Math.max(limit, 1));
 
   return c.json(
     {

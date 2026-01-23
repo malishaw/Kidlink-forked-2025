@@ -14,6 +14,8 @@ import {
 } from "@repo/ui/components/card";
 import { cn } from "@repo/ui/lib/utils";
 
+import { updateUser } from "./user/user-update";
+
 type UserType = "teacher" | "parent" | "nursery-owner";
 
 interface UserTypeOption {
@@ -71,10 +73,19 @@ export function UserSelectionForm({
             : "Parent";
 
       try {
+        // Update user name and image
         await authClient.updateUser({
           name,
           image: "",
         });
+
+        // If user selected teacher, also update their role in the database
+        if (selectedUserType === "teacher") {
+          const session = await authClient.getSession();
+          if (session?.data?.user?.id) {
+            await updateUser(session.data.user.id, { role: "teacher" });
+          }
+        }
 
         if (selectedUserType === "nursery-owner") {
           // Navigate to organization setup for nursery owners
@@ -86,7 +97,7 @@ export function UserSelectionForm({
           router.push(`/join-organization?userType=${selectedUserType}`);
         }
       } catch (error) {
-        console.error("Failed to update user name", error);
+        console.error("Failed to update user", error);
       }
     }
   };

@@ -7,19 +7,28 @@ import type { AppRouteHandler } from "@api/types";
 import { parents } from "@repo/database";
 
 import type {
-  CreateRoute,
-  GetByIdRoute,
-  GetByUserIdRoute,
-  ListRoute,
-  RemoveRoute,
-  UpdateRoute,
+    CreateRoute,
+    GetByIdRoute,
+    GetByUserIdRoute,
+    ListRoute,
+    RemoveRoute,
+    UpdateRoute,
 } from "./parent.routes";
 
 // 🔍 List all parents with filtering by organization ID
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const session = c.get("session");
+  const user = c.get("user");
 
-  if (!session?.activeOrganizationId) {
+  if (!session || !user) {
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
+
+  // Allow system admins to fetch all data, or require activeOrganizationId for others
+  if (user.role !== "admin" && !session.activeOrganizationId) {
     return c.json(
       { message: HttpStatusPhrases.UNAUTHORIZED },
       HttpStatusCodes.UNAUTHORIZED
@@ -28,15 +37,21 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 
   const organizationId = session.activeOrganizationId;
 
-  // Fetch parents filtered by the current organization ID
+  // Fetch parents filtered by the current organization ID (or all if admin)
   const results = await db.query.parents.findMany({
-    where: eq(parents.organizationId, organizationId),
+    where: organizationId
+      ? eq(parents.organizationId, organizationId)
+      : undefined, // No filter for admins - they see all
   });
 
+  // Get total count for pagination
+  const totalCount = await db.$count(parents,
+    organizationId ? eq(parents.organizationId, organizationId) : undefined
+  );
+
   const page = 1; // or from query params
-  const limit = results.length; // or from query params
-  const totalCount = results.length;
-  const totalPages = Math.ceil(totalCount / limit);
+  const limit = results.length || 10; // or from query params
+  const totalPages = Math.ceil(totalCount / Math.max(limit, 1));
 
   return c.json(
     {

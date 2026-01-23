@@ -11,8 +11,17 @@ import type { ListRoute } from "./badges.routes";
 // 🔍 List all badges with filtering by organization ID
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const session = c.get("session");
+  const user = c.get("user");
 
-  if (!session?.activeOrganizationId) {
+  if (!session || !user) {
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
+
+  // Allow system admins to fetch all data, or require activeOrganizationId for others
+  if (user.role !== "admin" && !session.activeOrganizationId) {
     return c.json(
       { message: HttpStatusPhrases.UNAUTHORIZED },
       HttpStatusCodes.UNAUTHORIZED
@@ -26,12 +35,19 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   const limit = parseInt(c.req.query("limit") || "5", 10); // Reduced default to 5 items per page
   const offset = (page - 1) * limit;
 
-  // Fetch badges filtered by the current organization ID with pagination
+  // Fetch badges filtered by the current organization ID with pagination (or all if admin)
   const results = await db.query.badges.findMany({
-    where: eq(badges.organizationId, organizationId),
+    where: organizationId
+      ? eq(badges.organizationId, organizationId)
+      : undefined, // No filter for admins - they see all
     limit,
     offset,
   });
+
+  // Get total count for pagination
+  const totalCount = await db.$count(badges,
+    organizationId ? eq(badges.organizationId, organizationId) : undefined
+  );
 
   // Process results to exclude large iconUrl data if it's base64
   const processedResults = results.map((badge) => ({
@@ -42,10 +58,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
         : badge.iconUrl,
   }));
 
-  // For now, we'll use the current page results count as total count
-  // This is more efficient and prevents massive responses
-  const totalCount = processedResults.length;
-  const totalPages = totalCount < limit ? page : page + 1; // Estimate if there are more pages
+  const totalPages = Math.ceil(totalCount / Math.max(limit, 1));
 
   return c.json(
     {

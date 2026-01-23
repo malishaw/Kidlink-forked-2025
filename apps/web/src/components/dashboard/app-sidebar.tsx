@@ -125,8 +125,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   ];
 
-  // Filter documents based on organization role
+  // --- Admin specific docs ---
+  const adminDocuments = [
+    { name: "Dashboard", url: "/admin", icon: IconBuildings },
+    { name: "Nurseries", url: "/admin/nurseries", icon: IconBuildings },
+    { name: "Children", url: "/admin/children", icon: IconBuildings },
+    { name: "Parents", url: "/admin/parents", icon: IconBuildings },
+    { name: "Teachers", url: "/admin/teachers", icon: IconBuildings },
+  ];
+
+  // Filter documents based on organization role or admin path
   const filteredDocuments = React.useMemo(() => {
+    // Check if we are in admin section
+    if (pathname.startsWith("/admin")) {
+      return adminDocuments.map((d) => ({ ...d, isActive: pathname === d.url }));
+    }
+
     if (isLoadingMember || !activeMember) return [];
     const role = activeMember.role.toLowerCase();
 

@@ -37,7 +37,7 @@ export default function CreateClassForm({
 
   // Get the first (and only) nursery ID
   const nurseryId = nurseries?.[0]?.id || "";
-  const nurseryTitle = nurseries?.[0]?.title || "";
+  const nurseryTitle = nurseries?.data?.[0]?.title || "";
 
   const addTeacherId = useCallback(() => {
     const trimmed = teacherInput.trim();

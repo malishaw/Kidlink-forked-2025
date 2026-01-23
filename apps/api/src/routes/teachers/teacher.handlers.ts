@@ -18,8 +18,18 @@ import type {
 // 🔍 List all teachers with filtering by organization ID
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const session = c.get("session");
+  const user = c.get("user");
+  const { page, limit } = c.req.valid("query");
 
-  if (!session?.activeOrganizationId) {
+  if (!session || !user) {
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
+
+  // Allow system admins to fetch all data, or require activeOrganizationId for others
+  if (user.role !== "admin" && !session.activeOrganizationId) {
     return c.json(
       { message: HttpStatusPhrases.UNAUTHORIZED },
       HttpStatusCodes.UNAUTHORIZED
@@ -28,23 +38,39 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 
   const organizationId = session.activeOrganizationId;
 
-  // Fetch teachers filtered by the current organization ID
+  // Parse pagination parameters
+  const currentPage = page ? parseInt(page) : 1;
+  const currentLimit = limit ? parseInt(limit) : 10;
+  const offset = (currentPage - 1) * currentLimit;
+
+  // Build where conditions
+  let where;
+  if (organizationId) {
+    where = eq(teachers.organizationId, organizationId);
+  } else {
+    where = undefined; // No filter for admins - they see all
+  }
+
+  // Fetch teachers with pagination
   const results = await db.query.teachers.findMany({
-    where: eq(teachers.organizationId, organizationId),
+    where,
+    limit: currentLimit,
+    offset: offset,
+    orderBy: [teachers.createdAt],
   });
 
-  const page = 1; // or from query params
-  const limit = results.length; // or from query params
-  const totalCount = results.length;
-  const totalPages = Math.ceil(totalCount / limit);
+  // Get total count for pagination
+  const totalCount = await db.$count(teachers, where);
+
+  const totalPages = Math.ceil(totalCount / Math.max(currentLimit, 1));
 
   return c.json(
     {
       data: results,
       meta: {
         totalCount,
-        limit,
-        currentPage: page,
+        limit: currentLimit,
+        currentPage: currentPage,
         totalPages,
       },
     },

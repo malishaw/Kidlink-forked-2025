@@ -49,7 +49,12 @@ export default function createApp(): OpenAPIHono<AppBindings> {
     }
 
     c.set("user", session.user);
-    c.set("session", session.session);
+    // Include the full session with activeOrganizationId
+    c.set("session", {
+      ...session.session,
+      activeOrganizationId: session.session?.activeOrganizationId,
+      userId: session.user?.id
+    });
     return next();
   });
 

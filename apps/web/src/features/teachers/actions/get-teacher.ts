@@ -12,7 +12,7 @@ export const TeachersList = (params: FilterParams) => {
   const { page = 1, limit = 10, search = "", sort = "desc" } = params;
 
   const query = useQuery({
-    queryKey: ["teacher", { page, limit, search, sort }],
+    queryKey: ["teachers", { page, limit, search, sort }],
     queryFn: async () => {
       const rpcClient = await getClient();
 
@@ -20,18 +20,15 @@ export const TeachersList = (params: FilterParams) => {
         query: {
           page: page.toString(),
           limit: limit.toString(),
-          // search: search || undefined,
           sort: sort || undefined,
         },
       });
 
       if (!teachersRes.ok) {
-        const errorData = await teachersRes.json();
-        throw new Error("Failed to fetch teacher");
+        throw new Error("Failed to fetch teachers");
       }
 
       const teachers = await teachersRes.json();
-
       return teachers;
     },
   });

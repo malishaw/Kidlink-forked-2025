@@ -2,16 +2,16 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  Building2,
-  Calendar,
-  Edit3,
-  Loader2,
-  MapPin,
-  Phone,
-  Save,
-  Star,
-  Users,
-  X,
+    Building2,
+    Calendar,
+    Edit3,
+    Loader2,
+    MapPin,
+    Phone,
+    Save,
+    Star,
+    Users,
+    X,
 } from "lucide-react";
 import { useState } from "react";
 import { useGetNurseries, type Nursery } from "../actions/get-nursery-action";
@@ -33,7 +33,7 @@ export default function NurseriesPage({ nursery }: { nursery?: Nursery }) {
   const { data, isLoading, isError, error, refetch } = useGetNurseries();
 
   // If nursery prop is provided, use it; otherwise use data from query
-  const nurseries = nursery ? [nursery] : (data ?? []);
+  const nurseries = nursery ? [nursery] : (data?.data ?? []);
 
   if (isLoading) {
     return (

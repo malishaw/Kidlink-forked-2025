@@ -7,12 +7,12 @@ import type { AppRouteHandler } from "@api/types";
 import { nurseries } from "@repo/database";
 
 import type {
-  CreateRoute,
-  GetByIdRoute,
-  GetMyNurseryRoute,
-  ListRoute,
-  RemoveRoute,
-  UpdateRoute,
+    CreateRoute,
+    GetByIdRoute,
+    GetMyNurseryRoute,
+    ListRoute,
+    RemoveRoute,
+    UpdateRoute,
 } from "./nursery.routes";
 
 // Session shape placed on ctx by your auth middleware
@@ -24,24 +24,34 @@ type Session = {
 // 🔍 List ONLY nurseries created by the logged-in user (optionally scoped by org)
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const session = c.get("session") as Session | undefined;
+  const user = c.get("user");
 
-  if (!session?.userId) {
+  if (!session?.userId || !user) {
     return c.json(
       { message: HttpStatusPhrases.UNAUTHORIZED },
       HttpStatusCodes.UNAUTHORIZED
     );
   }
 
-  const where = session.activeOrganizationId
-    ? and(eq(nurseries.organizationId, session.activeOrganizationId))
-    : eq(nurseries.createdBy, session.userId);
+  let where;
+
+  // Allow admins to see all nurseries
+  if (user.role === "admin") {
+    where = undefined; // No filter for admins
+  } else if (session.activeOrganizationId) {
+    where = eq(nurseries.organizationId, session.activeOrganizationId);
+  } else {
+    where = eq(nurseries.createdBy, session.userId);
+  }
 
   const results = await db.query.nurseries.findMany({ where });
 
+  // Get total count for pagination
+  const totalCount = await db.$count(nurseries, where);
+
   // TODO: wire real pagination using query params
   const page = 1;
-  const limit = results.length;
-  const totalCount = results.length;
+  const limit = results.length || 10;
   const totalPages = Math.ceil(totalCount / Math.max(limit, 1));
 
   return c.json(
