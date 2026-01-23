@@ -11,11 +11,13 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Award,
   ChevronDown,
+  Edit,
   Eye,
   GraduationCap,
   Grid3X3,
   Table,
-  Users,
+  Trash2,
+  Users
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -824,15 +826,15 @@ export function ChildrensList() {
             {sortedChildrens.map((children: any) => (
               <div
                 key={children.id}
-                className={`group relative overflow-hidden bg-white/90 backdrop-blur-md shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 rounded-3xl cursor-pointer border border-white/50 ${viewMode === "list" ? "flex flex-row gap-6 p-6" : "p-6"}`}
+                className={`group relative overflow-hidden bg-white/90 backdrop-blur-md shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 rounded-lg cursor-pointer border border-white/50 ${viewMode === "list" ? "flex flex-row gap-6 p-6" : "p-6"}`}
                 onClick={() =>
                   router.push(`/account/manage/children/${children.id}`)
                 }
               >
                 {/* Background Gradient Effects */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/60 via-purple-50/40 to-pink-50/60"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/60 via-blue-50/40 to-blue-50/60"></div>
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full blur-2xl"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-200/20 to-transparent rounded-full blur-2xl"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-200/20 to-transparent rounded-full blur-2xl"></div>
 
                 <div className="relative z-10 space-y-6">
                   {/* Header Section */}
@@ -842,7 +844,7 @@ export function ChildrensList() {
                         <AvatarImage
                           src={children.avatar || "/placeholder.svg"}
                         />
-                        <AvatarFallback className="bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 text-white font-bold text-lg">
+                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-900 text-white font-bold text-lg">
                           {children.name
                             .split(" ")
                             .map((n: string) => n[0])
@@ -964,7 +966,7 @@ export function ChildrensList() {
                             </div>
                             <Button
                               size="sm"
-                              className="bg-gradient-to-r from-blue-400 to-purple-500 hover:from-blue-500 hover:to-purple-600 text-white shadow-sm hover:shadow-md text-xs px-3 py-1 rounded-lg flex-shrink-0"
+                              className="bg-white text-black border border-gray-200  "
                             >
                               <Eye className="h-3 w-3 mr-1" />
                               View
@@ -978,18 +980,18 @@ export function ChildrensList() {
                   {/* Action Buttons */}
                   <div className="pt-2 flex gap-3">
                     <Button
-                      className="flex-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                      className="flex-1 bg-white text-black border border-gray-200 hover:bg-gray-100 "
                       onClick={(e) => {
                         e.stopPropagation();
                         router.push(`/account/manage/children/${children.id}`);
                       }}
                     >
-                      <Eye className="h-4 w-4 mr-2" />
+                      <Eye className="" />
                       View
                     </Button>
 
                     <Button
-                      className="flex-1 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-white font-semibold py-3 rounded-xl shadow-md transition-all duration-200"
+                      className="flex-1 bg-white text-black border border-gray-200 hover:bg-blue-100 "
                       onClick={(e) => {
                         e.stopPropagation();
                         setFormData({
@@ -1011,11 +1013,12 @@ export function ChildrensList() {
                         setIsModalOpen(true);
                       }}
                     >
+                      <Edit className="" />
                       Edit
                     </Button>
 
                     <Button
-                      className="flex-1 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-semibold py-3 rounded-xl shadow-md transition-all duration-200"
+                      className="flex-1 bg-white text-black border border-gray-200 hover:bg-red-300 "
                       onClick={async (e) => {
                         e.stopPropagation();
                         if (
@@ -1036,6 +1039,7 @@ export function ChildrensList() {
                         }
                       }}
                     >
+                      <Trash2/>
                       Delete
                     </Button>
                   </div>
