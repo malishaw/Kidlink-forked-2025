@@ -1,7 +1,7 @@
 import React from "react";
 
-import { AppSidebar } from "@/components/dashboard/app-sidebar";
-import { SiteHeader } from "@/components/dashboard/site-header";
+import { AppSidebar } from "@/components/admin-dashboard/app-sidebar";
+import { SiteHeader } from "@/components/admin-dashboard/site-header";
 import { SidebarInset, SidebarProvider } from "@repo/ui/components/sidebar";
 
 type Props = {
@@ -14,7 +14,7 @@ export default function DashboardLayout({ children }: Props) {
       style={
         {
           "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)"
+          "--header-height": "calc(var(--spacing) * 12)",
         } as React.CSSProperties
       }
     >
