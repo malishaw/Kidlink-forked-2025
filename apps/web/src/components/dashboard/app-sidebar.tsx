@@ -71,11 +71,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconBuildings,
       },
       { name: "Classes", url: "/account/manage/classes", icon: IconBuildings },
-      // {
-      //   name: "Teachers",
-      //   url: "/account/manage/teachers",
-      //   icon: IconBuildings,
-      // },
+      {
+        name: "Teachers",
+        url: "/account/manage/teachers",
+        icon: IconBuildings,
+      },
       // { name: "Parents", url: "/account/manage/parents", icon: IconBuildings },
       {
         name: "Notifications",
@@ -122,7 +122,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       icon: IconBuildings,
     },
     { name: "Payments", url: "/account/parent/payment", icon: IconBuildings },
-
   ];
 
   // Filter documents based on organization role

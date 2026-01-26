@@ -51,10 +51,23 @@ export function SiginForm({
           onRequest: () => {
             setIsPending(true);
           },
-          onSuccess: () => {
+          onSuccess: async () => {
             toast.success("Signed in successfully!");
-            // Redirect to organization selection after successful sign-in
-            router.push("/organization-selection");
+            try {
+              const res = await fetch("/api/auth/get-session", {
+                credentials: "include",
+              });
+              const json = await res.json();
+              const role = json?.user?.role;
+
+              if (role === "admin") {
+                router.push("/admin/nursery");
+              } else {
+                router.push("/organization-selection");
+              }
+            } catch (err) {
+              router.push("/organization-selection");
+            }
           },
           onError: (ctx) => {
             setIsPending(false);

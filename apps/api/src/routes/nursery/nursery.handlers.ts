@@ -36,7 +36,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     ? and(eq(nurseries.organizationId, session.activeOrganizationId))
     : eq(nurseries.createdBy, session.userId);
 
-  const results = await db.query.nurseries.findMany({ where });
+  const results = await db.query.nurseries.findMany();
 
   // TODO: wire real pagination using query params
   const page = 1;

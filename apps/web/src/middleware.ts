@@ -8,7 +8,7 @@ const authRoutes = [
   "/signup",
   "/reset-password",
   "/forgot-password",
-  "/email-verified"
+  "/email-verified",
 ];
 
 const protectedRoutes = ["/admin", "/account"];
@@ -30,8 +30,8 @@ export default async function authMiddleware(request: NextRequest) {
         baseURL: request.nextUrl.origin,
         headers: {
           //get the cookie from the request
-          cookie: request.headers.get("cookie") || ""
-        }
+          cookie: request.headers.get("cookie") || "",
+        },
       }
     );
 
@@ -41,7 +41,7 @@ export default async function authMiddleware(request: NextRequest) {
       const userType = await getUserType();
 
       if (userType === "systemAdmin") {
-        return NextResponse.redirect(new URL("/admin", request.url));
+        return NextResponse.redirect(new URL("/admin/nursery", request.url));
       }
 
       if (userType === "hotelOwner" || userType === "user") {
@@ -58,12 +58,12 @@ export default async function authMiddleware(request: NextRequest) {
     // If authenticated, and trying to access '/account'
     if (session && pathname.startsWith("/account")) {
       if (session.user.role === "admin") {
-        return NextResponse.redirect(new URL("/admin", request.url));
+        return NextResponse.redirect(new URL("/admin/nursery", request.url));
       }
     }
 
     // If authenticated, and trying to access '/admin'
-    if (session && pathname.startsWith("/admin")) {
+    if (session && pathname.startsWith("/admin/nursery")) {
       const userType = await getUserType();
 
       if (userType === "systemAdmin") {
@@ -84,6 +84,6 @@ export const config = {
     // Skip Next.js internals and all static files, unless found in search params
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     // Always run for API routes
-    "/(api|trpc)(.*)"
-  ]
+    "/(api|trpc)(.*)",
+  ],
 };
