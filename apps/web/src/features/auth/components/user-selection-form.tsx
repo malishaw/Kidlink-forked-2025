@@ -57,7 +57,7 @@ export function UserSelectionForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [selectedUserType, setSelectedUserType] = useState<UserType | null>(
-    null
+    null,
   );
   const router = useRouter();
 
@@ -79,7 +79,7 @@ export function UserSelectionForm({
         if (selectedUserType === "nursery-owner") {
           // Navigate to organization setup for nursery owners
           router.push(
-            `/setup-organization?userType=${selectedUserType}&view=profile-setup`
+            `/setup-organization?userType=${selectedUserType}&view=profile-setup`,
           );
         } else {
           // Navigate to invitation input for teachers and parents
@@ -111,7 +111,7 @@ export function UserSelectionForm({
                   "relative cursor-pointer rounded-xl border-2 p-6 transition-all duration-200",
                   selectedUserType === option.type
                     ? "border-blue-500 bg-blue-50 shadow-lg"
-                    : "border-gray-200 hover:border-gray-300 hover:shadow-md"
+                    : "border-gray-200 hover:border-gray-300 hover:shadow-md",
                 )}
                 onClick={() => setSelectedUserType(option.type)}
               >
@@ -120,7 +120,7 @@ export function UserSelectionForm({
                     className={cn(
                       "flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-lg transition-all duration-200",
                       option.gradient,
-                      option.hoverGradient
+                      option.hoverGradient,
                     )}
                   >
                     {option.icon}
@@ -138,7 +138,7 @@ export function UserSelectionForm({
                       "h-6 w-6 rounded-full border-2 transition-all duration-200",
                       selectedUserType === option.type
                         ? "border-blue-500 bg-blue-500"
-                        : "border-gray-300"
+                        : "border-gray-300",
                     )}
                   >
                     {selectedUserType === option.type && (
@@ -158,7 +158,7 @@ export function UserSelectionForm({
                 "w-full max-w-md bg-gradient-to-r text-white font-semibold py-3 px-8 rounded-xl transition-all duration-200",
                 selectedUserType
                   ? "from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl"
-                  : "from-gray-400 to-gray-500 cursor-not-allowed"
+                  : "from-gray-400 to-gray-500 cursor-not-allowed",
               )}
             >
               Continue as{" "}
