@@ -164,37 +164,42 @@ export const patch: AppRouteHandler<UpdateRoute> = async (c) => {
   return c.json(updated, HttpStatusCodes.OK);
 };
 
-// 🗑️ Delete (only your own row)
+// 🗑️ Delete (only your own row, or any row if admin)
 export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const session = c.get("session") as Session | undefined;
+  const user = c.get("user") as any | undefined;
 
-  if (!session?.userId) {
+  // Admins can delete without session.userId; others require session
+  const isAdmin = user && (user.role === "admin" || user.role === "systemAdmin");
+  if (!isAdmin && !session?.userId) {
     return c.json(
       { message: HttpStatusPhrases.UNAUTHORIZED },
       HttpStatusCodes.UNAUTHORIZED
     );
   }
 
-  const where = session.activeOrganizationId
+  const where = isAdmin
+    ? eq(nurseries.id, String(id))
+    : session.activeOrganizationId
     ? and(
         eq(nurseries.id, String(id)),
         eq(nurseries.createdBy, session.userId),
         eq(nurseries.organizationId, session.activeOrganizationId)
       )
-    : and(
-        eq(nurseries.id, String(id)),
-        eq(nurseries.createdBy, session.userId)
-      );
+    : and(eq(nurseries.id, String(id)), eq(nurseries.createdBy, session.userId));
 
-  const [deleted] = await db.delete(nurseries).where(where).returning();
-
-  if (!deleted) {
+  // Ensure item exists first (avoid relying on RETURNING across adapters)
+  const item = await db.query.nurseries.findFirst({ where });
+  if (!item) {
     return c.json(
       { message: HttpStatusPhrases.NOT_FOUND },
       HttpStatusCodes.NOT_FOUND
     );
   }
+
+  // Proceed to delete
+  await db.delete(nurseries).where(where);
 
   return c.body(null, HttpStatusCodes.NO_CONTENT);
 };
