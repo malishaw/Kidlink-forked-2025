@@ -59,6 +59,13 @@ export function SiginForm({
               });
               const json = await res.json();
               const role = json?.user?.role;
+              const name = String(json?.user?.name || "").trim();
+
+              // If the user's name column is empty, redirect to user-selection
+              if (!name) {
+                router.push("/user-selection");
+                return;
+              }
 
               if (role === "admin") {
                 router.push("/admin/nursery");

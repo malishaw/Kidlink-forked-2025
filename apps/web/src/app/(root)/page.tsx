@@ -403,14 +403,14 @@ export default function Home() {
                   Start Free Trial! 💫
                 </Button>
               </Link>
-              <Link href="/contact">
+              <Link href="/contact" >
                 <Button
                   variant="outline"
                   size="lg"
                   className="border-4 border-white text-white hover:bg-white/10 font-bold text-xl px-10 py-6 rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-200"
                 >
-                  <MessageCircle className="w-6 h-6 mr-2" />
-                  Talk to Us! 💬
+                  <MessageCircle className="w-6 h-6 mr-2 text-black" />
+                  <p className="text-purple-700">Talk to Us! 💬</p>
                 </Button>
               </Link>
             </div>

@@ -35,7 +35,7 @@ export function Navbar() {
 
           {/* Navigation Links */}
           <Link
-            href="/search"
+            href="#"
             className={cn(
               "font-medium text-sm hover:underline transition-colors opacity-70 hover:opacity-100",
               isHomePage

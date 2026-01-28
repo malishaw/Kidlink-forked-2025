@@ -57,6 +57,13 @@ export default async function authMiddleware(request: NextRequest) {
 
     // If authenticated, and trying to access '/account'
     if (session && pathname.startsWith("/account")) {
+      const name = String(session.user?.name || "").trim();
+
+      // If user's name is empty, force user-selection
+      if (!name) {
+        return NextResponse.redirect(new URL("/user-selection", request.url));
+      }
+
       if (session.user.role === "admin") {
         return NextResponse.redirect(new URL("/admin/nursery", request.url));
       }
